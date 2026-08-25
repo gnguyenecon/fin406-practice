@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>FIN 406 &middot; Quiz 1 Practice Set</title>
+<style>
+  :root{
+    --navy:#1E407C; --navy-dk:#001E44; --ink:#1a1a1a; --muted:#5a6472;
+    --line:#d7dce3; --bg:#f6f7f9; --card:#fff;
+    --ok:#1b6e3c; --ok-bg:#e8f5ec; --bad:#9b1c1c; --bad-bg:#fdeaea;
+    --warn:#8a5a00; --warn-bg:#fff5e0;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:16px/1.55 "Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif}
+  .wrap{max-width:880px;margin:0 auto;padding:24px 18px 64px}
+  header.top{background:var(--navy);color:#fff;border-radius:10px;padding:22px 24px;margin-bottom:18px}
+  header.top h1{margin:0 0 4px;font-size:1.5rem}
+  header.top .sub{opacity:.92;font-size:.95rem}
+  header.top .dates{margin-top:12px;font-size:.9rem;opacity:.95;
+       border-top:1px solid rgba(255,255,255,.28);padding-top:10px}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:10px;
+         padding:18px 20px;margin-bottom:18px}
+  .panel h2{margin:0 0 8px;font-size:1.05rem;color:var(--navy-dk)}
+  ul.tight{margin:.4rem 0 .2rem;padding-left:1.15rem}
+  ul.tight li{margin:.25rem 0}
+  code.u{background:#eef1f6;padding:1px 6px;border-radius:4px;font-size:.92em}
+
+  .scorebar{position:sticky;top:0;z-index:5;background:var(--card);border:1px solid var(--line);
+       border-radius:10px;padding:10px 16px;margin-bottom:18px;display:flex;align-items:center;
+       gap:14px;flex-wrap:wrap;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+  .track{flex:1 1 180px;height:8px;background:#e6e9ee;border-radius:99px;overflow:hidden;min-width:140px}
+  .fill{height:100%;width:0;background:var(--navy);transition:width .3s}
+
+  .q{background:var(--card);border:1px solid var(--line);border-radius:10px;
+     padding:18px 20px;margin-bottom:16px}
+  .q > header{display:flex;align-items:baseline;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+  .qn{font-weight:700;color:var(--navy);font-size:1.02rem}
+  .tag{font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);
+       border:1px solid var(--line);border-radius:99px;padding:2px 9px}
+  .stem{margin:0 0 4px}
+  .req{font-weight:700;color:var(--navy-dk);margin:14px 0 2px}
+
+  table.data{border-collapse:collapse;margin:10px 0 6px;font-size:.94rem}
+  table.data th,table.data td{border:1px solid var(--line);padding:5px 12px;text-align:right}
+  table.data th{background:#eef1f6;text-align:center}
+  table.data td:first-child,table.data th:first-child{text-align:left}
+
+  .part{margin:12px 0 0;padding-left:2px}
+  .part.concept{margin-top:16px;padding:12px 14px;background:#f2f6fb;
+       border:1px solid #cfdcec;border-left:4px solid var(--navy);border-radius:6px}
+  .concept-k{color:var(--navy);letter-spacing:.02em}
+  .part .ask{margin:0 0 6px}
+  .part .ask .k{font-weight:700}
+  .note{font-size:.86rem;color:#a03; margin:.15rem 0 .4rem}
+  .row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .row label.cap{font-size:.93rem;color:var(--muted);min-width:190px}
+  .row input[type=text]{width:130px;padding:7px 9px;font-size:1rem;font-family:inherit;
+       border:1.5px solid var(--line);border-radius:6px;background:#fff;text-align:right}
+  .row input:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(30,64,124,.13)}
+  .row .unit{font-size:.92rem;color:var(--muted)}
+  .row.ok input{border-color:var(--ok);background:var(--ok-bg)}
+  .row.bad input{border-color:var(--bad);background:var(--bad-bg)}
+  .yn{display:flex;gap:18px;align-items:center}
+  .yn label{font-size:.95rem;display:flex;gap:5px;align-items:center;cursor:pointer}
+
+  .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+  button{font:inherit;font-size:.92rem;padding:7px 14px;border-radius:6px;
+         border:1.5px solid var(--navy);background:var(--navy);color:#fff;cursor:pointer}
+  button.ghost{background:#fff;color:var(--navy)}
+  button:hover{filter:brightness(1.08)}
+  button:focus-visible{outline:3px solid rgba(30,64,124,.35);outline-offset:2px}
+
+  .fb{margin-top:12px;padding:11px 14px;border-radius:8px;font-size:.95rem;display:none}
+  .fb.show{display:block}
+  .fb.ok{background:var(--ok-bg);border:1px solid #b9dfc7;color:var(--ok)}
+  .fb.bad{background:var(--bad-bg);border:1px solid #f0c2c2;color:var(--bad)}
+  .fb.warn{background:var(--warn-bg);border:1px solid #f0dcae;color:var(--warn)}
+  .fb.hint{background:#eef1f6;border:1px solid var(--line);color:var(--ink)}
+
+  .sol{display:none;margin-top:12px;padding:14px 16px;background:#fbfcfd;border:1px solid var(--line);
+       border-left:4px solid var(--navy);border-radius:6px;font-size:.95rem}
+  .sol.show{display:block}
+  .sol h4{margin:0 0 8px;font-size:.95rem;color:var(--navy-dk)}
+  .sol p{margin:.4rem 0}
+  .sol .ans{color:var(--navy-dk)}
+  .sol .lbl{font-weight:700}
+
+  footer.foot{color:var(--muted);font-size:.87rem;text-align:center;margin-top:26px}
+
+  @media print{
+    body{background:#fff}
+    .btns,.scorebar{display:none}
+    .sol{display:block}
+    .q{break-inside:avoid;border-color:#999}
+    header.top{background:#fff;color:#000;border:1px solid #000}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>FIN 406 &middot; Quiz 1 Practice Set</h1>
+  <div class="sub">Measuring investment returns &middot; Leveraged trading strategies &middot; Expected return and risk</div>
+  <div class="dates">Material cutoff: Thursday 3 September &nbsp;|&nbsp; Quiz 1: Tuesday 8 September</div>
+</header>
+
+<div class="panel">
+  <h2>How to use this set</h2>
+  <p>Work each problem on paper with your financial calculator, then type your answers and press
+     <b>Check</b>.</p>
+  <p><b>New numbers</b> regenerates a problem with different values. <b>Explanation</b> shows the
+     full working for the numbers currently on screen.</p>
+  <p>The shaded <b>Concept check</b> at the end of a problem is to help improve your conceptual understanding of the problem.</p>
+  <p>If you spot an error in any of the solutions, please email me (gxn13@psu.edu) as soon as possible and include a screenshot. The numbers change every time a problem is regenerated, so without one I cannot see the version you were looking at.</p>
+  <h2 style="margin-top:14px">Before you start</h2>
+  <ul class="tight">
+    <li>Percent boxes take percent: type <code class="u">10.97</code>, not <code class="u">0.1097</code>.</li>
+    <li>Dollar boxes take a plain number: <code class="u">12500</code> or <code class="u">12,500</code>.</li>
+    <li>Negative answers may be typed either way: <code class="u">-51.94</code> or <code class="u">(51.94)</code>.</li>
+    <li>Do not round intermediate calculations. Round final answers to 2 decimal places.</li>
+  </ul>
+</div>
+
+<div class="scorebar">
+  Progress
+  <div class="track"><div class="fill" id="fill"></div></div>
+  <span id="scoretext"></span>
+  <button class="ghost" id="resetall" style="margin-left:auto">Reset all</button>
+</div>
+
+<div id="quiz"></div>
+
+<footer class="foot">
+  FIN 406: Security Analysis and Portfolio Management &middot; Prof. Nguyen &middot; Fall 2026
+</footer>
+</div>
+
+<script>
+/* =================== helpers =================== */
+const ri   = (a,b) => Math.floor(Math.random()*(b-a+1))+a;
+const pick = a => a[Math.floor(Math.random()*a.length)];
+const d2   = x => (Math.round(x*100)/100).toFixed(2);
+const cur  = x => x.toLocaleString('en-US',{minimumFractionDigits:0, maximumFractionDigits:2});
+const cur2 = x => x.toLocaleString('en-US',{minimumFractionDigits:2, maximumFractionDigits:2});
+const pc   = x => d2(x)+'%';
+
+/* Each generator returns {tag, stem, parts[], explain[]}
+   part = {key,label,unit,ans,tol}            numeric
+        | {key,label,type:'yesno',ansYes}     yes/no                                     */
+const PROBLEMS = [
+
+/* 1 — buying on margin, own funds + borrowed funds ------------------ */
+function marginBuy(){
+  const P0 = pick([10,12,15,20,25,30,40]);
+  const own = pick([1000,2000,2500,5000]);
+  const borrow = own;                       // 50% initial margin, as in the original
+  const invest = own + borrow;
+  const shares = invest / P0;
+  const i = ri(50,110)/10;                  // 5.0 .. 11.0 %
+  const g = ri(5,20);                       // price rises g%
+  const mm = pick([25,30,35]);
+  const ret = (invest*g/100 - borrow*i/100) / own * 100;
+  const call = borrow / (shares*(1-mm/100));
+  return {
+    tag:'Buying on margin',
+    stem:`You are bullish on Harborline Energy stock. The current market price is $${cur(P0)} per
+          share, and you have $${cur(own)} of your own to invest. You borrow an additional
+          $${cur(borrow)} from your broker at an interest rate of ${d2(i)}% per year and
+          invest $${cur(invest)} in the stock.`,
+    parts:[
+      {key:'a', ask:`What will be your rate of return if the price of Harborline Energy stock goes up by
+              ${g}% during the next year? (Assume the stock pays no dividend.)`,
+       note:'Round your answer to 2 decimal places.',
+       label:'Rate of return', unit:'%', ans:ret, tol:0.01},
+      {key:'b', ask:`What is the price below which you will receive a margin call, if the maintenance
+              margin is ${mm}%?`,
+       note:'Round your answer to 2 decimal places.',
+       label:'Stock price falls below', unit:'$', ans:call, tol:0.01}
+    ],
+    explain:[
+      `<span class="lbl">a.</span> Your initial investment is $${cur(own)} of equity plus $${cur(borrow)}
+       borrowed, which buys $${cur(invest)} &divide; $${cur(P0)} = ${cur(shares)} shares.`,
+      `The shares increase in value by ${g}%: $${cur(invest)} &times; ${(g/100).toFixed(2)} = $${cur2(invest*g/100)}.`,
+      `You pay interest of $${cur(borrow)} &times; ${(i/100).toFixed(4)} = $${cur2(borrow*i/100)}.`,
+      `Rate of return = ($${cur2(invest*g/100)} &minus; $${cur2(borrow*i/100)}) &divide; $${cur(own)}
+       = <span class="ans">${pc(ret)}</span>`,
+      `<span class="lbl">b.</span> The value of the ${cur(shares)} shares is ${cur(shares)}P.
+       Equity is (${cur(shares)}P &minus; $${cur(borrow)}), and the required margin is ${mm}%.`,
+      `Solving (${cur(shares)}P &minus; $${cur(borrow)}) &divide; ${cur(shares)}P = ${(mm/100).toFixed(2)},
+       we get P = <span class="ans">$${d2(call)}</span>.`,
+      `You will receive a margin call when the stock price falls below $${d2(call)}.`
+    ]
+  };
+},
+
+/* 2 — short sale with a dividend ------------------------------------ */
+function shortWithDividend(){
+  const N  = pick([100,200,500,1000]);
+  const P0 = pick([40,50,60,70,80]);
+  const m  = pick([0.50,0.60]);
+  const P1 = P0 + ri(8,25);
+  const D  = pick([2,4,5,10]);
+  const mm = pick([25,30,35]);
+  const initEq = m*N*P0;
+  const assets = N*P0 + initEq;
+  const endEq  = assets - N*P1 - N*D;
+  const marg   = endEq/(N*P1)*100;
+  const callYes = marg < mm;
+  const ret = (endEq-initEq)/initEq*100;
+  return {
+    tag:'Short sale with dividend',
+    stem:`Calderwood Capital opened an account to short-sell ${cur(N)} shares of
+          Solstice Media at $${cur(P0)} per share. The initial margin requirement was
+          ${(m*100).toFixed(0)}%. (The margin account pays no interest.) A year later, the price
+          of Solstice Media has risen from $${cur(P0)} to $${cur2(P1)}, and the stock has paid
+          a dividend of $${cur2(D)} per share.`,
+    parts:[
+      {key:'a', ask:'What is the remaining equity in the account at the end of the year?',
+       label:'Remaining margin', unit:'$', ans:endEq, tol:1},
+      {key:'b-1', ask:'What is the margin on the short position (in %)?',
+       note:'Round your answer to 2 decimal places.',
+       label:'Short margin', unit:'%', ans:marg, tol:0.01},
+      {key:'b-2', ask:`If the maintenance margin requirement is ${mm}%, will Calderwood
+              receive a margin call?`, type:'yesno', ansYes:callYes},
+      {key:'c', ask:`What is the rate of return on the short sale, assuming that Calderwood Capital
+              closes out the position after one year?`,
+       note:'Indicate a negative value with a minus sign. Round to 2 decimal places.',
+       label:'Rate of return', unit:'%', ans:ret, tol:0.01}
+    ],
+    explain:[
+      `<span class="lbl">a.</span> The initial margin (equity) was $${cur(P0)} &times; ${cur(N)} &times;
+       ${m.toFixed(2)} = $${cur2(initEq)}.`,
+      `Assets = short-sale proceeds + initial margin deposit = $${cur2(N*P0)} + $${cur2(initEq)}
+       = $${cur2(assets)}.`,
+      `Value of shares owed = $${cur2(N*P1)} when the stock price is $${cur2(P1)}.`,
+      `The short seller also owes the dividend to the lender of the shares:
+       $${cur2(D)} &times; ${cur(N)} = $${cur2(N*D)}.`,
+      `Remaining equity = $${cur2(assets)} &minus; $${cur2(N*P1)} &minus; $${cur2(N*D)}
+       = <span class="ans">$${cur2(endEq)}</span>`,
+      `<span class="lbl">b.</span> Margin on short position = equity &divide; value of shares owed
+       = $${cur2(endEq)} &divide; $${cur2(N*P1)} = <span class="ans">${pc(marg)}</span>`,
+      `Because the percentage margin is ${callYes?'below':'above'} the maintenance level of ${mm}%,
+       there <span class="ans">${callYes?'will':'will not'}</span> be a margin call.`,
+      `<span class="lbl">c.</span> Rate of return = (ending equity &minus; initial equity) &divide;
+       initial equity = ($${cur2(endEq)} &minus; $${cur2(initEq)}) &divide; $${cur2(initEq)}
+       = <span class="ans">${pc(ret)}</span>`
+    ]
+  };
+},
+
+/* 3 — margin purchase, loan stated in dollars ----------------------- */
+function marginLoanStated(){
+  let N, P0, cost, L, i, P1, mm, eq0, owed, val1, eq1, marg;
+  do {                       // keep the account solvent and the margin in a teachable range
+    N  = pick([100,200,300,400]);
+    P0 = pick([36,40,44,50,55,60]);
+    cost = N*P0;
+    L  = Math.round(cost*pick([0.45,0.47,0.5,0.55])/10)*10;
+    i  = pick([6,8,10,12]);
+    P1 = P0 - ri(6,16);
+    mm = pick([25,30,35]);
+    eq0 = cost - L;
+    owed = L*(1+i/100);
+    val1 = N*P1;
+    eq1 = val1 - owed;
+    marg = eq1/val1*100;
+  } while (!(marg > 8 && marg < 60));
+  const callYes = marg < mm;
+  const ret = (eq1-eq0)/eq0*100;
+  return {
+    tag:'Margin purchase, stated loan',
+    stem:`Priya Raman opens a brokerage account and purchases ${cur(N)} shares of
+          Ridgeway Foods at $${cur(P0)} per share. She borrows $${cur(L)} from her
+          broker to help pay for the purchase. The interest rate on the loan is ${i}%.`,
+    parts:[
+      {key:'a', ask:'What is the equity in Raman&rsquo;s account when she first purchases the stock?',
+       label:'Margin', unit:'$', ans:eq0, tol:1},
+      {key:'b', ask:`If the share price falls to $${cur(P1)} per share by the end of the year,
+              what is the equity in her account (after the broker adds the interest expense for the
+              year onto the loan balance)?`,
+       label:'Remaining margin', unit:'$', ans:eq1, tol:1},
+      {key:'c', ask:'What percentage margin does she then have in the account?',
+       note:'Round your answer to 2 decimal places.',
+       label:'Percentage margin', unit:'%', ans:marg, tol:0.01},
+      {key:'d', ask:`If the maintenance margin requirement is ${mm}%, will she receive a margin
+              call?`, type:'yesno', ansYes:callYes},
+      {key:'e', ask:`What is the rate of return on her investment if she closes out her position at the
+              end of the year?`,
+       note:'Indicate a negative value with a minus sign. Round to 2 decimal places.',
+       label:'Rate of return', unit:'%', ans:ret, tol:0.01}
+    ],
+    explain:[
+      `<span class="lbl">a.</span> The stock is purchased for $${cur(P0)} &times; ${cur(N)} shares
+       = $${cur2(cost)}. With $${cur(L)} borrowed, her equity is
+       $${cur2(cost)} &minus; $${cur(L)} = <span class="ans">$${cur2(eq0)}</span>`,
+      `<span class="lbl">b.</span> The loan grows to principal &times; (1 + interest rate)
+       = $${cur(L)} &times; ${(1+i/100).toFixed(2)} = $${cur2(owed)}.`,
+      `The value of the stock falls to $${cur(P1)} &times; ${cur(N)} shares = $${cur2(val1)}.`,
+      `Equity = $${cur2(val1)} &minus; $${cur2(owed)} = <span class="ans">$${cur2(eq1)}</span>`,
+      `<span class="lbl">c.</span> Percentage margin on a long position = equity &divide; value of
+       the position = $${cur2(eq1)} &divide; $${cur2(val1)} = <span class="ans">${pc(marg)}</span>.
+       Note the denominator: it is the current market value of the shares, not the original purchase
+       price and not the amount of her own money.`,
+      `<span class="lbl">d.</span> That margin is ${callYes?'below':'above'} the ${mm}% maintenance
+       requirement, so she <span class="ans">${callYes?'will':'will not'}</span> receive a margin
+       call.`,
+      `<span class="lbl">e.</span> The dollar return equals the change in equity, since the ending
+       equity already reflects the interest: $${cur2(eq1)} &minus; $${cur2(eq0)} = $${cur2(eq1-eq0)}.`,
+      `Rate of return = $${cur2(eq1-eq0)} &divide; $${cur2(eq0)} = <span class="ans">${pc(ret)}</span>`
+    ]
+  };
+},
+
+/* 4 — scenario distribution ----------------------------------------- */
+function scenarioDist(){
+  const p1 = ri(20,40)/100, p2 = ri(30,45)/100;
+  const p3 = Math.round((1-p1-p2)*1000)/1000;
+  const r1 = ri(240,380)/10, r2 = ri(50,120)/10, r3 = -ri(120,260)/10;
+  const P = [p1,p2,p3], R = [r1,r2,r3];
+  const er = P[0]*R[0]+P[1]*R[1]+P[2]*R[2];
+  const dev = R.map(x=>x-er);
+  const va = P[0]*dev[0]**2 + P[1]*dev[1]**2 + P[2]*dev[2]**2;
+  const sd = Math.sqrt(va);
+  const rows = ['Boom','Normal growth','Recession'].map((s,k)=>
+    `<tr><td>${s}</td><td>${k+1}</td><td>${P[k].toFixed(3)}</td><td>${d2(R[k])}%</td></tr>`).join('');
+  const calc = ['Boom','Normal growth','Recession'].map((s,k)=>
+    `<tr><td>${s}</td><td>${P[k].toFixed(3)}</td><td>${d2(R[k])}%</td><td>${d2(dev[k])}%</td>
+      <td>${(dev[k]**2/10000).toFixed(9)}</td><td>${(P[k]*dev[k]**2/10000).toFixed(9)}</td></tr>`).join('');
+  return {
+    tag:'Expected return and risk',
+    stem:`The following data represent the probability distribution of the holding period returns for
+      an investment in Alder Creek Brewing (ACB) stock.
+      <table class="data">
+        <tr><th>State of the Economy</th><th>Scenario</th><th>Probability, p(s)</th><th>HPR</th></tr>
+        ${rows}
+      </table>`,
+    parts:[
+      {key:'a', ask:'What is the expected return on ACB?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Expected return', unit:'%', ans:er, tol:0.5},
+      {key:'b', ask:'What is the standard deviation of the returns on ACB?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Standard deviation', unit:'%', ans:sd, tol:0.5}
+    ],
+    explain:[
+      `<span class="lbl">a.</span> E(r) = &Sigma; p(s) r(s)
+       = ${P[0].toFixed(3)} &times; ${d2(R[0])}% + ${P[1].toFixed(3)} &times; ${d2(R[1])}%
+       + ${P[2].toFixed(3)} &times; (${d2(R[2])}%) = <span class="ans">${pc(er)}</span>`,
+      `<span class="lbl">b.</span> The standard deviation is the square root of the variance, where
+       VAR(r) = &Sigma; p(s)[r(s) &minus; E(r)]&sup2;. Setting it out in a table:
+       <table class="data">
+         <tr><th>(1) State</th><th>(2) p(s)</th><th>(3) HPR</th><th>(4) HPR &minus; E(r)</th>
+             <th>(5) (4) squared</th><th>(6) (2) &times; (5)</th></tr>
+         ${calc}
+       </table>`,
+      `VAR = sum of column (6) = ${(va/10000).toFixed(9)} &nbsp;(that is ${d2(va)} in percent squared)`,
+      `SD = &radic;VAR = <span class="ans">${pc(sd)}</span>`
+    ]
+  };
+},
+
+/* 5 — HPR over a sub-annual period, then APR and EAR ---------------- */
+function hprAprEar(){
+  const months = pick([3,4,6]);
+  const paid = ri(1200,2400);
+  const hprPct = ri(60,180)/10;             // 6.0 .. 18.0 %
+  const sold = Math.round(paid*(1+hprPct/100));
+  const hpr = (sold-paid)/paid*100;         // recompute from the rounded price
+  const n = 12/months;
+  const apr = hpr*n;
+  const ear = (Math.pow(1+hpr/100, n)-1)*100;
+  const earCont = (Math.exp(apr/100)-1)*100;      // same APR, compounded continuously
+  return {
+    tag:'HPR, APR and EAR',
+    stem:`You invested in a security for ${months} months. You initially paid
+          $${cur(paid)} for it. When you sold the investment, it was worth
+          $${cur(sold)}.`,
+    parts:[
+      {key:'a', ask:'What is the holding-period return (HPR) on your investment?',
+       note:'Round your answer to 2 decimal places.',
+       label:'HPR', unit:'%', ans:hpr, tol:0.01},
+      {key:'b', ask:'What is the annual percentage rate (APR)?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'APR', unit:'%', ans:apr, tol:0.02},
+      {key:'c', ask:'What is the effective annual rate (EAR)?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'EAR', unit:'%', ans:ear, tol:0.02},
+      {key:'d', ask:`A bank offers you an account paying the same APR, but compounded continuously
+              rather than every ${months} months. What effective annual rate would that account earn?`,
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'EAR, continuous', unit:'%', ans:earCont, tol:0.02}
+    ],
+    explain:[
+      `<span class="lbl">a.</span> HPR = ($${cur(sold)} &minus; $${cur(paid)}) &divide; $${cur(paid)}
+       = <span class="ans">${pc(hpr)}</span>`,
+      `<span class="lbl">b.</span> That HPR is for ${months} months. The APR is the ${months}-month rate
+       times the number of ${months}-month periods in a year, n = 12 &divide; ${months} = ${n}.`,
+      `APR = ${pc(hpr)} &times; ${n} = <span class="ans">${pc(apr)}</span>.
+       Note that this is a simple multiplication &mdash; the APR does not compound.`,
+      `<span class="lbl">c.</span> 1 + EAR = (1 + APR/n)<sup>n</sup>
+       = (1 + ${(apr/100/n).toFixed(6)})<sup>${n}</sup> = ${(1+ear/100).toFixed(4)}`,
+      `EAR = ${(1+ear/100).toFixed(4)} &minus; 1 = <span class="ans">${pc(ear)}</span>.
+       The EAR exceeds the APR because it reflects compounding across the ${n} periods.`,
+      `<span class="lbl">d.</span> With continuous compounding the periodic formula is replaced by
+       1 + EAR = e<sup>APR</sup>, so EAR = e<sup>${(apr/100).toFixed(6)}</sup> &minus; 1
+       = ${(1+earCont/100).toFixed(4)} &minus; 1 = <span class="ans">${pc(earCont)}</span>`,
+      `Continuous compounding is the limit of the periodic formula as n grows without bound, so it
+       always gives the largest effective rate that a given APR can produce. Here the same APR of
+       ${pc(apr)} is worth ${pc(ear)} compounded ${n} times a year and ${pc(earCont)} compounded
+       continuously. Use e<sup>APR</sup> &minus; 1 only when the problem says continuous; otherwise
+       use the periodic formula with the n the problem gives you.`
+    ]
+  };
+},
+
+/* 6 — multi-year price and dividend history ------------------------- */
+function priceDividendHistory(){
+  const y0 = pick([2020,2021,2022]);
+  const D  = pick([2,3,4,5]);
+  const p  = [pick([80,90,100,110])];
+  p.push(p[0] + ri(5,20));
+  p.push(p[1] - ri(10,28));
+  p.push(p[2] + ri(2,14));
+  const r = [];
+  for(let k=0;k<3;k++) r.push((p[k+1]-p[k]+D)/p[k]*100);
+  const arith = (r[0]+r[1]+r[2])/3;
+  let prod = 1; r.forEach(x=>prod*=(1+x/100));
+  const geo = (Math.pow(prod,1/3)-1)*100;
+  const rows = p.map((pr,k)=>
+    `<tr><td>${y0+k}</td><td>$${cur(pr)}</td><td>$${cur(D)}</td></tr>`).join('');
+  const work = r.map((x,k)=>
+    `<p>${y0+k} to ${y0+k+1}: ($${cur(p[k+1])} &minus; $${cur(p[k])} + $${cur(D)}) &divide; $${cur(p[k])}
+      = ${(x/100).toFixed(4)} or ${pc(x)}</p>`).join('');
+  return {
+    tag:'Arithmetic vs geometric average',
+    stem:`Kestrel Industries stock price and dividend history are as follows:
+      <table class="data">
+        <tr><th>Year</th><th>Beginning-of-Year Price</th><th>Dividend Paid at Year-End</th></tr>
+        ${rows}
+      </table>
+      An investor buys three shares of Kestrel Industries at the beginning of ${y0} and sells the shares at the
+      beginning of ${y0+3}.`,
+    parts:[
+      {key:'a', ask:'What is the arithmetic time-weighted average rate of return?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Arithmetic average', unit:'%', ans:arith, tol:0.01},
+      {key:'b', ask:'What is the geometric time-weighted average rate of return?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Geometric average', unit:'%', ans:geo, tol:0.01}
+    ],
+    explain:[
+      `Each year&rsquo;s return = (capital gain + dividend) &divide; beginning price:`,
+      work,
+      `<span class="lbl">a.</span> Arithmetic mean =
+       [${(r[0]/100).toFixed(4)} + (${(r[1]/100).toFixed(4)}) + ${(r[2]/100).toFixed(4)}] &divide; 3
+       = <span class="ans">${pc(arith)}</span>`,
+      `<span class="lbl">b.</span> Geometric mean =
+       &#8731;[(1 + ${(r[0]/100).toFixed(4)}) &times; (1 + ${(r[1]/100).toFixed(4)}) &times;
+       (1 + ${(r[2]/100).toFixed(4)})] &minus; 1 = <span class="ans">${pc(geo)}</span>`,
+      `The geometric average is the lower of the two, and always is unless every annual return is
+       identical.`
+    ]
+  };
+},
+
+/* 7 — short sale, margin required and call price -------------------- */
+function shortBasics(){
+  const N  = pick([100,200,300,500]);
+  const P0 = pick([25,28,31,35,42,50]);
+  const m  = pick([0.50,0.60]);
+  const mm = pick([25,30,35]);
+  const cash = m*N*P0;
+  const assets = N*P0 + cash;
+  const call = assets/(N*(1+mm/100));
+  return {
+    tag:'Short sale mechanics',
+    stem:`You are bearish on Thornbury Mining and decide to sell short ${cur(N)} shares at the
+          current market price of $${cur(P0)} per share.`,
+    parts:[
+      {key:'a', ask:`How much in cash must you put into your brokerage account if the broker&rsquo;s
+              initial margin requirement is ${(m*100).toFixed(0)}% of the value of the short
+              position?`,
+       label:'Cash required', unit:'$', ans:cash, tol:1},
+      {key:'b', ask:`How high can the price of the stock go before you get a margin call if the
+              maintenance margin is ${mm}% of the value of the short position?`,
+       note:'Round your answer to 2 decimal places.',
+       label:'Price reaches', unit:'$', ans:call, tol:0.01}
+    ],
+    explain:[
+      `<span class="lbl">a.</span> The value of the short position is ${cur(N)} &times; $${cur(P0)}
+       = $${cur2(N*P0)}. Initial margin is ${(m*100).toFixed(0)}% of that
+       = <span class="ans">$${cur2(cash)}</span>`,
+      `<span class="lbl">b.</span> Total assets are $${cur2(assets)}
+       ($${cur2(N*P0)} from the sale of the stock and $${cur2(cash)} put up for margin).
+       Liabilities are ${cur(N)}P, so net worth is ($${cur2(assets)} &minus; ${cur(N)}P).`,
+      `Solving ($${cur2(assets)} &minus; ${cur(N)}P) &divide; ${cur(N)}P = ${(mm/100).toFixed(2)},
+       we get P = <span class="ans">$${d2(call)}</span>.`,
+      `A margin call will be issued when the stock price reaches $${d2(call)} or higher.`
+    ]
+  };
+},
+
+/* 8 — return decomposition and the real return ---------------------- */
+function returnDecomposition(){
+  const P0 = pick([60,75,80,90,100,120]);
+  const D  = pick([2,2.5,3,4,5]);
+  const P1 = P0 + ri(-12,25);
+  const inf = ri(15,55)/10;
+  const dy = D/P0*100, cg = (P1-P0)/P0*100, hpr = dy+cg;
+  const real = ((1+hpr/100)/(1+inf/100)-1)*100;
+  return {
+    tag:'Return decomposition',
+    stem:`A year ago you bought Marlow Chemical at $${cur2(P0)} per share. During the year the
+          company paid a dividend of $${cur2(D)} per share, and today the share price is
+          $${cur2(P1)}. Inflation over the year was ${d2(inf)}%.`,
+    parts:[
+      {key:'a', ask:'What is the dividend yield?',
+       note:'Round your answer to 2 decimal places.',
+       label:'Dividend yield', unit:'%', ans:dy, tol:0.01},
+      {key:'b', ask:'What is the capital gain yield?',
+       note:'Round your answer to 2 decimal places.',
+       label:'Capital gain yield', unit:'%', ans:cg, tol:0.01},
+      {key:'c', ask:'What is the holding period return?',
+       note:'Round your answer to 2 decimal places.',
+       label:'HPR', unit:'%', ans:hpr, tol:0.01},
+      {key:'d', ask:'What was your real rate of return over the year?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Real return', unit:'%', ans:real, tol:0.02}
+    ],
+    explain:[
+      `<span class="lbl">a.</span> Dividend yield = D &divide; P<sub>beg</sub>
+       = $${cur2(D)} &divide; $${cur2(P0)} = <span class="ans">${pc(dy)}</span>`,
+      `<span class="lbl">b.</span> Capital gain yield = (P<sub>end</sub> &minus; P<sub>beg</sub>)
+       &divide; P<sub>beg</sub> = ($${cur2(P1)} &minus; $${cur2(P0)}) &divide; $${cur2(P0)}
+       = <span class="ans">${pc(cg)}</span>`,
+      `<span class="lbl">c.</span> HPR = (P<sub>end</sub> &minus; P<sub>beg</sub> + D) &divide;
+       P<sub>beg</sub> = <span class="ans">${pc(hpr)}</span>. Note that the two yields always sum to
+       the HPR: ${pc(dy)} + ${pc(cg)} = ${pc(hpr)}.`,
+      `<span class="lbl">d.</span> 1 + r<sub>real</sub> = (1 + r<sub>nominal</sub>) &divide; (1 + i)
+       = ${(1+hpr/100).toFixed(4)} &divide; ${(1+inf/100).toFixed(4)} = ${((1+hpr/100)/(1+inf/100)).toFixed(4)}`,
+      `r<sub>real</sub> = <span class="ans">${pc(real)}</span>. The quick approximation
+       ${pc(hpr)} &minus; ${pc(inf)} = ${pc(hpr-inf)} is close, but this course uses the exact form.`
+    ]
+  };
+},
+
+/* 9 — risk premium and the Sharpe ratio ----------------------------- */
+function sharpeCompare(){
+  const rf = ri(20,45)/10;
+  const erA = rf + ri(30,80)/10, sdA = ri(80,130)/10;
+  const erB = erA + ri(15,50)/10, sdB = sdA + ri(40,110)/10;
+  const sA = (erA-rf)/sdA, sB = (erB-rf)/sdB;
+  return {
+    tag:'Risk premium and Sharpe ratio',
+    stem:`A client is choosing between two funds. The risk-free rate is ${d2(rf)}%.
+      <table class="data">
+        <tr><th>Fund</th><th>E(r)</th><th>&sigma;</th></tr>
+        <tr><td>Redwood</td><td>${d2(erA)}%</td><td>${d2(sdA)}%</td></tr>
+        <tr><td>Sterling</td><td>${d2(erB)}%</td><td>${d2(sdB)}%</td></tr>
+      </table>`,
+    parts:[
+      {key:'a', ask:'What is the risk premium on Redwood?',
+       note:'Round your answer to 2 decimal places.',
+       label:'Risk premium, Redwood', unit:'%', ans:erA-rf, tol:0.01},
+      {key:'b', ask:'What is the Sharpe ratio of Redwood?',
+       note:'Round your answer to 2 decimal places.',
+       label:'Sharpe ratio, Redwood', unit:'', ans:sA, tol:0.01},
+      {key:'c', ask:'What is the Sharpe ratio of Sterling?',
+       note:'Round your answer to 2 decimal places.',
+       label:'Sharpe ratio, Sterling', unit:'', ans:sB, tol:0.01},
+      {key:'d', ask:'Which fund is more likely to suit a risk-averse client?',
+       type:'yesno', yesLabel:'Redwood', noLabel:'Sterling', ansYes: sA > sB}
+    ],
+    explain:[
+      `<span class="lbl">a.</span> Risk premium = E(r) &minus; r<sub>f</sub>
+       = ${d2(erA)}% &minus; ${d2(rf)}% = <span class="ans">${pc(erA-rf)}</span>.
+       It is a difference in returns, not a ratio.`,
+      `<span class="lbl">b.</span> Sharpe ratio for Redwood = (${d2(erA)} &minus; ${d2(rf)})
+       &divide; ${d2(sdA)} = <span class="ans">${d2(sA)}</span>`,
+      `<span class="lbl">c.</span> Sharpe ratio for Sterling = (${d2(erB)} &minus; ${d2(rf)})
+       &divide; ${d2(sdB)} = <span class="ans">${d2(sB)}</span>`,
+      `<span class="lbl">d.</span> <span class="ans">${sA>sB?'Redwood':'Sterling'}</span> suits the
+       client better: it delivers more risk premium per unit of risk. Note that Sterling has the
+       higher expected return, and that alone does not settle the question. Choosing purely on
+       expected return is risk neutrality; a risk-averse client demands compensation for the extra
+       &sigma;.`
+    ]
+  };
+},
+
+/* 10 — leverage concepts, as true/false statements ------------------- */
+function leverageConcepts(){
+  const POOL = [
+    ['The most an investor can lose on a stock bought on margin is the amount of their own money they committed.', true,
+     'True. A share price cannot fall below zero, so the value of the position is bounded below and the loss stops at the investor’s own capital, plus the interest owed. A long position’s downside is therefore limited, however much leverage is used.'],
+    ['A short seller’s maximum possible loss is limited to the proceeds received from the sale.', false,
+     'False. There is no ceiling on a share price, so the cost of buying the shares back has no upper bound. This is the sharpest asymmetry between a long and a short position, and it is why brokers demand margin on top of the proceeds.'],
+    ['Leverage magnifies the volatility of the return on the investor’s own money relative to the volatility of the stock itself.', true,
+     'True. The investor absorbs the full swing of a larger position on a smaller equity base, so percentage moves are amplified in both directions.'],
+    ['Buying on margin improves the investor’s return only when the stock earns more than the interest rate on the loan.', true,
+     'True. Borrowing carries a fixed cost. If the stock earns less than that cost, leverage makes the outcome worse rather than better.'],
+    ['If a stock bought on margin happens to return exactly the broker’s interest rate, the investor’s return on their own money equals that same rate.', true,
+     'True, and worth verifying algebraically. The borrowed portion earns precisely what it costs, so it contributes nothing either way and the equity is left earning the same rate. This is the break-even point at which leverage stops helping and starts hurting.'],
+    ['Two investors buy the same stock, one paying cash and one on margin. If the stock rises at all, the margin investor must earn the higher percentage return on their own money.', false,
+     'False, and the exception is the point. Leverage only helps once the stock’s return clears the interest on the loan. A small gain that falls short of the borrowing cost leaves the margin investor worse off than the one who paid cash.'],
+    ['A margin call on a long position is triggered by a rise in the share price.', false,
+     'False. Falling prices erode the equity in a long position. It is the short position that receives a call when the price rises, because there the liability grows.'],
+    ['A short seller owes any dividends paid during the period to the lender of the shares.', true,
+     'True. The lender remains entitled to the dividend, so it is charged to the short seller’s account and reduces the return on the position.'],
+    ['The maintenance margin is normally set equal to the initial margin.', false,
+     'False. The maintenance margin is the lower of the two. That gap is what allows a position to be opened comfortably and still be called later after the price moves.'],
+    ['Because a short seller receives cash from the sale, no further funds need to be deposited to open the position.', false,
+     'False. The proceeds are held by the broker as collateral, and margin is required on top of them, precisely because the potential loss is unbounded.']
+  ];
+  // pick four, guaranteeing at least one true and one false
+  let sel;
+  do {
+    sel = [...POOL].sort(()=>Math.random()-0.5).slice(0,4);
+  } while (!(sel.some(s=>s[1]) && sel.some(s=>!s[1])));   // need at least one of each
+  const roman = ['I','II','III','IV'];
+  return {
+    tag:'Leverage concepts',
+    stem:`Consider the following statements about leveraged trading strategies. Decide whether each is
+          true or false. There is nothing to calculate here &mdash; reason it through.`,
+    parts: sel.map((s,k)=>({
+      key: roman[k], ask: s[0], type:'yesno', yesLabel:'True', noLabel:'False', ansYes: s[1]
+    })),
+    explain: sel.map((s,k)=>
+      `<span class="lbl">${roman[k]}.</span> ${s[0]} &nbsp;&mdash;&nbsp; ${s[2]}`)
+  };
+}
+];
+
+/* Concept checks: one per numeric problem, indexed to match PROBLEMS.
+   These ask about the number the student has just computed, which is the
+   moment they have a concrete case in hand to reason from.               */
+const CONCEPTS = [
+  { ask:'Suppose instead the stock had fallen by that same percentage. Would the loss on your equity be larger, in magnitude, than the percentage fall in the stock?',
+    yesLabel:'Yes, larger', noLabel:'No, the same or smaller', ansYes:true,
+    why:'Yes. Leverage magnifies in both directions. Your equity is only part of the position, so any percentage move in the stock translates into a larger percentage move in your equity — and the interest on the loan makes the downside worse still.' },
+  { ask:'The dividend paid on a stock you have shorted does what to your return?',
+    yesLabel:'Reduces it', noLabel:'Increases it', ansYes:true,
+    why:'Reduces it. You owe the dividend to whoever lent you the shares, so it is a cash outflow charged against your account.' },
+  { ask:'As the price of a stock bought on margin falls, the percentage margin in the account falls too.',
+    yesLabel:'True', noLabel:'False', ansYes:true,
+    why:'True. The loan is fixed, so a falling market value shrinks equity faster than it shrinks the position value — which is exactly why a margin call can be triggered.' },
+  { ask:'Two assets have the same expected return, but one has returns spread more widely across the scenarios. Does that asset have the higher standard deviation?',
+    yesLabel:'Yes', noLabel:'No', ansYes:true,
+    why:'Yes. Standard deviation measures dispersion around the mean, so wider spread means larger deviations and a larger standard deviation — even though the expected return is identical.' },
+  { ask:'For a given periodic rate with more than one period per year, is the EAR always above the APR?',
+    yesLabel:'Yes', noLabel:'No', ansYes:true,
+    why:'Yes. The APR simply multiplies the periodic rate by n and ignores compounding; the EAR compounds it. The gap widens as n rises.' },
+  { ask:'If all three annual returns had been identical, would the arithmetic and geometric averages be equal?',
+    yesLabel:'Yes, equal', noLabel:'No, still different', ansYes:true,
+    why:'Yes. The gap between the two averages is driven entirely by variability. With no variation in returns they coincide; the more the returns bounce around, the further the geometric average falls below the arithmetic one.' },
+  { ask:'A short-seller receives a margin call when the stock price does what?',
+    yesLabel:'Rises', noLabel:'Falls', ansYes:true,
+    why:'Rises. The short-seller’s liability is the value of the shares owed, so a rising price increases the liability and erodes the equity in the account.' },
+  { ask:'If inflation over the year had exceeded your nominal return, would your real return be negative?',
+    yesLabel:'Yes', noLabel:'No', ansYes:true,
+    why:'Yes. The real return measures purchasing power. If prices rose faster than your investment did, you can buy less at the end of the year than at the start.' },
+  { ask:'Is an asset with the higher expected return always preferred by a risk-averse investor?',
+    yesLabel:'No', noLabel:'Yes', ansYes:true,
+    why:'No. A risk-averse investor weighs return against risk. The asset with the higher Sharpe ratio offers more compensation per unit of risk, and that is the relevant comparison here.' },
+  null   // problem 10 is already entirely conceptual
+];
+
+/* =================== rendering =================== */
+const state = PROBLEMS.map(()=>({solved:false}));
+
+function parseNum(s){
+  s = String(s).trim().replace(/[$,%\s]/g,'');
+  if(/^\(.*\)$/.test(s)) s = '-' + s.slice(1,-1);      // (51.94) => -51.94
+  return s === '' ? NaN : parseFloat(s);
+}
+
+function build(i){
+  const p = PROBLEMS[i]();
+  if(CONCEPTS[i]){                       // attach the concept check for this problem
+    const c = CONCEPTS[i];
+    p.parts = p.parts.concat([{ key:'concept', concept:true, type:'yesno',
+                                ask:c.ask, yesLabel:c.yesLabel, noLabel:c.noLabel,
+                                ansYes:c.ansYes }]);
+    p.explain = p.explain.concat([`<span class="lbl">Concept check.</span> ${c.why}`]);
+  }
+  const el = document.createElement('section');
+  el.className = 'q';
+
+  const partsHTML = p.parts.map((pt,j)=>{
+    const inner = pt.type === 'yesno'
+      ? `<div class="yn" id="f${i}_${j}">
+           <label><input type="radio" name="yn${i}_${j}" value="y"> ${pt.yesLabel||'Yes'}</label>
+           <label><input type="radio" name="yn${i}_${j}" value="n"> ${pt.noLabel||'No'}</label>
+         </div>`
+      : `<div class="row" id="f${i}_${j}">
+           <label class="cap" for="in${i}_${j}">${pt.label}</label>
+           ${pt.unit==='$' ? '<span class="unit">$</span>' : ''}
+           <input id="in${i}_${j}" type="text" inputmode="decimal" autocomplete="off"
+                  aria-label="${pt.label}">
+           ${pt.unit==='%' ? '<span class="unit">%</span>' : ''}
+         </div>`;
+    const head = pt.concept
+      ? '<span class="k concept-k">Concept check.</span>'
+      : `<span class="k">${pt.key}.</span>`;
+    return `<div class="part${pt.concept?' concept':''}">
+              <p class="ask">${head} ${pt.ask}</p>
+              ${pt.note ? `<p class="note">Note: ${pt.note}</p>` : ''}
+              ${inner}
+            </div>`;
+  }).join('');
+
+  el.innerHTML = `
+    <header><span class="qn">Problem ${i+1}</span><span class="tag">${p.tag}</span></header>
+    <div class="stem">${p.stem}</div>
+    <p class="req">Required:</p>
+    ${partsHTML}
+    <div class="btns">
+      <button data-act="check">Check</button>
+      <button class="ghost" data-act="sol">Explanation</button>
+      <button class="ghost" data-act="new">New numbers</button>
+    </div>
+    <div class="fb" id="fb${i}"></div>
+    <div class="sol" id="sol${i}">
+      <h4>Explanation</h4>
+      ${p.explain.map(s=>`<p>${s}</p>`).join('')}
+    </div>`;
+
+  const fb  = el.querySelector('#fb'+i);
+  const sol = el.querySelector('#sol'+i);
+
+  el.querySelector('[data-act="check"]').onclick = () => {
+    let blank = 0, wrong = [], unitsNote = '';
+    p.parts.forEach((pt,j)=>{
+      const box = el.querySelector('#f'+i+'_'+j);
+      box.classList.remove('ok','bad');
+      if(pt.type === 'yesno'){
+        const sel = el.querySelector(`input[name="yn${i}_${j}"]:checked`);
+        if(!sel){ blank++; return; }
+        if((sel.value==='y') === pt.ansYes) box.classList.add('ok');
+        else { box.classList.add('bad'); wrong.push(pt.key); }
+        return;
+      }
+      const v = parseNum(el.querySelector('#in'+i+'_'+j).value);
+      if(isNaN(v)){ blank++; return; }
+      if(Math.abs(v-pt.ans) <= pt.tol + 1e-9){ box.classList.add('ok'); return; }
+      if(pt.unit==='%' && Math.abs(v*100-pt.ans) <= Math.max(pt.tol,0.02)){
+        unitsNote = `Part ${pt.key} is the right number in decimal form. This box expects percent
+                     &mdash; enter ${d2(pt.ans)}, not ${v}.`;
+      }
+      box.classList.add('bad'); wrong.push(pt.key);
+    });
+
+    fb.className = 'fb show';
+    if(blank === p.parts.length){
+      fb.classList.add('hint');
+      fb.innerHTML = 'Work the problem first, then enter your answers and press Check.';
+    } else if(!wrong.length && !blank){
+      fb.classList.add('ok');
+      fb.innerHTML = 'All correct. Press <b>New numbers</b> to work this problem type again.';
+      if(!state[i].solved){ state[i].solved = true; updateScore(); }
+    } else if(unitsNote){
+      fb.classList.add('warn');
+      fb.innerHTML = 'Check your units. ' + unitsNote;
+    } else if(wrong.length){
+      fb.classList.add('bad');
+      fb.innerHTML = `Not right yet &mdash; part${wrong.length>1?'s':''} ${wrong.join(', ')}.
+                      Rework it on paper before checking again; open <b>Explanation</b> if you are stuck.`;
+    } else {
+      fb.classList.add('hint');
+      fb.innerHTML = 'Some parts are still blank.';
+    }
+  };
+
+  el.querySelector('[data-act="sol"]').onclick = e => {
+    sol.classList.toggle('show');
+    e.target.textContent = sol.classList.contains('show') ? 'Hide explanation' : 'Explanation';
+  };
+  el.querySelector('[data-act="new"]').onclick = () => el.replaceWith(build(i));
+  return el;
+}
+
+function updateScore(){
+  const n = state.filter(s=>s.solved).length;
+  document.getElementById('scoretext').textContent = `${n} of ${PROBLEMS.length} complete`;
+  document.getElementById('fill').style.width = (100*n/PROBLEMS.length)+'%';
+}
+
+const quiz = document.getElementById('quiz');
+PROBLEMS.forEach((_,i)=> quiz.appendChild(build(i)));
+updateScore();
+
+document.getElementById('resetall').onclick = () => {
+  quiz.innerHTML = '';
+  state.forEach(s=> s.solved = false);
+  PROBLEMS.forEach((_,i)=> quiz.appendChild(build(i)));
+  updateScore();
+  window.scrollTo({top:0,behavior:'smooth'});
+};
+</script>
+</body>
+</html>

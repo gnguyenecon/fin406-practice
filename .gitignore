@@ -1,0 +1,14 @@
+# Never publish publisher-copyrighted source material or course documents.
+# The Connect PDFs, slide decks, quizzes and answer keys stay in Dropbox only.
+Connect/
+*.pdf
+*.docx
+*.pptx
+*.xlsx
+*.csv
+*.tex
+
+# Local noise
+Thumbs.db
+desktop.ini
+.DS_Store

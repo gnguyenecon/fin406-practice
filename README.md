@@ -18,10 +18,18 @@ Dropbox\PennState\Teaching\FIN406_FA2026\practice_sets\
 Edit them there, verify them there, then run `publish.bat` in that folder. It copies the HTML into
 this repository and pushes. Editing a file here directly will be overwritten on the next publish.
 
-| Web address | Comes from |
-|---|---|
-| `/set1/` | `practice_sets\Set1\Unit1_Practice_Set.html` |
-| `/set2/` | `practice_sets\Set2\Unit2_Practice_Set.html` |
+| Web address | Comes from | Published? |
+|---|---|---|
+| `/set1/` | `practice_sets\Set1\Unit1_Practice_Set.html` | Yes |
+| `/set2/` | `practice_sets\Set2\Unit2_Practice_Set.html` | No — draft |
+| `/set3/` | `practice_sets\Set3\Unit3_Practice_Set.html` | No — draft |
+| `/set4/` | `practice_sets\Set4\Unit4_Practice_Set.html` | No — draft |
+| `/set5/` | `practice_sets\Set5\Unit5_Practice_Set.html` | No — draft |
+| `/set6/` | `practice_sets\Set6\Unit6_Practice_Set.html` | No — draft |
+
+All six sets exist in Dropbox, but only the ones marked published are on the web. The rest show as
+greyed placeholders on the landing page and their URLs return 404. `publish.bat` has a line for each
+set; the unpublished ones are commented out with `REM`.
 
 ## What must never be committed here
 
@@ -33,12 +41,16 @@ safeguard is that `publish.bat` copies named HTML files and nothing else.
 The practice sets themselves are safe to publish. They are ungraded, they show their own worked
 solutions on purpose, and they contain no quiz or exam material.
 
-## Adding a new set
+## Publishing a set
 
-1. Build and verify the new set in Dropbox as usual (`verify\check.bat`).
-2. Add one `call :put` line to `publish.bat`, following the pattern of the existing two.
-3. Add the set to the list in `index.html` here.
+1. Verify it in Dropbox (`verify\check.bat`).
+2. Delete the `REM ` from that set's `call :put` line in `publish.bat`.
+3. In `index.html` here, change that set from a greyed `<span class="soon">` placeholder to a real
+   link, following the pattern of Quiz 1, and fill in its topics and dates.
 4. Run `publish.bat`.
+
+To unpublish, reverse steps 2 and 3, delete the set's folder from this repository, and run
+`publish.bat` again.
 
 ## Notes
 

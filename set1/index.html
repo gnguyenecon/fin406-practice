@@ -556,7 +556,8 @@ function sharpeCompare(){
   const sA = (erA-rf)/sdA, sB = (erB-rf)/sdB;
   return {
     tag:'Risk premium and Sharpe ratio',
-    stem:`A client is choosing between two funds. The risk-free rate is ${d2(rf)}%.
+    stem:`A client is choosing between two funds to hold alongside T-bills. The risk-free rate is
+      ${d2(rf)}%.
       <table class="data">
         <tr><th>Fund</th><th>E(r)</th><th>&sigma;</th></tr>
         <tr><td>Redwood</td><td>${d2(erA)}%</td><td>${d2(sdA)}%</td></tr>
@@ -572,7 +573,7 @@ function sharpeCompare(){
       {key:'c', ask:'What is the Sharpe ratio of Sterling?',
        note:'Round your answer to 2 decimal places.',
        label:'Sharpe ratio, Sterling', unit:'', ans:sB, tol:0.01},
-      {key:'d', ask:'Which fund is more likely to suit a risk-averse client?',
+      {key:'d', ask:'Which fund should the client combine with T-bills?',
        type:'yesno', yesLabel:'Redwood', noLabel:'Sterling', ansYes: sA > sB}
     ],
     explain:[
@@ -583,11 +584,8 @@ function sharpeCompare(){
        &divide; ${d2(sdA)} = <span class="ans">${d2(sA)}</span>`,
       `<span class="lbl">c.</span> Sharpe ratio for Sterling = (${d2(erB)} &minus; ${d2(rf)})
        &divide; ${d2(sdB)} = <span class="ans">${d2(sB)}</span>`,
-      `<span class="lbl">d.</span> <span class="ans">${sA>sB?'Redwood':'Sterling'}</span> suits the
-       client better: it delivers more risk premium per unit of risk. Note that Sterling has the
-       higher expected return, and that alone does not settle the question. Choosing purely on
-       expected return is risk neutrality; a risk-averse client demands compensation for the extra
-       &sigma;.`
+      `<span class="lbl">d.</span> <span class="ans">${sA>sB?'Redwood':'Sterling'}</span>, because it
+       has the higher Sharpe ratio: it delivers more risk premium per unit of risk.`
     ]
   };
 },
@@ -595,8 +593,8 @@ function sharpeCompare(){
 /* 10 — leverage concepts, as true/false statements ------------------- */
 function leverageConcepts(){
   const POOL = [
-    ['The most an investor can lose on a stock bought on margin is the amount of their own money they committed.', true,
-     'True. A share price cannot fall below zero, so the value of the position is bounded below and the loss stops at the investor’s own capital, plus the interest owed. A long position’s downside is therefore limited, however much leverage is used.'],
+    ['The most an investor can lose on a stock bought on margin is the amount of their own money they committed.', false,
+     'False. The share price is bounded below at zero. At a price of zero the position is worth nothing, the investor has lost all of the money they committed, and they still owe the margin loan plus any interest accrued on it. The loss is therefore more than 100% of what they put in. How much more depends on the initial margin, the interest rate charged on the loan, and how long the loan has been outstanding.'],
     ['A short seller’s maximum possible loss is limited to the proceeds received from the sale.', false,
      'False. There is no ceiling on a share price, so the cost of buying the shares back has no upper bound. This is the sharpest asymmetry between a long and a short position, and it is why brokers demand margin on top of the proceeds.'],
     ['Leverage magnifies the volatility of the return on the investor’s own money relative to the volatility of the stock itself.', true,

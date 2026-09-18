@@ -194,8 +194,8 @@ function capitalAllocation(){
       {key:'', ask:'', label:'Calder', unit:'%', ans:y*wC, tol:0.05, cont:true},
       {key:'c', ask:'What is the reward-to-volatility (Sharpe) ratio of the risky portfolio, and of the complete portfolio?',
        note:'Round your answers to 4 decimal places.',
-       label:'Risky portfolio', unit:'', ans:sharpe, tol:0.0002},
-      {key:'', ask:'', label:'Complete portfolio', unit:'', ans:sharpe, tol:0.0002, cont:true}
+       label:'Risky portfolio', unit:'', ans:sharpe, tol:0.0001},
+      {key:'', ask:'', label:'Complete portfolio', unit:'', ans:sharpe, tol:0.0001, cont:true}
     ],
     explain:[
       `<span class="lbl">a.</span> E(r<sub>C</sub>) = y &times; E(r<sub>P</sub>) + (1 &minus; y) &times; r<sub>f</sub>
@@ -296,7 +296,7 @@ function riskCeiling(){
        note:'Round your answer to 2 decimal places.',
        label:'Fraction in the fund', unit:'%', ans:y*100, tol:0.01},
       {key:'b', ask:'How many dollars should be placed in cash, and in each of the three holdings?',
-       note:'Round your answers to the nearest dollar.',
+       note:'Do not round intermediate calculations. Round your answers to the nearest dollar.',
        label:'Cash', unit:'$', ans:$rf, tol:5},
       {key:'', ask:'', label:'Dunmore', unit:'$', ans:$D, tol:5, cont:true},
       {key:'', ask:'', label:'Eastgate', unit:'$', ans:$E, tol:5, cont:true},
@@ -361,14 +361,14 @@ function scenarioCovariance(){
     parts:[
       {key:'a', ask:'Calculate the expected return and variance for the Growth Fund.',
        note:'Do not round intermediate calculations. Round your answers to 2 decimal places.',
-       label:'Expected return', unit:'%', ans:erS, tol:0.05},
-      {key:'', ask:'', label:'Variance', unit:'', ans:varS, tol:0.5, cont:true, varianceUnits:true},
+       label:'Expected return', unit:'%', ans:erS, tol:0.01},
+      {key:'', ask:'', label:'Variance', unit:'', ans:varS, tol:0.01, cont:true, varianceUnits:true},
       {key:'b', ask:'Calculate the covariance between the Growth Fund and the Income Fund.',
        note:'Indicate a negative value with a minus sign. Round your answer to 2 decimal places.',
-       label:'Covariance', unit:'', ans:cov, tol:0.5, varianceUnits:true},
+       label:'Covariance', unit:'', ans:cov, tol:0.01, varianceUnits:true},
       {key:'c', ask:'Calculate the correlation coefficient between the two funds.',
        note:'Round your answer to 4 decimal places.',
-       label:'Correlation', unit:'', ans:corr, tol:0.005}
+       label:'Correlation', unit:'', ans:corr, tol:0.002}
     ],
     explain:[
       `<span class="lbl">a.</span> Mean and variance for the Growth Fund:
@@ -466,12 +466,12 @@ function optimalRisky(){
     parts:[
       {key:'a', ask:'Solve for the proportions of each risky asset in the optimal risky portfolio.',
        note:'Do not round intermediate calculations. Round your answers to 2 decimal places.',
-       label:'Proportion in Sable', unit:'%', ans:wS*100, tol:0.25},
-      {key:'', ask:'', label:'Proportion in Bramwell', unit:'%', ans:wB*100, tol:0.25, cont:true},
+       label:'Proportion in Sable', unit:'%', ans:wS*100, tol:0.01},
+      {key:'', ask:'', label:'Proportion in Bramwell', unit:'%', ans:wB*100, tol:0.01, cont:true},
       {key:'b', ask:'What are the expected return and standard deviation of the optimal risky portfolio?',
        note:'Do not round intermediate calculations. Round your answers to 2 decimal places.',
-       label:'Expected return', unit:'%', ans:erP, tol:0.25},
-      {key:'', ask:'', label:'Standard deviation', unit:'%', ans:sdP, tol:0.25, cont:true}
+       label:'Expected return', unit:'%', ans:erP, tol:0.01},
+      {key:'', ask:'', label:'Standard deviation', unit:'%', ans:sdP, tol:0.01, cont:true}
     ],
     explain:[
       `Parameters: E(r<sub>S</sub>) = ${erS}%, E(r<sub>B</sub>) = ${erB}%, &sigma;<sub>S</sub> =

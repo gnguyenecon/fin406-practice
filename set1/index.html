@@ -341,10 +341,10 @@ function scenarioDist(){
     parts:[
       {key:'a', ask:'What is the expected return on ACB?',
        note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
-       label:'Expected return', unit:'%', ans:er, tol:0.5},
+       label:'Expected return', unit:'%', ans:er, tol:0.05},
       {key:'b', ask:'What is the standard deviation of the returns on ACB?',
        note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
-       label:'Standard deviation', unit:'%', ans:sd, tol:0.5}
+       label:'Standard deviation', unit:'%', ans:sd, tol:0.05}
     ],
     explain:[
       `<span class="lbl">a.</span> E(r) = &Sigma; p(s) r(s)
@@ -662,7 +662,7 @@ const CONCEPTS = [
     yesLabel:'Yes', noLabel:'No', ansYes:true,
     why:'Yes. The real return measures purchasing power. If prices rose faster than your investment did, you can buy less at the end of the year than at the start.' },
   { ask:'Is an asset with the higher expected return always preferred by a risk-averse investor?',
-    yesLabel:'No', noLabel:'Yes', ansYes:true,
+    yesLabel:'Yes', noLabel:'No', ansYes:false,
     why:'No. A risk-averse investor weighs return against risk. The asset with the higher Sharpe ratio offers more compensation per unit of risk, and that is the relevant comparison here.' },
   null   // problem 10 is already entirely conceptual
 ];

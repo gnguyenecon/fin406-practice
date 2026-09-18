@@ -466,12 +466,12 @@ function optimalRisky(){
     parts:[
       {key:'a', ask:'Solve for the proportions of each risky asset in the optimal risky portfolio.',
        note:'Do not round intermediate calculations. Round your answers to 2 decimal places.',
-       label:'Proportion in Sable', unit:'%', ans:wS*100, tol:1},
-      {key:'', ask:'', label:'Proportion in Bramwell', unit:'%', ans:wB*100, tol:1, cont:true},
+       label:'Proportion in Sable', unit:'%', ans:wS*100, tol:0.25},
+      {key:'', ask:'', label:'Proportion in Bramwell', unit:'%', ans:wB*100, tol:0.25, cont:true},
       {key:'b', ask:'What are the expected return and standard deviation of the optimal risky portfolio?',
        note:'Do not round intermediate calculations. Round your answers to 2 decimal places.',
-       label:'Expected return', unit:'%', ans:erP, tol:1},
-      {key:'', ask:'', label:'Standard deviation', unit:'%', ans:sdP, tol:1, cont:true}
+       label:'Expected return', unit:'%', ans:erP, tol:0.25},
+      {key:'', ask:'', label:'Standard deviation', unit:'%', ans:sdP, tol:0.25, cont:true}
     ],
     explain:[
       `Parameters: E(r<sub>S</sub>) = ${erS}%, E(r<sub>B</sub>) = ${erB}%, &sigma;<sub>S</sub> =
@@ -691,7 +691,7 @@ function readingTheTable(){
       {key:'c', ask:'In general, a security whose return is identical in every scenario must have zero covariance with every other security.',
        type:'yesno', yesLabel:'True', noLabel:'False', ansYes:true},
       {key:'d', ask:'In general, two securities that always move in opposite directions must have a correlation of exactly &minus;1.',
-       type:'yesno', yesLabel:'False', noLabel:'True', ansYes:true}
+       type:'yesno', yesLabel:'True', noLabel:'False', ansYes:false}
     ],
     explain:[
       `<span class="lbl">a.</span> <span class="ans">${whoOpts[whoAns]}.</span>
@@ -725,25 +725,25 @@ function readingTheTable(){
 /* Concept checks for the numeric problems (index-aligned; null = already conceptual) */
 const CONCEPTS = [
   { ask:'If your client moved more of his money into the risk-free asset, would the Sharpe ratio of his complete portfolio fall?',
-    yesLabel:'No, it stays the same', noLabel:'Yes, it falls', ansYes:true,
+    yesLabel:'Yes, it falls', noLabel:'No, it stays the same', ansYes:false,
     why:'It stays the same. Shifting along the capital allocation line changes both the risk premium and the standard deviation in the same proportion, so the ratio between them is unchanged. Only a better risky portfolio raises the Sharpe ratio.' },
   { ask:'To reach an expected return above that of the risky portfolio itself, what would y have to be?',
     yesLabel:'Greater than 1', noLabel:'Between 0 and 1', ansYes:true,
     why:'Greater than 1 — the investor would have to borrow at the risk-free rate and invest more than 100% of his own money in the risky portfolio. That is a levered position on the capital allocation line.' },
   { ask:'Should the client invest strictly less than the risk limit allows, to be safe?',
-    yesLabel:'No, use the full limit', noLabel:'Yes, stay below it', ansYes:true,
+    yesLabel:'Yes, stay below it', noLabel:'No, use the full limit', ansYes:false,
     why:'No. Expected return rises steadily with y, so any portfolio below the risk ceiling is dominated by one that uses the full budget. The optimum always sits exactly on the constraint.' },
   { ask:'A covariance of zero between two assets would mean there is no diversification benefit from combining them.',
-    yesLabel:'False', noLabel:'True', ansYes:true,
+    yesLabel:'True', noLabel:'False', ansYes:false,
     why:'False. Zero covariance means the returns are unrelated, and combining unrelated assets is a substantial source of risk reduction. Diversification benefit disappears only at perfect positive correlation.' },
   { ask:'Can a portfolio of two risky stocks have a standard deviation lower than either stock on its own?',
     yesLabel:'Yes', noLabel:'No', ansYes:true,
     why:'Yes, provided the correlation is low enough. This is the central result of diversification: portfolio risk is not a weighted average of individual risks, and with sufficiently low correlation it can fall below both.' },
   { ask:'Is the optimal risky portfolio the one with the lowest possible variance?',
-    yesLabel:'No', noLabel:'Yes', ansYes:true,
+    yesLabel:'Yes', noLabel:'No', ansYes:false,
     why:'No. That is the minimum-variance portfolio, a different point. The optimal risky portfolio maximises the Sharpe ratio — the steepest capital allocation line from the risk-free rate — and normally carries more risk than the minimum-variance portfolio in exchange for more return.' },
   { ask:'If you re-expressed both standard deviations and the covariance in percent rather than decimals, would the correlation change?',
-    yesLabel:'No', noLabel:'Yes', ansYes:true,
+    yesLabel:'Yes', noLabel:'No', ansYes:false,
     why:'No. Correlation is unit-free: the units in the numerator and denominator cancel. Covariance, by contrast, is scaled by 10,000 when moving between decimal and percent form — which is why covariance is hard to interpret on its own.' },
   null,   // 8  — diversification, already conceptual
   null,   // 9  — definitions, already conceptual

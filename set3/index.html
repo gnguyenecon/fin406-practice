@@ -704,8 +704,8 @@ function ffConcepts(){
   const a = shuffle([
     ['small firms tend to be riskier than large firms, so investors require a higher expected return for holding them', true],
     ['small firms earn higher returns than large firms in every period, so holding them is a sure gain', false],
-    ['small firms carry more firm-specific risk, and the market pays a premium for bearing firm-specific risk', false],
-    ['small firms have lower share prices, and low-priced shares mechanically earn higher returns', false]
+    ['small firms tend to be safer than large firms, because they are simpler businesses to run', false],
+    ['small firms typically have better access to financing in bad times than large firms do', false]
   ]);
   const b = shuffle([
     ['a high ratio of book value to market value', true],
@@ -725,6 +725,14 @@ function ffConcepts(){
     ['the same expected return, because only market beta is priced', false],
     ['the same expected return, provided the two stocks have equal standard deviations', false]
   ]);
+  const sPos = pick([true,false]);
+  const vPos = pick([true,false]);
+  const combos = shuffle([
+    ['a small value firm',  sPos && vPos],
+    ['a small growth firm', sPos && !vPos],
+    ['a large value firm',  !sPos && vPos],
+    ['a large growth firm', !sPos && !vPos]
+  ]);
   return {
     tag:'Fama-French 3 Factor Model Concepts',
     stem:`Four short questions on the Fama-French three-factor model. There is nothing to calculate
@@ -738,7 +746,11 @@ function ffConcepts(){
        type:'mc', options:c.map(o=>o[0]), ansIdx:c.findIndex(o=>o[1])},
       {key:'d', ask:`Other things equal, the three-factor model says a small value stock should
               offer ______ a large growth stock.`,
-       type:'mc', options:d.map(o=>o[0]), ansIdx:d.findIndex(o=>o[1])}
+       type:'mc', options:d.map(o=>o[0]), ansIdx:d.findIndex(o=>o[1])},
+      {key:'e', ask:`A stock has a ${sPos?'positive':'negative'} size beta and a
+              ${vPos?'positive':'negative'} value beta. In its return behaviour it acts most
+              like ______.`,
+       type:'mc', options:combos.map(o=>o[0]), ansIdx:combos.findIndex(o=>o[1])}
     ],
     explain:[
       `<span class="lbl">a.</span> <span class="ans">Small firms tend to be riskier than large
@@ -761,7 +773,15 @@ function ffConcepts(){
       `<span class="lbl">d.</span> <span class="ans">A higher expected return.</span> A small value
        stock has positive betas on both extra factors, and each positive beta adds its premium to
        the expected return. The CAPM, by contrast, would see no difference between the two stocks
-       unless their market betas differed.`
+       unless their market betas differed.`,
+      `<span class="lbl">e.</span> <span class="ans">${(c=>c.charAt(0).toUpperCase()+c.slice(1))(combos.find(o=>o[1])[0])}.</span>
+       The sign of each beta says which side of the factor the stock behaves like. A positive size
+       beta means its returns move with small firms, a negative one means it behaves like a large
+       firm; a positive value beta means it moves with value firms, a negative one marks
+       growth-firm behaviour. Here the size beta is ${sPos?'positive':'negative'} and the value
+       beta is ${vPos?'positive':'negative'}, so the stock acts like
+       ${combos.find(o=>o[1])[0]} &mdash; whatever the size and industry label on the company
+       itself might suggest.`
     ]
   };
 },
@@ -779,8 +799,6 @@ function performanceConcepts(){
      'False. The two measures divide the same excess return by different notions of risk. They agree only when the portfolios are equally well diversified; otherwise the rankings can and do reverse.'],
     ['A positive alpha means the manager earned more than the return justified by the portfolio’s systematic risk.', true,
      'True. That is exactly the definition: alpha is the actual return minus the CAPM benchmark return for the beta actually run.'],
-    ['The market index portfolio has an alpha of zero by construction.', true,
-     'True. Its beta is 1, so the CAPM benchmark for it is the market return itself, and the gap between the two is necessarily zero.'],
     ['The contribution of asset allocation measures how well a manager chose individual securities within each sector.', false,
      'False. That describes security selection. Asset allocation measures the effect of over- or under-weighting whole sectors relative to the benchmark, valued at benchmark returns.'],
     ['The contributions of security selection and asset allocation must sum to the manager’s total over- or underperformance.', true,

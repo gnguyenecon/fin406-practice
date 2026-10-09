@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>FIN 406 &middot; Quiz 3 Practice Set</title>
+<style>
+  :root{
+    --navy:#1E407C; --navy-dk:#001E44; --ink:#1a1a1a; --muted:#5a6472;
+    --line:#d7dce3; --bg:#f6f7f9; --card:#fff;
+    --ok:#1b6e3c; --ok-bg:#e8f5ec; --bad:#9b1c1c; --bad-bg:#fdeaea;
+    --warn:#8a5a00; --warn-bg:#fff5e0;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:16px/1.55 "Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif}
+  .wrap{max-width:880px;margin:0 auto;padding:24px 18px 64px}
+  header.top{background:var(--navy);color:#fff;border-radius:10px;padding:22px 24px;margin-bottom:18px}
+  header.top h1{margin:0 0 4px;font-size:1.5rem}
+  header.top .sub{opacity:.92;font-size:.95rem}
+  header.top .dates{margin-top:12px;font-size:.9rem;opacity:.95;
+       border-top:1px solid rgba(255,255,255,.28);padding-top:10px}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:10px;
+         padding:18px 20px;margin-bottom:18px}
+  .panel h2{margin:0 0 8px;font-size:1.05rem;color:var(--navy-dk)}
+  ul.tight{margin:.4rem 0 .2rem;padding-left:1.15rem}
+  ul.tight li{margin:.25rem 0}
+  code.u{background:#eef1f6;padding:1px 6px;border-radius:4px;font-size:.92em}
+
+  .scorebar{position:sticky;top:0;z-index:5;background:var(--card);border:1px solid var(--line);
+       border-radius:10px;padding:10px 16px;margin-bottom:18px;display:flex;align-items:center;
+       gap:14px;flex-wrap:wrap;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+  .track{flex:1 1 180px;height:8px;background:#e6e9ee;border-radius:99px;overflow:hidden;min-width:140px}
+  .fill{height:100%;width:0;background:var(--navy);transition:width .3s}
+
+  .q{background:var(--card);border:1px solid var(--line);border-radius:10px;
+     padding:18px 20px;margin-bottom:16px}
+  .q > header{display:flex;align-items:baseline;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+  .qn{font-weight:700;color:var(--navy);font-size:1.02rem}
+  .tag{font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);
+       border:1px solid var(--line);border-radius:99px;padding:2px 9px}
+  .stem{margin:0 0 4px}
+  .req{font-weight:700;color:var(--navy-dk);margin:14px 0 2px}
+
+  table.data{border-collapse:collapse;margin:10px 0 6px;font-size:1rem}
+  table.data th,table.data td{border:1px solid var(--line);padding:5px 12px;text-align:right}
+  table.data th{background:#eef1f6;text-align:center}
+  table.data td:first-child,table.data th:first-child{text-align:left}
+
+  .part{margin:12px 0 0;padding-left:2px}
+  .part.concept{margin-top:16px;padding:12px 14px;background:#f2f6fb;
+       border:1px solid #cfdcec;border-left:4px solid var(--navy);border-radius:6px}
+  .concept-k{color:var(--navy);letter-spacing:.02em}
+  .part .ask{margin:0 0 6px}
+  .part .ask .k{font-weight:700}
+  .note{font-size:1rem;color:#a03;margin:.15rem 0 .4rem}
+  .row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:5px 0}
+  .row label.cap{font-size:1rem;color:var(--muted);min-width:250px}
+  .row input[type=text]{width:130px;padding:7px 9px;font-size:1rem;font-family:inherit;
+       border:1.5px solid var(--line);border-radius:6px;background:#fff;text-align:right}
+  .row input:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(30,64,124,.13)}
+  .row .unit{font-size:.92rem;color:var(--muted)}
+  .row.ok input{border-color:var(--ok);background:var(--ok-bg)}
+  .row.bad input{border-color:var(--bad);background:var(--bad-bg)}
+  .yn{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+  .yn label{font-size:1rem;display:flex;gap:5px;align-items:center;cursor:pointer}
+  .mc{display:flex;flex-direction:column;gap:5px;margin-top:4px}
+  .mc label{font-size:1rem;display:flex;gap:8px;align-items:flex-start;cursor:pointer;
+       padding:5px 8px;border-radius:5px}
+  .mc label:hover{background:#f2f6fb}
+  .mc.ok{outline:2px solid var(--ok);outline-offset:3px;border-radius:6px}
+  .mc.bad{outline:2px solid var(--bad);outline-offset:3px;border-radius:6px}
+
+  .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+  button{font:inherit;font-size:.92rem;padding:7px 14px;border-radius:6px;
+         border:1.5px solid var(--navy);background:var(--navy);color:#fff;cursor:pointer}
+  button.ghost{background:#fff;color:var(--navy)}
+  button:hover{filter:brightness(1.08)}
+  button:focus-visible{outline:3px solid rgba(30,64,124,.35);outline-offset:2px}
+
+  .fb{margin-top:12px;padding:11px 14px;border-radius:8px;font-size:1rem;display:none}
+  .fb.show{display:block}
+  .fb.ok{background:var(--ok-bg);border:1px solid #b9dfc7;color:var(--ok)}
+  .fb.bad{background:var(--bad-bg);border:1px solid #f0c2c2;color:var(--bad)}
+  .fb.warn{background:var(--warn-bg);border:1px solid #f0dcae;color:var(--warn)}
+  .fb.hint{background:#eef1f6;border:1px solid var(--line);color:var(--ink)}
+
+  .sol{display:none;margin-top:12px;padding:14px 16px;background:#fbfcfd;border:1px solid var(--line);
+       border-left:4px solid var(--navy);border-radius:6px;font-size:1rem}
+  .sol.show{display:block}
+  .sol h4{margin:0 0 8px;font-size:1rem;color:var(--navy-dk)}
+  .sol p{margin:.4rem 0}
+  .sol .ans{color:var(--navy-dk)}
+  .sol .lbl{font-weight:700}
+
+  footer.foot{color:var(--muted);font-size:.87rem;text-align:center;margin-top:26px}
+
+  @media (max-width:560px){
+    table.data th,table.data td{padding:4px 7px}
+    .row label.cap{min-width:0}
+  }
+
+  @media print{
+    body{background:#fff}
+    .btns,.scorebar{display:none}
+    .sol{display:block}
+    .q{break-inside:avoid;border-color:#999}
+    header.top{background:#fff;color:#000;border:1px solid #000}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>FIN 406 &middot; Quiz 3 Practice Set</h1>
+  <div class="sub">The capital asset pricing model &middot; The security market line &middot; Evaluating portfolio performance</div>
+  <div class="dates">Material cutoff: Thursday 8 October &nbsp;|&nbsp; Quiz 3: Tuesday 13 October</div>
+</header>
+
+<div class="panel">
+  <h2>How to use this set</h2>
+  <p>Work each problem on paper with your financial calculator, then type your answers and press
+     <b>Check</b>.</p>
+  <p><b>New numbers</b> regenerates a problem with different values. <b>Explanation</b> shows the
+     full working for the numbers currently on screen.</p>
+  <p>The shaded <b>Concept check</b> at the end of a problem is to help improve your conceptual understanding of the problem.</p>
+  <p>If you spot an error in any of the solutions, please email me (gxn13@psu.edu) as soon as possible and include a screenshot. The numbers change every time a problem is regenerated, so without one I cannot see the version you were looking at.</p>
+  <h2 style="margin-top:14px">Before you start</h2>
+  <ul class="tight">
+    <li>Percent boxes take percent: type <code class="u">14.41</code>, not <code class="u">0.1441</code>.</li>
+    <li>Beta and the Sharpe measure are plain numbers, not percentages.</li>
+    <li>The Treynor measure goes in as percentage points per unit of beta &mdash; for example <code class="u">8.83</code>, not <code class="u">0.0883</code>.</li>
+    <li>Negative answers may be typed either way: <code class="u">-2.50</code> or <code class="u">(2.50)</code>.</li>
+    <li>Do not round intermediate calculations. Round each final answer as the question asks.</li>
+  </ul>
+</div>
+
+<div class="scorebar">
+  Progress
+  <div class="track"><div class="fill" id="fill"></div></div>
+  <span id="scoretext"></span>
+  <button class="ghost" id="resetall" style="margin-left:auto">Reset all</button>
+</div>
+
+<div id="quiz"></div>
+
+<footer class="foot">
+  FIN 406: Security Analysis and Portfolio Management &middot; Prof. Nguyen &middot; Fall 2026
+</footer>
+</div>
+
+<script>
+/* =================== helpers =================== */
+const ri   = (a,b) => Math.floor(Math.random()*(b-a+1))+a;
+const pick = a => a[Math.floor(Math.random()*a.length)];
+const d1   = x => (Math.round(x*10)/10).toFixed(1);
+const d2   = x => (Math.round(x*100)/100).toFixed(2);
+const d4   = x => (Math.round(x*10000)/10000).toFixed(4);
+const pc   = x => d2(x)+'%';
+const shuffle = a => a.map(v=>[Math.random(),v]).sort((p,q)=>p[0]-q[0]).map(p=>p[1]);
+
+/* part = {key,label,unit,ans,tol}              numeric
+        | {key,type:'yesno',ansYes,...}         two-way choice
+        | {key,type:'mc',options:[],ansIdx}     multiple choice                     */
+const PROBLEMS = [
+/* 1 — CAPM: the fair return and whether a stock is mispriced --------- */
+function capmMispricing(){
+  const rf  = ri(2,5);
+  const mrp = ri(4,8);
+  const bA  = pick([1.2,1.3,1.4,1.5,1.6]);
+  const bB  = pick([0.6,0.7,0.8,0.9,1.0]);
+  const fairA = rf + bA*mrp;
+  const fairB = rf + bB*mrp;
+  const erA = fairA - pick([0.5,1,1.5,2]);        // priced to be overpriced
+  const erB = fairB + pick([0.5,1,1.5,2]);        // priced to be underpriced
+  const sdA = ri(22,34), sdB = ri(8,18);
+  const verdict = ['Overpriced','Underpriced','Fairly priced'];
+  return {
+    tag:'CAPM and mispricing',
+    stem:`Here is the relevant information on two companies. The T-bill rate is ${rf}% and the
+          market risk premium is ${mrp}%.
+      <table class="data">
+        <tr><th></th><th>Northwind Aviation</th><th>Bexley Robotics</th></tr>
+        <tr><td>Expected return</td><td>${pc(erA)}</td><td>${pc(erB)}</td></tr>
+        <tr><td>Standard deviation of returns</td><td>${sdA}%</td><td>${sdB}%</td></tr>
+        <tr><td>Beta</td><td>${bA.toFixed(1)}</td><td>${bB.toFixed(1)}</td></tr>
+      </table>`,
+    parts:[
+      {key:'a-1', ask:'What return does the CAPM predict for Northwind Aviation?',
+       note:'Round your answer to 2 decimal places.',
+       label:'Fair return', unit:'%', ans:fairA, tol:0.01},
+      {key:'a-2', ask:'What return does the CAPM predict for Bexley Robotics?',
+       note:'Round your answer to 2 decimal places.',
+       label:'Fair return', unit:'%', ans:fairB, tol:0.01},
+      {key:'b-1', ask:'Based on its expected return, Northwind Aviation is:',
+       type:'mc', options:verdict, ansIdx:0},
+      {key:'b-2', ask:'Based on its expected return, Bexley Robotics is:',
+       type:'mc', options:verdict, ansIdx:1}
+    ],
+    explain:[
+      `<span class="lbl">a.</span> The CAPM gives the return an asset should offer for the systematic
+       risk it carries: E(r) = r<sub>f</sub> + &beta; &times; market risk premium.`,
+      `Northwind Aviation: ${rf}% + ${bA.toFixed(1)} &times; ${mrp}% =
+       <span class="ans">${pc(fairA)}</span>`,
+      `Bexley Robotics: ${rf}% + ${bB.toFixed(1)} &times; ${mrp}% =
+       <span class="ans">${pc(fairB)}</span>`,
+      `<span class="lbl">b.</span> Compare each expected return with the fair return just computed.
+       The difference is the stock&rsquo;s alpha.`,
+      `Northwind Aviation is expected to return ${pc(erA)}, which is below the fair return of
+       ${pc(fairA)}. Its alpha is ${pc(erA-fairA)}, so it is <span class="ans">overpriced</span> &mdash;
+       you are not being paid enough for the risk you would take on.`,
+      `Bexley Robotics is expected to return ${pc(erB)}, which is above the fair return of
+       ${pc(fairB)}. Its alpha is +${pc(erB-fairB)}, so it is <span class="ans">underpriced</span>.`,
+      `Notice that the standard deviations played no part in the calculation. Under the CAPM only
+       systematic risk, measured by beta, is rewarded; the rest of a stock&rsquo;s volatility is
+       diversifiable and earns nothing.`
+    ]
+  };
+},
+
+/* 2 — reading the security market line backwards --------------------- */
+function smlBackwards(){
+  const rf  = ri(3,6);
+  const mrp = pick([5,6,7,8]);
+  const erM = rf + mrp;
+  const bX  = pick([0.8,1.2,1.4,1.6,2.0]);
+  const erX = rf + bX*mrp;                       // fairly priced: solve for beta
+  const bP  = pick([0.9,1.1,1.3,1.5]);
+  const alP = pick([-2.5,-2,-1.5,1.5,2,2.5]);
+  const reqP = rf + bP*mrp;
+  const actP = reqP + alP;
+  return {
+    tag:'The security market line',
+    stem:`The risk-free rate is ${rf}% and the expected return on the market portfolio is ${erM}%.
+          All of the questions below refer to the same security market line.`,
+    parts:[
+      {key:'a', ask:`Ravenswood Retail is fairly priced and has an expected return of ${pc(erX)}.
+              What is its beta?`,
+       note:'Round your answer to 2 decimal places.',
+       label:'Beta', unit:'', ans:bX, tol:0.01},
+      {key:'b', ask:`What return should a portfolio with a beta of ${bP.toFixed(1)} be expected to earn?`,
+       note:'Round your answer to 2 decimal places.',
+       label:'Required return', unit:'%', ans:reqP, tol:0.01},
+      {key:'c', ask:`Tarnbrook Systems has a beta of ${bP.toFixed(1)} and an actual expected return of
+              ${pc(actP)}. What is its alpha?`,
+       note:'Indicate a negative value with a minus sign. Round your answer to 2 decimal places.',
+       label:'Alpha', unit:'%', ans:alP, tol:0.01},
+      {key:'d', ask:'On the evidence of that alpha, Tarnbrook Systems is:',
+       type:'mc', options:['A good buy — it plots above the SML','A poor buy — it plots below the SML'],
+       ansIdx: alP>0 ? 0 : 1}
+    ],
+    explain:[
+      `<span class="lbl">a.</span> The market risk premium is the slope of the SML:
+       ${erM}% &minus; ${rf}% = ${pc(mrp)}.`,
+      `A fairly priced security sits on the line, so ${pc(erX)} = ${rf}% + &beta; &times; ${pc(mrp)}.
+       Rearranging, &beta; = (${pc(erX)} &minus; ${rf}%) &divide; ${pc(mrp)} =
+       <span class="ans">${d2(bX)}</span>`,
+      `<span class="lbl">b.</span> Running the same line forwards:
+       ${rf}% + ${bP.toFixed(1)} &times; ${pc(mrp)} = <span class="ans">${pc(reqP)}</span>`,
+      `<span class="lbl">c.</span> Alpha is the gap between what a security actually offers and what
+       the SML says it should offer: ${pc(actP)} &minus; ${pc(reqP)} =
+       <span class="ans">${pc(alP)}</span>`,
+      `<span class="lbl">d.</span> ${alP>0
+         ? `A positive alpha puts Tarnbrook Systems <span class="ans">above the SML</span>: it offers
+            more than its systematic risk warrants, which makes it a good buy.`
+         : `A negative alpha puts Tarnbrook Systems <span class="ans">below the SML</span>: it offers
+            less than its systematic risk warrants, which makes it a poor buy.`}`
+    ]
+  };
+},
+
+/* 3 — two advisers: the higher return is not the better manager ------ */
+function twoAdvisers(){
+  let rf,mrp,erM,bA,bB,alA,alB,rA,rB,reqA,reqB;
+  do {
+    rf  = ri(3,6);
+    mrp = pick([6,7,8]);
+    erM = rf + mrp;
+    bA  = pick([1.4,1.5,1.6,1.7,1.8]);
+    bB  = pick([0.8,0.9,1.0,1.1,1.2]);
+    alA = pick([0.2,0.4,0.6,0.8]);
+    alB = pick([1.6,2.0,2.4,2.8]);
+    reqA = rf + bA*mrp;  reqB = rf + bB*mrp;
+    rA = reqA + alA;     rB = reqB + alB;
+  } while (!(rA > rB + 0.4));            // A must look better on raw return alone
+  return {
+    tag:'Comparing managers',
+    stem:`Two investment advisers are comparing performance over the same period. Pemberton Advisors
+          averaged a return of ${pc(rA)} with a portfolio beta of ${bA.toFixed(1)}. Whitfield Capital
+          averaged ${pc(rB)} with a portfolio beta of ${bB.toFixed(1)}. Over that period the T-bill
+          rate was ${rf}% and the market returned ${erM}%.`,
+    parts:[
+      {key:'a-1', ask:'What return should Pemberton Advisors have earned, given the risk it took?',
+       note:'Round your answer to 2 decimal places.',
+       label:'Required return', unit:'%', ans:reqA, tol:0.01},
+      {key:'a-2', ask:'What return should Whitfield Capital have earned, given the risk it took?',
+       note:'Round your answer to 2 decimal places.',
+       label:'Required return', unit:'%', ans:reqB, tol:0.01},
+      {key:'b-1', ask:'What was Pemberton&rsquo;s alpha?',
+       note:'Indicate a negative value with a minus sign. Round your answer to 2 decimal places.',
+       label:'Alpha', unit:'%', ans:alA, tol:0.01},
+      {key:'b-2', ask:'What was Whitfield&rsquo;s alpha?',
+       note:'Indicate a negative value with a minus sign. Round your answer to 2 decimal places.',
+       label:'Alpha', unit:'%', ans:alB, tol:0.01},
+      {key:'c', ask:'Which adviser performed better?',
+       type:'mc',
+       options:['Pemberton, because it earned the higher return',
+                'Whitfield, because it generated the larger alpha',
+                'Pemberton, because it generated the larger alpha',
+                'Whitfield, because it took less risk'],
+       ansIdx:1}
+    ],
+    explain:[
+      `<span class="lbl">a.</span> The benchmark for each adviser is the CAPM return for the risk
+       actually taken. The market risk premium is ${erM}% &minus; ${rf}% = ${pc(mrp)}.`,
+      `Pemberton: ${rf}% + ${bA.toFixed(1)} &times; ${pc(mrp)} = <span class="ans">${pc(reqA)}</span>`,
+      `Whitfield: ${rf}% + ${bB.toFixed(1)} &times; ${pc(mrp)} = <span class="ans">${pc(reqB)}</span>`,
+      `<span class="lbl">b.</span> Alpha is the return earned in excess of that benchmark.`,
+      `Pemberton: ${pc(rA)} &minus; ${pc(reqA)} = <span class="ans">${pc(alA)}</span>`,
+      `Whitfield: ${pc(rB)} &minus; ${pc(reqB)} = <span class="ans">${pc(alB)}</span>`,
+      `<span class="lbl">c.</span> Pemberton earned the higher raw return, ${pc(rA)} against
+       ${pc(rB)} &mdash; but it did so by running a much higher beta, and most of that extra return
+       is simply payment for the extra market risk. Once that is stripped out,
+       <span class="ans">Whitfield</span> added ${pc(alB)} of value against Pemberton&rsquo;s
+       ${pc(alA)}.`,
+      `This is the central lesson of performance evaluation: a raw return means nothing until you
+       know the risk that produced it.`
+    ]
+  };
+},
+
+/* 4 — the Fama-French three-factor model ----------------------------- */
+function famaFrench(){
+  const rf = ri(1,4);
+  const mp = pick([5,6,7]);
+  const sp = pick([1.5,2,2.5,3]);
+  const vp = pick([3,3.5,4,4.5]);
+  const bM = pick([0.9,1.0,1.1,1.2]);
+  const bS = pick([0.25,0.5,0.75,1.0]);
+  const bV = pick([0.5,0.75,1.0,1.25]);
+  const fair = rf + bM*mp + bS*sp + bV*vp;
+  const dir  = pick([-1,1]);
+  const er   = fair + dir*pick([1,1.5,2,2.5]);
+  return {
+    tag:'Fama-French three-factor model',
+    stem:`Ashgrove Industries has an expected return of ${pc(er)}. Its exposure to each systematic
+          risk factor, and the risk premium attached to that factor, are given below. The risk-free
+          rate is ${rf}%.
+      <table class="data">
+        <tr><th>Systematic factor</th><th>Risk premium</th><th>Beta</th></tr>
+        <tr><td>Market risk</td><td>${pc(mp)}</td><td>${bM.toFixed(2)}</td></tr>
+        <tr><td>Size factor</td><td>${pc(sp)}</td><td>${bS.toFixed(2)}</td></tr>
+        <tr><td>Value factor</td><td>${pc(vp)}</td><td>${bV.toFixed(2)}</td></tr>
+      </table>`,
+    parts:[
+      {key:'a', ask:`Using the Fama-French three-factor model, what return should Ashgrove Industries
+              be expected to earn?`,
+       note:'Round your answer to 2 decimal places.',
+       label:'Expected return', unit:'%', ans:fair, tol:0.01},
+      {key:'b', ask:'How much of that return is compensation for the value-factor exposure alone?',
+       note:'Round your answer to 2 decimal places.',
+       label:'Value factor contribution', unit:'%', ans:bV*vp, tol:0.01},
+      {key:'c', ask:'On the evidence of its expected return, Ashgrove Industries is:',
+       type:'mc', options:['Overpriced','Underpriced'], ansIdx: dir<0 ? 0 : 1}
+    ],
+    explain:[
+      `<span class="lbl">a.</span> The three-factor model works exactly like the CAPM, except that
+       there are three sources of priced risk instead of one. Add the risk-free rate to the sum of
+       each beta multiplied by its own risk premium.`,
+      `E(r) = ${rf}% + (${bM.toFixed(2)} &times; ${pc(mp)}) + (${bS.toFixed(2)} &times; ${pc(sp)})
+       + (${bV.toFixed(2)} &times; ${pc(vp)})`,
+      `E(r) = ${rf}% + ${pc(bM*mp)} + ${pc(bS*sp)} + ${pc(bV*vp)} =
+       <span class="ans">${pc(fair)}</span>`,
+      `<span class="lbl">b.</span> The value factor contributes ${bV.toFixed(2)} &times; ${pc(vp)}
+       = <span class="ans">${pc(bV*vp)}</span>. Each factor&rsquo;s contribution is its own beta
+       times its own premium; the factors do not interact.`,
+      `<span class="lbl">c.</span> The stock is expected to return ${pc(er)} against a fair return of
+       ${pc(fair)}, an alpha of ${pc(er-fair)}. It is therefore
+       <span class="ans">${dir<0?'overpriced':'underpriced'}</span>.`,
+      `The logic is unchanged from the CAPM. Widening the model to three factors changes what counts
+       as fair compensation, not the way mispricing is judged.`
+    ]
+  };
+},
+
+/* 5 — Sharpe and Treynor can disagree -------------------------------- */
+function sharpeTreynor(){
+  let rf,mrp,erM,bA,bB,alA,alB,sdA,sdB,rA,rB,shA,shB,trA,trB;
+  do {
+    rf  = ri(3,6);
+    mrp = pick([6,7,8]);
+    erM = rf + mrp;
+    bA  = pick([1.1,1.2,1.3]);
+    bB  = pick([0.7,0.8,0.9]);
+    alA = pick([0.5,1,1.5]);
+    alB = pick([1,1.5,2,2.5]);
+    sdA = ri(18,24);
+    sdB = ri(25,32);
+    rA  = rf + bA*mrp + alA;
+    rB  = rf + bB*mrp + alB;
+    shA = (rA-rf)/sdA;  shB = (rB-rf)/sdB;
+    trA = (rA-rf)/bA;   trB = (rB-rf)/bB;
+  } while (!(shA > shB + 0.02 && trB > trA + 0.2));   // force the two measures to disagree
+  return {
+    tag:'Sharpe and Treynor',
+    stem:`Consider two portfolios, Ellsworth and Grantham. Over the period the risk-free rate was
+          ${rf}% and the market returned ${erM}%. Ellsworth has a beta of ${bA.toFixed(1)}, an alpha
+          of ${pc(alA)} and a standard deviation of ${sdA}%. Grantham has a beta of ${bB.toFixed(1)},
+          an alpha of ${pc(alB)} and a standard deviation of ${sdB}%.`,
+    parts:[
+      {key:'a-1', ask:'What return did Ellsworth actually earn?',
+       note:'Round your answer to 2 decimal places.',
+       label:'Return', unit:'%', ans:rA, tol:0.01},
+      {key:'a-2', ask:'What return did Grantham actually earn?',
+       note:'Round your answer to 2 decimal places.',
+       label:'Return', unit:'%', ans:rB, tol:0.01},
+      {key:'b-1', ask:'What is the Sharpe measure for Ellsworth?',
+       note:'Round your answer to 4 decimal places.',
+       label:'Sharpe measure', unit:'', ans:shA, tol:0.0001},
+      {key:'b-2', ask:'What is the Sharpe measure for Grantham?',
+       note:'Round your answer to 4 decimal places.',
+       label:'Sharpe measure', unit:'', ans:shB, tol:0.0001},
+      {key:'c-1', ask:`What is the Treynor measure for Ellsworth?`,
+       note:'Express it in percentage points per unit of beta. Round your answer to 2 decimal places.',
+       label:'Treynor measure', unit:'%', ans:trA, tol:0.01},
+      {key:'c-2', ask:`What is the Treynor measure for Grantham?`,
+       note:'Express it in percentage points per unit of beta. Round your answer to 2 decimal places.',
+       label:'Treynor measure', unit:'%', ans:trB, tol:0.01},
+      {key:'d-1', ask:'If each portfolio is the investor&rsquo;s entire holding, which is better?',
+       type:'mc', options:['Ellsworth','Grantham'], ansIdx:0},
+      {key:'d-2', ask:'If each is one small holding inside a large, well-diversified portfolio, which is better?',
+       type:'mc', options:['Ellsworth','Grantham'], ansIdx:1}
+    ],
+    explain:[
+      `<span class="lbl">a.</span> Alpha is the return earned above the CAPM benchmark, so run that
+       backwards to recover the actual return: r = &alpha; + r<sub>f</sub> + &beta; &times;
+       (r<sub>M</sub> &minus; r<sub>f</sub>), with a market risk premium of ${pc(mrp)}.`,
+      `Ellsworth: ${pc(alA)} + ${rf}% + ${bA.toFixed(1)} &times; ${pc(mrp)} =
+       <span class="ans">${pc(rA)}</span>`,
+      `Grantham: ${pc(alB)} + ${rf}% + ${bB.toFixed(1)} &times; ${pc(mrp)} =
+       <span class="ans">${pc(rB)}</span>`,
+      `<span class="lbl">b.</span> The Sharpe measure divides the excess return by total risk,
+       the standard deviation.`,
+      `Ellsworth: (${pc(rA)} &minus; ${rf}%) &divide; ${sdA}% =
+       <span class="ans">${d4(shA)}</span> &nbsp;&nbsp; Grantham: (${pc(rB)} &minus; ${rf}%) &divide;
+       ${sdB}% = <span class="ans">${d4(shB)}</span>`,
+      `<span class="lbl">c.</span> The Treynor measure divides the same excess return by beta, that
+       is, by systematic risk alone.`,
+      `Ellsworth: (${pc(rA)} &minus; ${rf}%) &divide; ${bA.toFixed(1)} =
+       <span class="ans">${d2(trA)}</span> &nbsp;&nbsp; Grantham: (${pc(rB)} &minus; ${rf}%) &divide;
+       ${bB.toFixed(1)} = <span class="ans">${d2(trB)}</span>`,
+      `<span class="lbl">d.</span> The two measures rank these portfolios differently, and that is
+       the point of the problem. The right measure depends on what else the investor owns.`,
+      `If the portfolio is everything the investor holds, total risk is what they actually bear, so
+       the Sharpe measure applies and <span class="ans">Ellsworth</span> wins.`,
+      `If it is one small position inside a well-diversified portfolio, its firm-specific risk is
+       already diversified away and only its systematic risk matters. The Treynor measure applies and
+       <span class="ans">Grantham</span> wins.`
+    ]
+  };
+},
+
+/* 6 — ranking three funds against the index -------------------------- */
+function rankThreeFunds(){
+  const names = ['Holloway Fund','Quillon Fund','Denby Fund'];
+  let rf,rM,sdM,r,sd,b,sh,tr,shM,iSh,iTr;
+  do {
+    rf  = ri(4,7);
+    rM  = rf + pick([8,10,12]);
+    sdM = ri(14,18);
+    r   = [ri(12,26), ri(12,26), ri(12,26)];
+    sd  = [ri(10,32), ri(10,32), ri(10,32)];
+    b   = [pick([0.5,0.6,0.7,0.8]), pick([0.9,1.0,1.1]), pick([1.2,1.4,1.5])];
+    sh  = r.map((x,k)=>(x-rf)/sd[k]);
+    tr  = r.map((x,k)=>(x-rf)/b[k]);
+    shM = (rM-rf)/sdM;
+    iSh = sh.indexOf(Math.max(...sh));
+    iTr = tr.indexOf(Math.max(...tr));
+  } while (
+    iSh === iTr ||                                        // the two rankings must disagree
+    new Set(sh.map(x=>x.toFixed(3))).size < 3 ||          // no ties
+    new Set(tr.map(x=>x.toFixed(2))).size < 3 ||
+    r.some(x=>x<=rf)
+  );
+  const rows = names.map((n,k)=>
+    `<tr><td>${n}</td><td>${r[k]}%</td><td>${sd[k]}%</td><td>${b[k].toFixed(1)}</td></tr>`).join('');
+  return {
+    tag:'Ranking funds',
+    stem:`You are evaluating three funds against a broad market index. The risk-free return over the
+          sample period was ${rf}%.
+      <table class="data">
+        <tr><th></th><th>Average return</th><th>Standard deviation</th><th>Beta</th></tr>
+        ${rows}
+        <tr><td>Market index</td><td>${rM}%</td><td>${sdM}%</td><td>1.0</td></tr>
+      </table>`,
+    parts:[
+      {key:'a-1', ask:`What is the Sharpe measure for the ${names[0]}?`,
+       note:'Round your answer to 4 decimal places.',
+       label:'Sharpe measure', unit:'', ans:sh[0], tol:0.0001},
+      {key:'a-2', ask:`What is the Sharpe measure for the ${names[1]}?`,
+       note:'Round your answer to 4 decimal places.',
+       label:'Sharpe measure', unit:'', ans:sh[1], tol:0.0001},
+      {key:'a-3', ask:`What is the Sharpe measure for the ${names[2]}?`,
+       note:'Round your answer to 4 decimal places.',
+       label:'Sharpe measure', unit:'', ans:sh[2], tol:0.0001},
+      {key:'b', ask:'What is the Sharpe measure for the market index?',
+       note:'Round your answer to 4 decimal places.',
+       label:'Sharpe measure', unit:'', ans:shM, tol:0.0001},
+      {key:'c', ask:'Which fund has the highest Sharpe measure?',
+       type:'mc', options:names, ansIdx:iSh},
+      {key:'d', ask:'Which fund has the highest Treynor measure?',
+       type:'mc', options:names, ansIdx:iTr}
+    ],
+    explain:[
+      `<span class="lbl">a.</span> Sharpe measure = (average return &minus; risk-free rate) &divide;
+       standard deviation.`,
+      ...names.map((n,k)=>
+        `${n}: (${r[k]}% &minus; ${rf}%) &divide; ${sd[k]}% = <span class="ans">${d4(sh[k])}</span>`),
+      `<span class="lbl">b.</span> Market index: (${rM}% &minus; ${rf}%) &divide; ${sdM}% =
+       <span class="ans">${d4(shM)}</span>. Any fund below this figure failed to beat a simple index
+       holding on a risk-adjusted basis.`,
+      `<span class="lbl">c.</span> The highest Sharpe measure belongs to the
+       <span class="ans">${names[iSh]}</span>.`,
+      `<span class="lbl">d.</span> The Treynor measure divides the same excess returns by beta:
+       ${names.map((n,k)=>`${n} ${d2(tr[k])}`).join(', ')}. The highest belongs to the
+       <span class="ans">${names[iTr]}</span>.`,
+      `The two measures disagree here because they divide by different notions of risk. A fund can
+       look strong per unit of total volatility and weak per unit of market exposure, or the reverse,
+       depending on how much of its risk is diversifiable.`
+    ]
+  };
+},
+
+/* 7 — performance attribution: selection versus allocation ----------- */
+function attribution(){
+  let waE,waB,waC,wbE,wbB,wbC,raE,raB,rC,rbE,rbB,mgr,bench,diff,sel,alloc;
+  do {
+    waE = pick([0.55,0.60,0.65,0.70]);
+    waB = pick([0.15,0.20,0.25]);
+    waC = Math.round((1-waE-waB)*100)/100;
+    wbE = pick([0.50,0.55,0.60]);
+    wbB = pick([0.25,0.30,0.35]);
+    wbC = Math.round((1-wbE-wbB)*100)/100;
+    raE = ri(10,45)/10;  rbE = ri(10,45)/10;
+    raB = ri(5,25)/10;   rbB = ri(5,25)/10;
+    rC  = pick([0.3,0.4,0.5]);                    // cash: the manager cannot add value here
+    mgr   = waE*raE + waB*raB + waC*rC;
+    bench = wbE*rbE + wbB*rbB + wbC*rC;
+    diff  = mgr - bench;
+    sel   = waE*(raE-rbE) + waB*(raB-rbB) + waC*(rC-rC);
+    alloc = (waE-wbE)*rbE + (waB-wbB)*rbB + (waC-wbC)*rC;
+  } while (waC < 0.05 || wbC < 0.05 || Math.abs(diff) < 0.05
+           || Math.abs(sel) < 0.03 || Math.abs(alloc) < 0.03);
+  return {
+    tag:'Performance attribution',
+    stem:`The table shows how a money manager performed last month. Column 1 is the return the
+          manager earned in each sector, column 2 is the fraction of the portfolio she put there,
+          and columns 3 and 4 are the corresponding weights and returns for the benchmark portfolio.
+      <table class="data">
+        <tr><th>Sector</th><th>Actual return</th><th>Actual weight</th>
+            <th>Benchmark weight</th><th>Benchmark return</th></tr>
+        <tr><td>Equity</td><td>${pc(raE)}</td><td>${waE.toFixed(2)}</td><td>${wbE.toFixed(2)}</td><td>${pc(rbE)}</td></tr>
+        <tr><td>Bonds</td><td>${pc(raB)}</td><td>${waB.toFixed(2)}</td><td>${wbB.toFixed(2)}</td><td>${pc(rbB)}</td></tr>
+        <tr><td>Cash</td><td>${pc(rC)}</td><td>${waC.toFixed(2)}</td><td>${wbC.toFixed(2)}</td><td>${pc(rC)}</td></tr>
+      </table>`,
+    parts:[
+      {key:'a-1', ask:'What was the manager&rsquo;s return over the month?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Manager return', unit:'%', ans:mgr, tol:0.01},
+      {key:'a-2', ask:'What was the return on the benchmark portfolio?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Benchmark return', unit:'%', ans:bench, tol:0.01},
+      {key:'a-3', ask:'What was her over- or underperformance?',
+       note:'Indicate underperformance with a minus sign. Round your answer to 2 decimal places.',
+       label:'Over/underperformance', unit:'%', ans:diff, tol:0.01},
+      {key:'b', ask:'What was the contribution of security selection?',
+       note:'Indicate a negative value with a minus sign. Round your answer to 2 decimal places.',
+       label:'Security selection', unit:'%', ans:sel, tol:0.01},
+      {key:'c', ask:'What was the contribution of asset allocation?',
+       note:'Indicate a negative value with a minus sign. Round your answer to 2 decimal places.',
+       label:'Asset allocation', unit:'%', ans:alloc, tol:0.01}
+    ],
+    explain:[
+      `<span class="lbl">a.</span> Each portfolio&rsquo;s return is the weighted average of its own
+       sector returns, using its own weights.`,
+      `Manager: (${waE.toFixed(2)} &times; ${pc(raE)}) + (${waB.toFixed(2)} &times; ${pc(raB)}) +
+       (${waC.toFixed(2)} &times; ${pc(rC)}) = <span class="ans">${pc(mgr)}</span>`,
+      `Benchmark: (${wbE.toFixed(2)} &times; ${pc(rbE)}) + (${wbB.toFixed(2)} &times; ${pc(rbB)}) +
+       (${wbC.toFixed(2)} &times; ${pc(rC)}) = <span class="ans">${pc(bench)}</span>`,
+      `Difference: ${pc(mgr)} &minus; ${pc(bench)} = <span class="ans">${pc(diff)}</span>,
+       an ${diff<0?'underperformance':'outperformance'} of ${pc(Math.abs(diff))}.`,
+      `<span class="lbl">b.</span> Security selection asks how well she picked within each sector.
+       Multiply the return she beat the sector benchmark by, by the weight she actually held.`,
+      `<table class="data">
+         <tr><th>Sector</th><th>Return difference</th><th>Actual weight</th><th>Contribution</th></tr>
+         <tr><td>Equity</td><td>${pc(raE-rbE)}</td><td>${waE.toFixed(2)}</td><td>${pc(waE*(raE-rbE))}</td></tr>
+         <tr><td>Bonds</td><td>${pc(raB-rbB)}</td><td>${waB.toFixed(2)}</td><td>${pc(waB*(raB-rbB))}</td></tr>
+         <tr><td>Cash</td><td>${pc(0)}</td><td>${waC.toFixed(2)}</td><td>${pc(0)}</td></tr>
+       </table>
+       Contribution of security selection = <span class="ans">${pc(sel)}</span>`,
+      `<span class="lbl">c.</span> Asset allocation asks how well she chose the sector weights.
+       Multiply the weight she over- or under-held by, by the benchmark return of that sector.`,
+      `<table class="data">
+         <tr><th>Sector</th><th>Excess weight</th><th>Benchmark return</th><th>Contribution</th></tr>
+         <tr><td>Equity</td><td>${(waE-wbE).toFixed(2)}</td><td>${pc(rbE)}</td><td>${pc((waE-wbE)*rbE)}</td></tr>
+         <tr><td>Bonds</td><td>${(waB-wbB).toFixed(2)}</td><td>${pc(rbB)}</td><td>${pc((waB-wbB)*rbB)}</td></tr>
+         <tr><td>Cash</td><td>${(waC-wbC).toFixed(2)}</td><td>${pc(rC)}</td><td>${pc((waC-wbC)*rC)}</td></tr>
+       </table>
+       Contribution of asset allocation = <span class="ans">${pc(alloc)}</span>`,
+      `As a check, the two contributions must add back to the total: ${pc(sel)} + ${pc(alloc)}
+       = ${pc(sel+alloc)}, which is the ${diff<0?'under':'over'}performance found in part a.`
+    ]
+  };
+},
+
+/* 8 — portfolio beta and the CAPM ------------------------------------ */
+function portfolioBeta(){
+  const rf  = ri(2,5);
+  const mrp = pick([5,6,7]);
+  const erM = rf + mrp;
+  const b1  = pick([0.6,0.7,0.8,0.9]);
+  const b2  = pick([1.2,1.3,1.4,1.5,1.6]);
+  const w1  = pick([0.3,0.4,0.5,0.6,0.7]);
+  const w2  = Math.round((1-w1)*100)/100;
+  const bP  = w1*b1 + w2*b2;
+  const erP = rf + bP*mrp;
+  const tgt = pick([0.5,0.75,1.25,1.5]);
+  const erT = rf + tgt*mrp;
+  return {
+    tag:'Portfolio beta',
+    stem:`The risk-free rate is ${rf}% and the market portfolio is expected to return ${erM}%.
+          You hold ${(w1*100).toFixed(0)}% of your money in Kirkfell Utilities, which has a beta of
+          ${b1.toFixed(1)}, and ${(w2*100).toFixed(0)}% in Ardsley Semiconductor, which has a beta of
+          ${b2.toFixed(1)}.`,
+    parts:[
+      {key:'a', ask:'What is the beta of your portfolio?',
+       note:'Round your answer to 3 decimal places.',
+       label:'Portfolio beta', unit:'', ans:bP, tol:0.001},
+      {key:'b', ask:'What return should your portfolio be expected to earn?',
+       note:'Round your answer to 2 decimal places.',
+       label:'Expected return', unit:'%', ans:erP, tol:0.01},
+      {key:'c', ask:`Suppose instead you held only the market portfolio and T-bills. What percentage
+              of your money would go into the market portfolio to give a beta of ${tgt.toFixed(2)}?`,
+       note:'Round your answer to 2 decimal places.',
+       label:'Weight in the market portfolio', unit:'%', ans:tgt*100, tol:0.01},
+      {key:'d', ask:'What return would that combination be expected to earn?',
+       note:'Round your answer to 2 decimal places.',
+       label:'Expected return', unit:'%', ans:erT, tol:0.01}
+    ],
+    explain:[
+      `<span class="lbl">a.</span> Beta is additive across a portfolio: the portfolio beta is the
+       weighted average of the individual betas, using the same weights as the holdings.`,
+      `&beta;<sub>P</sub> = (${w1.toFixed(2)} &times; ${b1.toFixed(1)}) + (${w2.toFixed(2)} &times;
+       ${b2.toFixed(1)}) = <span class="ans">${bP.toFixed(3)}</span>`,
+      `<span class="lbl">b.</span> Apply the CAPM to that portfolio beta, with a market risk premium
+       of ${erM}% &minus; ${rf}% = ${pc(mrp)}:`,
+      `E(r<sub>P</sub>) = ${rf}% + ${bP.toFixed(3)} &times; ${pc(mrp)} =
+       <span class="ans">${pc(erP)}</span>`,
+      `You would get the same answer by taking the weighted average of the two stocks&rsquo; own CAPM
+       returns, ${pc(rf+b1*mrp)} and ${pc(rf+b2*mrp)}, because the SML is a straight line.`,
+      `<span class="lbl">c.</span> T-bills have a beta of 0 and the market portfolio has a beta of 1,
+       so a portfolio holding weight w in the market has a beta of w &times; 1 + (1 &minus; w)
+       &times; 0 = w. To reach a beta of ${tgt.toFixed(2)} you put
+       <span class="ans">${pc(tgt*100)}</span> in the market portfolio.`,
+      `<span class="lbl">d.</span> E(r) = ${rf}% + ${tgt.toFixed(2)} &times; ${pc(mrp)} =
+       <span class="ans">${pc(erT)}</span>`,
+      `${tgt>1
+        ? `Note that a weight above 100% means borrowing at the risk-free rate and investing the
+           proceeds in the market &mdash; the levered part of the capital allocation line.`
+        : `The remaining ${pc(100-tgt*100)} sits in T-bills, which is the lending part of the capital
+           allocation line.`}`
+    ]
+  };
+},
+
+/* 9 — CAPM concepts, multiple choice --------------------------------- */
+function capmConcepts(){
+  const a = shuffle([
+    ['beta', true],
+    ['the standard deviation of returns', false],
+    ['firm-specific risk', false],
+    ['reinvestment risk', false]
+  ]);
+  const b = shuffle([
+    ['zero alphas', true],
+    ['positive alphas', false],
+    ['positive betas', false],
+    ['negative betas', false]
+  ]);
+  const c = shuffle([
+    ['systematic risk', true],
+    ['unsystematic risk', false],
+    ['residual risk', false],
+    ['firm-specific risk', false]
+  ]);
+  const d = shuffle([
+    ['a positive alpha is considered underpriced', true],
+    ['a positive alpha is considered overpriced', false],
+    ['a negative alpha is considered a good buy', false],
+    ['a zero alpha is considered a good buy', false]
+  ]);
+  return {
+    tag:'CAPM concepts',
+    stem:`Four short questions on the capital asset pricing model. There is nothing to calculate
+          here &mdash; reason each one through.`,
+    parts:[
+      {key:'a', ask:'The measure of risk used in the capital asset pricing model is ______.',
+       type:'mc', options:a.map(o=>o[0]), ansIdx:a.findIndex(o=>o[1])},
+      {key:'b', ask:'According to the CAPM, fairly priced securities have ______.',
+       type:'mc', options:b.map(o=>o[0]), ansIdx:b.findIndex(o=>o[1])},
+      {key:'c', ask:'Investors require a risk premium as compensation for bearing ______.',
+       type:'mc', options:c.map(o=>o[0]), ansIdx:c.findIndex(o=>o[1])},
+      {key:'d', ask:'According to the CAPM, a security with ______.',
+       type:'mc', options:d.map(o=>o[0]), ansIdx:d.findIndex(o=>o[1])}
+    ],
+    explain:[
+      `<span class="lbl">a.</span> <span class="ans">Beta.</span> The CAPM prices only the risk an
+       investor cannot diversify away. Beta measures how much of the market&rsquo;s movement a
+       security carries; standard deviation mixes that together with firm-specific risk, which earns
+       no premium because a diversified investor need not bear it.`,
+      `<span class="lbl">b.</span> <span class="ans">Zero alphas.</span> Alpha is the gap between a
+       security&rsquo;s expected return and the return the SML says it should offer. A fairly priced
+       security sits exactly on the line, so that gap is zero. Beta may be anything at all,
+       including negative.`,
+      `<span class="lbl">c.</span> <span class="ans">Systematic risk.</span> Compensation is paid
+       only for risk that cannot be avoided. Unsystematic, residual and firm-specific risk are three
+       names for the same diversifiable component, and it commands no premium.`,
+      `<span class="lbl">d.</span> <span class="ans">A positive alpha is considered underpriced.</span>
+       A positive alpha means the security offers more than its systematic risk warrants, which is
+       what makes it attractive. Its price is too low relative to what it is expected to deliver.`
+    ]
+  };
+},
+
+/* 10 — performance evaluation, true or false ------------------------- */
+function performanceConcepts(){
+  const POOL = [
+    ['A portfolio with a higher average return than another must have performed better.', false,
+     'False. A raw return says nothing until it is set against the risk that produced it. A portfolio can beat another purely by running a higher beta, which is compensation the market hands out for free rather than skill on the manager’s part.'],
+    ['The Sharpe measure is the appropriate one when the portfolio being judged is the investor’s entire holding.', true,
+     'True. If the investor owns nothing else, they bear the portfolio’s total risk, and total risk is what the standard deviation in the denominator of the Sharpe measure captures.'],
+    ['The Treynor measure is the appropriate one when the portfolio is one holding among many in a well-diversified portfolio.', true,
+     'True. In that setting the position’s firm-specific risk is diversified away by everything else the investor owns, so only its systematic risk is relevant — and that is the beta in the denominator of the Treynor measure.'],
+    ['Two portfolios ranked by the Sharpe measure must be ranked the same way by the Treynor measure.', false,
+     'False. The two measures divide the same excess return by different notions of risk. They agree only when the portfolios are equally well diversified; otherwise the rankings can and do reverse.'],
+    ['A positive alpha means the manager earned more than the return justified by the portfolio’s systematic risk.', true,
+     'True. That is exactly the definition: alpha is the actual return minus the CAPM benchmark return for the beta actually run.'],
+    ['The market index portfolio has an alpha of zero by construction.', true,
+     'True. Its beta is 1, so the CAPM benchmark for it is the market return itself, and the gap between the two is necessarily zero.'],
+    ['The contribution of asset allocation measures how well a manager chose individual securities within each sector.', false,
+     'False. That describes security selection. Asset allocation measures the effect of over- or under-weighting whole sectors relative to the benchmark, valued at benchmark returns.'],
+    ['The contributions of security selection and asset allocation must sum to the manager’s total over- or underperformance.', true,
+     'True, and it is worth using as an arithmetic check. The decomposition is exhaustive: every part of the difference between the manager and the benchmark is attributed to one of the two.'],
+    ['A fund whose Sharpe measure is below that of a broad market index has beaten the index on a risk-adjusted basis.', false,
+     'False. It is the other way round. A lower Sharpe measure means less excess return per unit of total risk than simply holding the index would have delivered.'],
+    ['Because beta measures only systematic risk, the Treynor measure ignores a portfolio’s firm-specific risk entirely.', true,
+     'True. That is deliberate rather than an oversight: the measure is built for a position held alongside enough other assets that its firm-specific risk has already been diversified away.']
+  ];
+  let sel;
+  do {
+    sel = [...POOL].sort(()=>Math.random()-0.5).slice(0,4);
+  } while (!(sel.some(s=>s[1]) && sel.some(s=>!s[1])));
+  const roman = ['I','II','III','IV'];
+  return {
+    tag:'Performance evaluation concepts',
+    stem:`Consider the following statements about evaluating portfolio performance. Decide whether
+          each is true or false. There is nothing to calculate here &mdash; reason it through.`,
+    parts: sel.map((s,k)=>({
+      key: roman[k], ask: s[0], type:'yesno', yesLabel:'True', noLabel:'False', ansYes: s[1]
+    })),
+    explain: sel.map((s,k)=>
+      `<span class="lbl">${roman[k]}.</span> ${s[0]} &nbsp;&mdash;&nbsp; ${s[2]}`)
+  };
+}
+];
+
+/* Concept checks: one per numeric problem, indexed to match PROBLEMS. */
+const CONCEPTS = [
+  { ask:'Suppose one of these two companies had a much larger standard deviation but the same beta. Would the CAPM change the fair return it should offer?',
+    yesLabel:'Yes, it would rise', noLabel:'No, it would be unchanged', ansYes:false,
+    why:'No. The CAPM prices systematic risk only, and beta is what measures it. The extra volatility would be firm-specific, and a diversified investor can shed it for nothing — so the market pays nothing to bear it.' },
+  { ask:'If a security plots above the security market line, is its alpha positive?',
+    yesLabel:'Yes', noLabel:'No', ansYes:true,
+    why:'Yes. The line shows the return the security should offer for its beta. Plotting above it means offering more than that, and the vertical distance between the point and the line is precisely the alpha.' },
+  { ask:'If both advisers had run exactly the same beta, would the one with the higher return also have the higher alpha?',
+    yesLabel:'Yes', noLabel:'No', ansYes:true,
+    why:'Yes. With the same beta they face the same CAPM benchmark, so the comparison of alphas reduces to a comparison of raw returns. It is only when the betas differ that raw returns mislead — which is what happened here.' },
+  { ask:'In the three-factor model, if a stock had no exposure to the size and value factors, would its expected return collapse back to the CAPM figure?',
+    yesLabel:'Yes', noLabel:'No', ansYes:true,
+    why:'Yes. With betas of zero on the two extra factors, their contributions vanish and only the risk-free rate and the market term remain — which is the CAPM. The CAPM is the special case of the three-factor model in which the other two exposures are absent.' },
+  { ask:'For a portfolio that is perfectly diversified, would the Sharpe and Treynor measures rank it consistently with other such portfolios?',
+    yesLabel:'Yes', noLabel:'No', ansYes:true,
+    why:'Yes. When all the firm-specific risk has been diversified away, standard deviation and beta measure the same thing up to a constant, so dividing by either one preserves the ordering. Disagreement between the two measures is a symptom of incomplete diversification.' },
+  { ask:'A fund has a high Sharpe measure but a low Treynor measure relative to its peers. Does that suggest it holds a lot of diversifiable risk?',
+    yesLabel:'Yes', noLabel:'No, the opposite', ansYes:false,
+    why:'No, the opposite. Scoring well per unit of total risk but poorly per unit of beta means its total risk is small relative to its market exposure — that is, it is well diversified. A fund loaded with firm-specific risk shows the reverse pattern.' },
+  { ask:'If the manager had held exactly the benchmark weights in every sector, would the contribution of asset allocation be zero?',
+    yesLabel:'Yes', noLabel:'No', ansYes:true,
+    why:'Yes. Each term in the asset allocation calculation is an excess weight multiplied by a benchmark return. Matching the benchmark weights makes every excess weight zero, so the whole contribution vanishes and any over- or underperformance must have come from selection.' },
+  { ask:'Would adding a stock with a beta below your current portfolio beta lower the portfolio beta?',
+    yesLabel:'Yes', noLabel:'No', ansYes:true,
+    why:'Yes. The portfolio beta is a weighted average of the individual betas, and a weighted average always moves toward whatever is added. This is why beta is such a convenient risk measure: it aggregates by simple addition, which variance and standard deviation do not.' },
+  null,   // problem 9 is entirely conceptual
+  null    // problem 10 is entirely conceptual
+];
+
+/* =================== rendering =================== */
+const state = PROBLEMS.map(()=>({solved:false}));
+
+function parseNum(s){
+  s = String(s).trim().replace(/[$,%\s]/g,'');
+  if(/^\(.*\)$/.test(s)) s = '-' + s.slice(1,-1);      // (85.60) => -85.60
+  return s === '' ? NaN : parseFloat(s);
+}
+
+function build(i){
+  const p = PROBLEMS[i]();
+  if(CONCEPTS[i]){
+    const c = CONCEPTS[i];
+    p.parts = p.parts.concat([{ key:'concept', concept:true, type:'yesno',
+                                ask:c.ask, yesLabel:c.yesLabel, noLabel:c.noLabel,
+                                ansYes:c.ansYes }]);
+    p.explain = p.explain.concat([`<span class="lbl">Concept check.</span> ${c.why}`]);
+  }
+  const el = document.createElement('section');
+  el.className = 'q';
+
+  const partsHTML = p.parts.map((pt,j)=>{
+    let inner;
+    if(pt.type === 'yesno'){
+      inner = `<div class="yn" id="f${i}_${j}">
+                 <label><input type="radio" name="g${i}_${j}" value="y"> ${pt.yesLabel||'Yes'}</label>
+                 <label><input type="radio" name="g${i}_${j}" value="n"> ${pt.noLabel||'No'}</label>
+               </div>`;
+    } else if(pt.type === 'mc'){
+      inner = `<div class="mc" id="f${i}_${j}">` + pt.options.map((o,k)=>
+                 `<label><input type="radio" name="g${i}_${j}" value="${k}"> <span>${o}</span></label>`
+               ).join('') + `</div>`;
+    } else {
+      inner = `<div class="row" id="f${i}_${j}">
+                 <label class="cap" for="in${i}_${j}">${pt.label}</label>
+                 ${pt.unit==='$' ? '<span class="unit">$</span>' : ''}
+                 <input id="in${i}_${j}" type="text" inputmode="decimal" autocomplete="off"
+                        aria-label="${pt.label}">
+                 ${pt.unit==='%' ? '<span class="unit">%</span>' : ''}
+               </div>`;
+    }
+    if(pt.cont) return inner;                       // extra answer row under the same question
+    const head = pt.concept
+      ? '<span class="k concept-k">Concept check.</span>'
+      : `<span class="k">${pt.key}.</span>`;
+    return `<div class="part${pt.concept?' concept':''}">
+              <p class="ask">${head} ${pt.ask}</p>
+              ${pt.note ? `<p class="note">Note: ${pt.note}</p>` : ''}
+              ${inner}
+            </div>`;
+  }).join('');
+
+  el.innerHTML = `
+    <header><span class="qn">Problem ${i+1}</span><span class="tag">${p.tag}</span></header>
+    <div class="stem">${p.stem}</div>
+    <p class="req">Required:</p>
+    ${partsHTML}
+    <div class="btns">
+      <button data-act="check">Check</button>
+      <button class="ghost" data-act="sol">Explanation</button>
+      <button class="ghost" data-act="new">New numbers</button>
+    </div>
+    <div class="fb" id="fb${i}"></div>
+    <div class="sol" id="sol${i}">
+      <h4>Explanation</h4>
+      ${p.explain.map(s=>`<p>${s}</p>`).join('')}
+    </div>`;
+
+  const fb  = el.querySelector('#fb'+i);
+  const sol = el.querySelector('#sol'+i);
+
+  el.querySelector('[data-act="check"]').onclick = () => {
+    let blank = 0, wrong = 0, unitsNote = '';
+    p.parts.forEach((pt,j)=>{
+      const box = el.querySelector('#f'+i+'_'+j);
+      box.classList.remove('ok','bad');
+      if(pt.type === 'yesno' || pt.type === 'mc'){
+        const sel = el.querySelector(`input[name="g${i}_${j}"]:checked`);
+        if(!sel){ blank++; return; }
+        const right = pt.type === 'mc' ? (+sel.value === pt.ansIdx)
+                                       : ((sel.value === 'y') === pt.ansYes);
+        if(right) box.classList.add('ok'); else { box.classList.add('bad'); wrong++; }
+        return;
+      }
+      const v = parseNum(el.querySelector('#in'+i+'_'+j).value);
+      if(isNaN(v)){ blank++; return; }
+      if(Math.abs(v-pt.ans) <= pt.tol + 1e-9){ box.classList.add('ok'); return; }
+      if(pt.varianceUnits && Math.abs(v*10000-pt.ans) <= Math.max(pt.tol,0.5)){
+        unitsNote = `Your ${pt.label.toLowerCase()} is right, but in decimal units. Multiply by
+                     10,000 for percent squared: ${d2(pt.ans)}.`;
+      } else if(pt.unit==='%' && Math.abs(v*100-pt.ans) <= Math.max(pt.tol,0.02)){
+        unitsNote = `That is the right number in decimal form. This box expects percent &mdash;
+                     enter ${d2(pt.ans)}, not ${v}.`;
+      }
+      box.classList.add('bad'); wrong++;
+    });
+
+    fb.className = 'fb show';
+    if(blank === p.parts.length){
+      fb.classList.add('hint');
+      fb.innerHTML = 'Work the problem first, then enter your answers and press Check.';
+    } else if(!wrong && !blank){
+      fb.classList.add('ok');
+      fb.innerHTML = 'All correct. Press <b>New numbers</b> to work this problem type again.';
+      if(!state[i].solved){ state[i].solved = true; updateScore(); }
+    } else if(unitsNote){
+      fb.classList.add('warn');
+      fb.innerHTML = 'Check your units. ' + unitsNote;
+    } else if(wrong){
+      fb.classList.add('bad');
+      fb.innerHTML = `Not right yet &mdash; ${wrong} answer${wrong>1?'s are':' is'} wrong.
+                      Rework it on paper before checking again; open <b>Explanation</b> if you are stuck.`;
+    } else {
+      fb.classList.add('hint');
+      fb.innerHTML = 'Some answers are still blank.';
+    }
+  };
+
+  el.querySelector('[data-act="sol"]').onclick = e => {
+    sol.classList.toggle('show');
+    e.target.textContent = sol.classList.contains('show') ? 'Hide explanation' : 'Explanation';
+  };
+  el.querySelector('[data-act="new"]').onclick = () => el.replaceWith(build(i));
+  return el;
+}
+
+function updateScore(){
+  const n = state.filter(s=>s.solved).length;
+  document.getElementById('scoretext').textContent = `${n} of ${PROBLEMS.length} complete`;
+  document.getElementById('fill').style.width = (100*n/PROBLEMS.length)+'%';
+}
+
+const quiz = document.getElementById('quiz');
+PROBLEMS.forEach((_,i)=> quiz.appendChild(build(i)));
+updateScore();
+
+document.getElementById('resetall').onclick = () => {
+  quiz.innerHTML = '';
+  state.forEach(s=> s.solved = false);
+  PROBLEMS.forEach((_,i)=> quiz.appendChild(build(i)));
+  updateScore();
+  window.scrollTo({top:0,behavior:'smooth'});
+};
+</script>
+</body>
+</html>

@@ -22,7 +22,7 @@ this repository and pushes. Editing a file here directly will be overwritten on 
 |---|---|---|
 | `/set1/` | `practice_sets\Set1\Unit1_Practice_Set.html` | Yes |
 | `/set2/` | `practice_sets\Set2\Unit2_Practice_Set.html` | Yes — published 17 Sep 2026 |
-| `/set3/` | `practice_sets\Set3\Unit3_Practice_Set.html` | No — draft |
+| `/set3/` | `practice_sets\Set3\Unit3_Practice_Set.html` | Yes — published 8 Oct 2026 |
 | `/set4/` | `practice_sets\Set4\Unit4_Practice_Set.html` | No — draft |
 | `/set5/` | `practice_sets\Set5\Unit5_Practice_Set.html` | No — draft |
 | `/set6/` | `practice_sets\Set6\Unit6_Practice_Set.html` | No — draft |

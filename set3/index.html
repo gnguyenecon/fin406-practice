@@ -14,7 +14,7 @@
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);
-       font:16px/1.55 "Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif}
+       font:1rem/1.55 "Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif}
   .wrap{max-width:880px;margin:0 auto;padding:24px 18px 64px}
   header.top{background:var(--navy);color:#fff;border-radius:10px;padding:22px 24px;margin-bottom:18px}
   header.top h1{margin:0 0 4px;font-size:1.5rem}
@@ -115,7 +115,7 @@
 
 <header class="top">
   <h1>FIN 406 &middot; Quiz 3 Practice Set</h1>
-  <div class="sub">The capital asset pricing model &middot; The security market line &middot; Evaluating portfolio performance</div>
+  <div class="sub">The capital asset pricing model &middot; The security market line &middot; The Fama-French three-factor model &middot; Evaluating portfolio performance</div>
   <div class="dates">Material cutoff: Thursday 8 October &nbsp;|&nbsp; Quiz 3: Tuesday 13 October</div>
 </header>
 
@@ -180,7 +180,8 @@ function capmMispricing(){
   return {
     tag:'CAPM and mispricing',
     stem:`Here is the relevant information on two companies. The T-bill rate is ${rf}% and the
-          market risk premium is ${mrp}%.
+          market risk premium is ${mrp}%. Remember that the market risk premium is the market
+          return net of the risk-free rate &mdash; do not subtract the T-bill rate from it again.
       <table class="data">
         <tr><th></th><th>Northwind Aviation</th><th>Bexley Robotics</th></tr>
         <tr><td>Expected return</td><td>${pc(erA)}</td><td>${pc(erB)}</td></tr>
@@ -233,7 +234,7 @@ function smlBackwards(){
   const actP = reqP + alP;
   return {
     tag:'The security market line',
-    stem:`The risk-free rate is ${rf}% and the expected return on the market portfolio is ${erM}%.
+    stem:`The risk-free rate is ${rf}% and the expected return on the market is ${erM}%.
           All of the questions below refer to the same security market line.`,
     parts:[
       {key:'a', ask:`Ravenswood Retail is fairly priced and has an expected return of ${pc(erX)}.
@@ -290,7 +291,8 @@ function twoAdvisers(){
     stem:`Two investment advisers are comparing performance over the same period. Pemberton Advisors
           averaged a return of ${pc(rA)} with a portfolio beta of ${bA.toFixed(1)}. Whitfield Capital
           averaged ${pc(rB)} with a portfolio beta of ${bB.toFixed(1)}. Over that period the T-bill
-          rate was ${rf}% and the market returned ${erM}%.`,
+          rate was ${rf}% and the market returned ${erM}%. Use the CAPM as the benchmark for the
+          return each adviser should have earned.`,
     parts:[
       {key:'a-1', ask:'What return should Pemberton Advisors have earned, given the risk it took?',
        note:'Round your answer to 2 decimal places.',
@@ -304,7 +306,7 @@ function twoAdvisers(){
       {key:'b-2', ask:'What was Whitfield&rsquo;s alpha?',
        note:'Indicate a negative value with a minus sign. Round your answer to 2 decimal places.',
        label:'Alpha', unit:'%', ans:alB, tol:0.01},
-      {key:'c', ask:'Which adviser performed better?',
+      {key:'c', ask:'Which adviser performed better on a risk-adjusted basis, based on the CAPM?',
        type:'mc',
        options:['Pemberton, because it earned the higher return',
                 'Whitfield, because it generated the larger alpha',
@@ -359,10 +361,17 @@ function famaFrench(){
               be expected to earn?`,
        note:'Round your answer to 2 decimal places.',
        label:'Expected return', unit:'%', ans:fair, tol:0.01},
-      {key:'b', ask:'How much of that return is compensation for the value-factor exposure alone?',
+      {key:'b-1', ask:'How much of that return is compensation for the market-risk exposure alone?',
+       note:'Round your answer to 2 decimal places.',
+       label:'Market factor contribution', unit:'%', ans:bM*mp, tol:0.01},
+      {key:'b-2', ask:'How much of that return is compensation for the size-factor exposure alone?',
+       note:'Round your answer to 2 decimal places.',
+       label:'Size factor contribution', unit:'%', ans:bS*sp, tol:0.01},
+      {key:'b-3', ask:'How much of that return is compensation for the value-factor exposure alone?',
        note:'Round your answer to 2 decimal places.',
        label:'Value factor contribution', unit:'%', ans:bV*vp, tol:0.01},
-      {key:'c', ask:'On the evidence of its expected return, Ashgrove Industries is:',
+      {key:'c', ask:`According to the Fama-French three-factor model, on the evidence of its
+              expected return, Ashgrove Industries is:`,
        type:'mc', options:['Overpriced','Underpriced'], ansIdx: dir<0 ? 0 : 1}
     ],
     explain:[
@@ -373,9 +382,12 @@ function famaFrench(){
        + (${bV.toFixed(2)} &times; ${pc(vp)})`,
       `E(r) = ${rf}% + ${pc(bM*mp)} + ${pc(bS*sp)} + ${pc(bV*vp)} =
        <span class="ans">${pc(fair)}</span>`,
-      `<span class="lbl">b.</span> The value factor contributes ${bV.toFixed(2)} &times; ${pc(vp)}
-       = <span class="ans">${pc(bV*vp)}</span>. Each factor&rsquo;s contribution is its own beta
-       times its own premium; the factors do not interact.`,
+      `<span class="lbl">b.</span> Each factor&rsquo;s contribution is its own beta times its own
+       premium; the factors do not interact. Market: ${bM.toFixed(2)} &times; ${pc(mp)} =
+       <span class="ans">${pc(bM*mp)}</span>. Size: ${bS.toFixed(2)} &times; ${pc(sp)} =
+       <span class="ans">${pc(bS*sp)}</span>. Value: ${bV.toFixed(2)} &times; ${pc(vp)} =
+       <span class="ans">${pc(bV*vp)}</span>. Adding the risk-free rate to the three contributions
+       reproduces the part a answer.`,
       `<span class="lbl">c.</span> The stock is expected to return ${pc(er)} against a fair return of
        ${pc(fair)}, an alpha of ${pc(er-fair)}. It is therefore
        <span class="ans">${dir<0?'overpriced':'underpriced'}</span>.`,
@@ -405,15 +417,16 @@ function sharpeTreynor(){
   } while (!(shA > shB + 0.02 && trB > trA + 0.2));   // force the two measures to disagree
   return {
     tag:'Sharpe and Treynor',
-    stem:`Consider two portfolios, Ellsworth and Grantham. Over the period the risk-free rate was
-          ${rf}% and the market returned ${erM}%. Ellsworth has a beta of ${bA.toFixed(1)}, an alpha
-          of ${pc(alA)} and a standard deviation of ${sdA}%. Grantham has a beta of ${bB.toFixed(1)},
-          an alpha of ${pc(alB)} and a standard deviation of ${sdB}%.`,
+    stem:`Consider two portfolios, Ellsworth and Grantham. Ellsworth has a beta of ${bA.toFixed(1)},
+          an alpha of ${pc(alA)} and a standard deviation of ${sdA}%. Grantham has a beta of
+          ${bB.toFixed(1)}, an alpha of ${pc(alB)} and a standard deviation of ${sdB}%. Over the
+          period the risk-free rate was ${rf}% and the market returned ${erM}%.`,
     parts:[
-      {key:'a-1', ask:'What return did Ellsworth actually earn?',
+      {key:'a-1', ask:`Each alpha is measured against the CAPM benchmark. Using the CAPM relation,
+              what return did Ellsworth actually earn?`,
        note:'Round your answer to 2 decimal places.',
        label:'Return', unit:'%', ans:rA, tol:0.01},
-      {key:'a-2', ask:'What return did Grantham actually earn?',
+      {key:'a-2', ask:'Using the CAPM relation, what return did Grantham actually earn?',
        note:'Round your answer to 2 decimal places.',
        label:'Return', unit:'%', ans:rB, tol:0.01},
       {key:'b-1', ask:'What is the Sharpe measure for Ellsworth?',
@@ -462,78 +475,7 @@ function sharpeTreynor(){
   };
 },
 
-/* 6 — ranking three funds against the index -------------------------- */
-function rankThreeFunds(){
-  const names = ['Holloway Fund','Quillon Fund','Denby Fund'];
-  let rf,rM,sdM,r,sd,b,sh,tr,shM,iSh,iTr;
-  do {
-    rf  = ri(4,7);
-    rM  = rf + pick([8,10,12]);
-    sdM = ri(14,18);
-    r   = [ri(12,26), ri(12,26), ri(12,26)];
-    sd  = [ri(10,32), ri(10,32), ri(10,32)];
-    b   = [pick([0.5,0.6,0.7,0.8]), pick([0.9,1.0,1.1]), pick([1.2,1.4,1.5])];
-    sh  = r.map((x,k)=>(x-rf)/sd[k]);
-    tr  = r.map((x,k)=>(x-rf)/b[k]);
-    shM = (rM-rf)/sdM;
-    iSh = sh.indexOf(Math.max(...sh));
-    iTr = tr.indexOf(Math.max(...tr));
-  } while (
-    iSh === iTr ||                                        // the two rankings must disagree
-    new Set(sh.map(x=>x.toFixed(3))).size < 3 ||          // no ties
-    new Set(tr.map(x=>x.toFixed(2))).size < 3 ||
-    r.some(x=>x<=rf)
-  );
-  const rows = names.map((n,k)=>
-    `<tr><td>${n}</td><td>${r[k]}%</td><td>${sd[k]}%</td><td>${b[k].toFixed(1)}</td></tr>`).join('');
-  return {
-    tag:'Ranking funds',
-    stem:`You are evaluating three funds against a broad market index. The risk-free return over the
-          sample period was ${rf}%.
-      <table class="data">
-        <tr><th></th><th>Average return</th><th>Standard deviation</th><th>Beta</th></tr>
-        ${rows}
-        <tr><td>Market index</td><td>${rM}%</td><td>${sdM}%</td><td>1.0</td></tr>
-      </table>`,
-    parts:[
-      {key:'a-1', ask:`What is the Sharpe measure for the ${names[0]}?`,
-       note:'Round your answer to 4 decimal places.',
-       label:'Sharpe measure', unit:'', ans:sh[0], tol:0.0001},
-      {key:'a-2', ask:`What is the Sharpe measure for the ${names[1]}?`,
-       note:'Round your answer to 4 decimal places.',
-       label:'Sharpe measure', unit:'', ans:sh[1], tol:0.0001},
-      {key:'a-3', ask:`What is the Sharpe measure for the ${names[2]}?`,
-       note:'Round your answer to 4 decimal places.',
-       label:'Sharpe measure', unit:'', ans:sh[2], tol:0.0001},
-      {key:'b', ask:'What is the Sharpe measure for the market index?',
-       note:'Round your answer to 4 decimal places.',
-       label:'Sharpe measure', unit:'', ans:shM, tol:0.0001},
-      {key:'c', ask:'Which fund has the highest Sharpe measure?',
-       type:'mc', options:names, ansIdx:iSh},
-      {key:'d', ask:'Which fund has the highest Treynor measure?',
-       type:'mc', options:names, ansIdx:iTr}
-    ],
-    explain:[
-      `<span class="lbl">a.</span> Sharpe measure = (average return &minus; risk-free rate) &divide;
-       standard deviation.`,
-      ...names.map((n,k)=>
-        `${n}: (${r[k]}% &minus; ${rf}%) &divide; ${sd[k]}% = <span class="ans">${d4(sh[k])}</span>`),
-      `<span class="lbl">b.</span> Market index: (${rM}% &minus; ${rf}%) &divide; ${sdM}% =
-       <span class="ans">${d4(shM)}</span>. Any fund below this figure failed to beat a simple index
-       holding on a risk-adjusted basis.`,
-      `<span class="lbl">c.</span> The highest Sharpe measure belongs to the
-       <span class="ans">${names[iSh]}</span>.`,
-      `<span class="lbl">d.</span> The Treynor measure divides the same excess returns by beta:
-       ${names.map((n,k)=>`${n} ${d2(tr[k])}`).join(', ')}. The highest belongs to the
-       <span class="ans">${names[iTr]}</span>.`,
-      `The two measures disagree here because they divide by different notions of risk. A fund can
-       look strong per unit of total volatility and weak per unit of market exposure, or the reverse,
-       depending on how much of its risk is diversifiable.`
-    ]
-  };
-},
-
-/* 7 — performance attribution: selection versus allocation ----------- */
+/* 6 — performance attribution: selection versus allocation ----------- */
 function attribution(){
   let waE,waB,waC,wbE,wbB,wbC,raE,raB,rC,rbE,rbB,mgr,bench,diff,sel,alloc;
   do {
@@ -555,15 +497,16 @@ function attribution(){
            || Math.abs(sel) < 0.03 || Math.abs(alloc) < 0.03);
   return {
     tag:'Performance attribution',
-    stem:`The table shows how a money manager performed last month. Column 1 is the return the
-          manager earned in each sector, column 2 is the fraction of the portfolio she put there,
-          and columns 3 and 4 are the corresponding weights and returns for the benchmark portfolio.
+    stem:`The table shows how a fund manager performed last month. For the managed portfolio and
+          for the benchmark portfolio alike, the first column gives the fraction of the portfolio
+          placed in each sector and the second column gives the return earned in that sector.
       <table class="data">
-        <tr><th>Sector</th><th>Actual return</th><th>Actual weight</th>
-            <th>Benchmark weight</th><th>Benchmark return</th></tr>
-        <tr><td>Equity</td><td>${pc(raE)}</td><td>${waE.toFixed(2)}</td><td>${wbE.toFixed(2)}</td><td>${pc(rbE)}</td></tr>
-        <tr><td>Bonds</td><td>${pc(raB)}</td><td>${waB.toFixed(2)}</td><td>${wbB.toFixed(2)}</td><td>${pc(rbB)}</td></tr>
-        <tr><td>Cash</td><td>${pc(rC)}</td><td>${waC.toFixed(2)}</td><td>${wbC.toFixed(2)}</td><td>${pc(rC)}</td></tr>
+        <tr><th rowspan="2">Sector</th><th colspan="2">Managed Portfolio</th>
+            <th colspan="2">Benchmark Portfolio</th></tr>
+        <tr><th style="text-align:center">Weight</th><th>Return</th><th>Weight</th><th>Return</th></tr>
+        <tr><td>Equity</td><td>${waE.toFixed(2)}</td><td>${pc(raE)}</td><td>${wbE.toFixed(2)}</td><td>${pc(rbE)}</td></tr>
+        <tr><td>Bonds</td><td>${waB.toFixed(2)}</td><td>${pc(raB)}</td><td>${wbB.toFixed(2)}</td><td>${pc(rbB)}</td></tr>
+        <tr><td>Cash</td><td>${waC.toFixed(2)}</td><td>${pc(rC)}</td><td>${wbC.toFixed(2)}</td><td>${pc(rC)}</td></tr>
       </table>`,
     parts:[
       {key:'a-1', ask:'What was the manager&rsquo;s return over the month?',
@@ -615,67 +558,94 @@ function attribution(){
   };
 },
 
-/* 8 — portfolio beta and the CAPM ------------------------------------ */
-function portfolioBeta(){
-  const rf  = ri(2,5);
-  const mrp = pick([5,6,7]);
-  const erM = rf + mrp;
-  const b1  = pick([0.6,0.7,0.8,0.9]);
-  const b2  = pick([1.2,1.3,1.4,1.5,1.6]);
-  const w1  = pick([0.3,0.4,0.5,0.6,0.7]);
-  const w2  = Math.round((1-w1)*100)/100;
-  const bP  = w1*b1 + w2*b2;
-  const erP = rf + bP*mrp;
-  const tgt = pick([0.5,0.75,1.25,1.5]);
-  const erT = rf + tgt*mrp;
+/* 7 — alpha under the three-factor model is model-dependent ---------- */
+function ffManagerComparison(){
+  let rf,mp,sp,vp,bMA,bSA,bVA,bMB,bSB,bVB,ffA,ffB,reqA,reqB,rA,rB,capmA,capmB;
+  do {
+    rf  = ri(2,4);
+    mp  = pick([6,7,8]);
+    sp  = pick([2,3]);
+    vp  = pick([3,4,5]);
+    bMA = pick([0.9,1.0,1.1]);
+    bSA = pick([0.75,1.0]);
+    bVA = pick([0.75,1.0]);
+    bMB = pick([1.0,1.1,1.2]);
+    bSB = pick([0,0.25]);
+    bVB = pick([0,0.25]);
+    ffA = pick([-1.5,-1,-0.5]);
+    ffB = pick([0.5,1,1.5]);
+    reqA = rf + bMA*mp + bSA*sp + bVA*vp;
+    reqB = rf + bMB*mp + bSB*sp + bVB*vp;
+    rA = reqA + ffA;  rB = reqB + ffB;
+    capmA = rA - (rf + bMA*mp);               // what the CAPM would call alpha
+    capmB = rB - (rf + bMB*mp);
+  } while (!(rA > rB + 0.4 && capmA > capmB + 0.4));
   return {
-    tag:'Portfolio beta',
-    stem:`The risk-free rate is ${rf}% and the market portfolio is expected to return ${erM}%.
-          You hold ${(w1*100).toFixed(0)}% of your money in Kirkfell Utilities, which has a beta of
-          ${b1.toFixed(1)}, and ${(w2*100).toFixed(0)}% in Ardsley Semiconductor, which has a beta of
-          ${b2.toFixed(1)}.`,
+    tag:'Alpha is model-dependent',
+    stem:`Two fund managers ran the Bancroft Fund and the Thackeray Fund over the same year, and
+          their performance is to be compared under the Fama-French three-factor model. The
+          risk-free rate was ${rf}%, and the market, size and value factors carried premiums of
+          ${pc(mp)}, ${pc(sp)} and ${pc(vp)} respectively.
+      <table class="data">
+        <tr><th></th><th>Bancroft Fund</th><th>Thackeray Fund</th></tr>
+        <tr><td>Return earned</td><td>${pc(rA)}</td><td>${pc(rB)}</td></tr>
+        <tr><td>Market beta</td><td>${bMA.toFixed(2)}</td><td>${bMB.toFixed(2)}</td></tr>
+        <tr><td>Size beta</td><td>${bSA.toFixed(2)}</td><td>${bSB.toFixed(2)}</td></tr>
+        <tr><td>Value beta</td><td>${bVA.toFixed(2)}</td><td>${bVB.toFixed(2)}</td></tr>
+      </table>`,
     parts:[
-      {key:'a', ask:'What is the beta of your portfolio?',
-       note:'Round your answer to 3 decimal places.',
-       label:'Portfolio beta', unit:'', ans:bP, tol:0.001},
-      {key:'b', ask:'What return should your portfolio be expected to earn?',
+      {key:'a-1', ask:`According to the three-factor model, what return should the Bancroft Fund
+              have earned, given the factor risks it carried?`,
        note:'Round your answer to 2 decimal places.',
-       label:'Expected return', unit:'%', ans:erP, tol:0.01},
-      {key:'c', ask:`Suppose instead you held only the market portfolio and T-bills. What percentage
-              of your money would go into the market portfolio to give a beta of ${tgt.toFixed(2)}?`,
+       label:'Required return', unit:'%', ans:reqA, tol:0.01},
+      {key:'a-2', ask:`According to the three-factor model, what return should the Thackeray Fund
+              have earned, given the factor risks it carried?`,
        note:'Round your answer to 2 decimal places.',
-       label:'Weight in the market portfolio', unit:'%', ans:tgt*100, tol:0.01},
-      {key:'d', ask:'What return would that combination be expected to earn?',
-       note:'Round your answer to 2 decimal places.',
-       label:'Expected return', unit:'%', ans:erT, tol:0.01}
+       label:'Required return', unit:'%', ans:reqB, tol:0.01},
+      {key:'b-1', ask:'What was the Bancroft Fund&rsquo;s alpha under the three-factor model?',
+       note:'Indicate a negative value with a minus sign. Round your answer to 2 decimal places.',
+       label:'Three-factor alpha', unit:'%', ans:ffA, tol:0.01},
+      {key:'b-2', ask:'What was the Thackeray Fund&rsquo;s alpha under the three-factor model?',
+       note:'Indicate a negative value with a minus sign. Round your answer to 2 decimal places.',
+       label:'Three-factor alpha', unit:'%', ans:ffB, tol:0.01},
+      {key:'c', ask:'Which fund performed better on a risk-adjusted basis, based on the three-factor model?',
+       type:'mc',
+       options:['Bancroft, because it earned the higher return',
+                'Thackeray, because it has the higher three-factor alpha',
+                'Bancroft, because it has the higher three-factor alpha',
+                'Thackeray, because it carried less exposure to the size and value factors'],
+       ansIdx:1},
+      {key:'d', ask:`If the two funds had instead been judged on CAPM alphas, using only their
+              market betas, which fund would have shown the higher alpha?`,
+       type:'mc', options:['The Bancroft Fund','The Thackeray Fund'], ansIdx:0}
     ],
     explain:[
-      `<span class="lbl">a.</span> Beta is additive across a portfolio: the portfolio beta is the
-       weighted average of the individual betas, using the same weights as the holdings.`,
-      `&beta;<sub>P</sub> = (${w1.toFixed(2)} &times; ${b1.toFixed(1)}) + (${w2.toFixed(2)} &times;
-       ${b2.toFixed(1)}) = <span class="ans">${bP.toFixed(3)}</span>`,
-      `<span class="lbl">b.</span> Apply the CAPM to that portfolio beta, with a market risk premium
-       of ${erM}% &minus; ${rf}% = ${pc(mrp)}:`,
-      `E(r<sub>P</sub>) = ${rf}% + ${bP.toFixed(3)} &times; ${pc(mrp)} =
-       <span class="ans">${pc(erP)}</span>`,
-      `You would get the same answer by taking the weighted average of the two stocks&rsquo; own CAPM
-       returns, ${pc(rf+b1*mrp)} and ${pc(rf+b2*mrp)}, because the SML is a straight line.`,
-      `<span class="lbl">c.</span> T-bills have a beta of 0 and the market portfolio has a beta of 1,
-       so a portfolio holding weight w in the market has a beta of w &times; 1 + (1 &minus; w)
-       &times; 0 = w. To reach a beta of ${tgt.toFixed(2)} you put
-       <span class="ans">${pc(tgt*100)}</span> in the market portfolio.`,
-      `<span class="lbl">d.</span> E(r) = ${rf}% + ${tgt.toFixed(2)} &times; ${pc(mrp)} =
-       <span class="ans">${pc(erT)}</span>`,
-      `${tgt>1
-        ? `Note that a weight above 100% means borrowing at the risk-free rate and investing the
-           proceeds in the market &mdash; the levered part of the capital allocation line.`
-        : `The remaining ${pc(100-tgt*100)} sits in T-bills, which is the lending part of the capital
-           allocation line.`}`
+      `<span class="lbl">a.</span> The three-factor benchmark adds the risk-free rate to each beta
+       multiplied by its own factor premium.`,
+      `Bancroft: ${rf}% + (${bMA.toFixed(2)} &times; ${pc(mp)}) + (${bSA.toFixed(2)} &times;
+       ${pc(sp)}) + (${bVA.toFixed(2)} &times; ${pc(vp)}) = <span class="ans">${pc(reqA)}</span>`,
+      `Thackeray: ${rf}% + (${bMB.toFixed(2)} &times; ${pc(mp)}) + (${bSB.toFixed(2)} &times;
+       ${pc(sp)}) + (${bVB.toFixed(2)} &times; ${pc(vp)}) = <span class="ans">${pc(reqB)}</span>`,
+      `<span class="lbl">b.</span> Alpha is the return earned in excess of that benchmark.`,
+      `Bancroft: ${pc(rA)} &minus; ${pc(reqA)} = <span class="ans">${pc(ffA)}</span> &nbsp;&nbsp;
+       Thackeray: ${pc(rB)} &minus; ${pc(reqB)} = <span class="ans">${pc(ffB)}</span>`,
+      `<span class="lbl">c.</span> Bancroft earned the higher raw return, but every percentage
+       point of the gap &mdash; and more &mdash; is payment for the heavy size and value exposure
+       it carried. Judged against the three-factor benchmark, <span class="ans">Thackeray</span>
+       added ${pc(ffB)} of value while Bancroft destroyed ${pc(Math.abs(ffA))}.`,
+      `<span class="lbl">d.</span> A CAPM benchmark prices only market risk: Bancroft&rsquo;s is
+       ${rf}% + ${bMA.toFixed(2)} &times; ${pc(mp)} = ${pc(rf+bMA*mp)}, giving a CAPM alpha of
+       ${pc(capmA)}; Thackeray&rsquo;s is ${pc(rf+bMB*mp)}, giving ${pc(capmB)}. By that measure
+       <span class="ans">the Bancroft Fund</span> looks better &mdash; the opposite verdict.`,
+      `That reversal is the lesson: alpha is always measured relative to a model of fair return,
+       so it is only as good as the model. Under the CAPM, Bancroft&rsquo;s size and value
+       exposures masquerade as skill; once the three-factor model prices them, the apparent alpha
+       disappears.`
     ]
   };
 },
 
-/* 9 — CAPM concepts, multiple choice --------------------------------- */
+/* 8 — CAPM concepts, multiple choice --------------------------------- */
 function capmConcepts(){
   const a = shuffle([
     ['beta', true],
@@ -730,6 +700,70 @@ function capmConcepts(){
       `<span class="lbl">d.</span> <span class="ans">A positive alpha is considered underpriced.</span>
        A positive alpha means the security offers more than its systematic risk warrants, which is
        what makes it attractive. Its price is too low relative to what it is expected to deliver.`
+    ]
+  };
+},
+
+/* 9 — Fama-French three-factor model concepts ------------------------ */
+function ffConcepts(){
+  const a = shuffle([
+    ['small firms have historically earned higher average returns than large firms', true],
+    ['large firms have historically earned higher average returns than small firms', false],
+    ['firms with volatile earnings pay higher dividends than stable firms', false],
+    ['newly listed firms outperform the market in their first year of trading', false]
+  ]);
+  const b = shuffle([
+    ['a high ratio of book value to market value', true],
+    ['a low ratio of book value to market value', false],
+    ['a high expected growth rate of future earnings', false],
+    ['a market beta well above 1', false]
+  ]);
+  const c = shuffle([
+    ['compensation for bearing additional sources of systematic risk', true],
+    ['compensation for firm-specific risk, which diversification cannot remove', false],
+    ['a reward for the higher trading costs of small and value stocks only', false],
+    ['proof that higher returns can be earned without bearing any extra risk', false]
+  ]);
+  const d = shuffle([
+    ['a higher expected return, because it has positive exposure to both the size and the value factor', true],
+    ['a lower expected return, because small value firms are better diversified', false],
+    ['the same expected return, because only market beta is priced', false],
+    ['the same expected return, provided the two stocks have equal standard deviations', false]
+  ]);
+  return {
+    tag:'Fama-French 3 Factor Model Concepts',
+    stem:`Four short questions on the Fama-French three-factor model. There is nothing to calculate
+          here &mdash; reason each one through.`,
+    parts:[
+      {key:'a', ask:'The size factor captures the empirical tendency that ______.',
+       type:'mc', options:a.map(o=>o[0]), ansIdx:a.findIndex(o=>o[1])},
+      {key:'b', ask:'In the Fama-French model, a value stock is one with ______.',
+       type:'mc', options:b.map(o=>o[0]), ansIdx:b.findIndex(o=>o[1])},
+      {key:'c', ask:'Within the model, the size premium and the value premium are best interpreted as ______.',
+       type:'mc', options:c.map(o=>o[0]), ansIdx:c.findIndex(o=>o[1])},
+      {key:'d', ask:`Other things equal, the three-factor model says a small value stock should
+              offer ______ a large growth stock.`,
+       type:'mc', options:d.map(o=>o[0]), ansIdx:d.findIndex(o=>o[1])}
+    ],
+    explain:[
+      `<span class="lbl">a.</span> <span class="ans">Small firms have historically earned higher
+       average returns than large firms.</span> That long-run gap is the size premium. In the model
+       it is treated as payment for risk that falls disproportionately on small firms, which tend
+       to be less diversified businesses with weaker access to financing in bad times.`,
+      `<span class="lbl">b.</span> <span class="ans">A high ratio of book value to market value.</span>
+       A value stock is one the market prices low relative to its accounting value. Its opposite
+       &mdash; a low book-to-market ratio &mdash; marks a growth stock, priced richly on the
+       expectation of future earnings. The value premium is the long-run average return of the
+       first group over the second.`,
+      `<span class="lbl">c.</span> <span class="ans">Compensation for bearing additional sources of
+       systematic risk.</span> The premiums are not free money and not payment for firm-specific
+       risk, which remains diversifiable and unpriced. The model&rsquo;s claim is that size and
+       value exposure, like market exposure, cannot be diversified away &mdash; so bearing it earns
+       a premium.`,
+      `<span class="lbl">d.</span> <span class="ans">A higher expected return.</span> A small value
+       stock has positive betas on both extra factors, and each positive beta adds its premium to
+       the expected return. The CAPM, by contrast, would see no difference between the two stocks
+       unless their market betas differed.`
     ]
   };
 },
@@ -793,15 +827,13 @@ const CONCEPTS = [
   { ask:'For a portfolio that is perfectly diversified, would the Sharpe and Treynor measures rank it consistently with other such portfolios?',
     yesLabel:'Yes', noLabel:'No', ansYes:true,
     why:'Yes. When all the firm-specific risk has been diversified away, standard deviation and beta measure the same thing up to a constant, so dividing by either one preserves the ordering. Disagreement between the two measures is a symptom of incomplete diversification.' },
-  { ask:'A fund has a high Sharpe measure but a low Treynor measure relative to its peers. Does that suggest it holds a lot of diversifiable risk?',
-    yesLabel:'Yes', noLabel:'No, the opposite', ansYes:false,
-    why:'No, the opposite. Scoring well per unit of total risk but poorly per unit of beta means its total risk is small relative to its market exposure — that is, it is well diversified. A fund loaded with firm-specific risk shows the reverse pattern.' },
   { ask:'If the manager had held exactly the benchmark weights in every sector, would the contribution of asset allocation be zero?',
     yesLabel:'Yes', noLabel:'No', ansYes:true,
     why:'Yes. Each term in the asset allocation calculation is an excess weight multiplied by a benchmark return. Matching the benchmark weights makes every excess weight zero, so the whole contribution vanishes and any over- or underperformance must have come from selection.' },
-  { ask:'Would adding a stock with a beta below your current portfolio beta lower the portfolio beta?',
-    yesLabel:'Yes', noLabel:'No', ansYes:true,
-    why:'Yes. The portfolio beta is a weighted average of the individual betas, and a weighted average always moves toward whatever is added. This is why beta is such a convenient risk measure: it aggregates by simple addition, which variance and standard deviation do not.' },
+  { ask:'A fund&rsquo;s positive CAPM alpha disappears entirely once the size and value factors are added to the benchmark. Did its manager demonstrate genuine selection skill?',
+    yesLabel:'Yes', noLabel:'No', ansYes:false,
+    why:'No. What the CAPM called alpha was repackaged factor exposure: the fund earned the size and value premiums, which any investor can collect simply by tilting toward small and value stocks. Skill means beating a benchmark that already accounts for every priced risk the manager took.' },
+  null,   // problem 8 is entirely conceptual
   null,   // problem 9 is entirely conceptual
   null    // problem 10 is entirely conceptual
 ];

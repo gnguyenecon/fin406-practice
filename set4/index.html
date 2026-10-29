@@ -165,16 +165,17 @@ const shuffle = a => a.map(v=>[Math.random(),v]).sort((p,q)=>p[0]-q[0]).map(p=>p
         | {key,type:'yesno',ansYes,...}         two-way choice
         | {key,type:'mc',options:[],ansIdx}     multiple choice                     */
 const PROBLEMS = [
-/* 1 — bond price, current yield, premium or discount ---------------- */
+/* 1 — bond price on and between coupon dates, premium or discount --- */
 function bondPricing(){
   const F = 1000;
   const cRate = pick([3.5,4,4.5,5,5.5,6,6.5,7]);
   const gap   = pick([-2,-1.5,-1,1,1.5,2]);        // never zero, so never priced at par
   const ytm   = cRate + gap;
   const yrs   = pick([8,10,12,15,20,25]);
+  const mos   = pick([1,2,4,5]);                   // months past the last coupon, in part c
   const cpn   = F*cRate/100/2;
   const P     = bondPriceN(F, cpn, ytm/100/2, yrs*2);
-  const cy    = F*cRate/100/P*100;
+  const Pnc   = P*Math.pow(1+ytm/200, mos/6);
   return {
     tag:'Bond pricing',
     stem:`Marchmont Industries has a bond outstanding with a face value of $1,000 and ${yrs} years
@@ -184,12 +185,13 @@ function bondPricing(){
       {key:'a', ask:'What is the semiannual coupon payment?',
        note:'Round your answer to 2 decimal places.',
        label:'Coupon payment', unit:'$', ans:cpn, tol:0.01},
-      {key:'b', ask:'What is the bond selling for today?',
+      {key:'b', ask:'What is the bond selling for today? Assume today is a coupon date.',
        note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
        label:'Price', unit:'$', ans:P, tol:0.01},
-      {key:'c', ask:'What is the current yield?',
+      {key:'c', ask:`Suppose instead that ${mos} month${mos>1?'s have':' has'} passed since the
+              last coupon payment, with the yield unchanged. What is the bond worth on that date?`,
        note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
-       label:'Current yield', unit:'%', ans:cy, tol:0.01},
+       label:'Value', unit:'$', ans:Pnc, tol:0.01},
       {key:'d', ask:'The bond is selling at:',
        type:'mc', options:['A premium','A discount','Par'], ansIdx: gap<0 ? 0 : 1}
     ],
@@ -203,17 +205,17 @@ function bondPricing(){
       `Price = $${money(cpn)} &times; [1 &minus; (1 + ${d4(ytm/200)})<sup>&minus;${yrs*2}</sup>]
        &divide; ${d4(ytm/200)} &nbsp;+&nbsp; $1,000 &divide; (1 + ${d4(ytm/200)})<sup>${yrs*2}</sup>
        = <span class="ans">$${money(P)}</span>`,
-      `<span class="lbl">c.</span> The current yield relates the annual coupon to the price actually
-       paid: $${money(F*cRate/100)} &divide; $${money(P)} = <span class="ans">${pc(cy)}</span>`,
+      `<span class="lbl">c.</span> Between coupon dates the bond&rsquo;s value grows at the
+       semiannual yield from its last coupon-date price, and ${mos} month${mos>1?'s':''} is
+       ${mos}/6 of the six-month coupon period:`,
+      `Value = $${money(P)} &times; (1 + ${d4(ytm/200)})<sup>${mos}/6</sup> =
+       <span class="ans">$${money(Pnc)}</span>`,
       `<span class="lbl">d.</span> The coupon rate is ${pc(cRate)} and the market demands ${pc(ytm)}.
        ${gap<0
          ? `Because the bond pays more than the market requires, it must sell above face value: at
             <span class="ans">a premium</span>.`
          : `Because the bond pays less than the market requires, it must sell below face value: at
-            <span class="ans">a discount</span>.`}`,
-      `Note the ordering that always holds here: ${gap<0
-         ? `coupon rate &gt; current yield &gt; yield to maturity, for a premium bond.`
-         : `coupon rate &lt; current yield &lt; yield to maturity, for a discount bond.`}`
+            <span class="ans">a discount</span>.`}`
     ]
   };
 },
@@ -222,15 +224,15 @@ function bondPricing(){
 function zeroCoupon(){
   const F  = 1000;
   const P1 = pick([380,400,425,450,500,550,600]), n1 = pick([10,12,15,20]);
-  const y1 = (Math.pow(F/P1, 1/n1) - 1)*100;
+  const y1 = (Math.pow(F/P1, 1/(2*n1)) - 1)*200;
   const y2 = pick([4,4.5,5,6,7,8]),               n2 = pick([5,8,10,12]);
-  const P2 = F/Math.pow(1+y2/100, n2);
+  const P2 = F/Math.pow(1+y2/200, 2*n2);
   const P3 = pick([400,450,500,550]),             y3 = pick([6,7,8,9]);
-  const n3 = Math.log(F/P3)/Math.log(1+y3/100);
+  const n3 = Math.log(F/P3)/Math.log(1+y3/200)/2;
   return {
     tag:'Zero-coupon bonds',
-    stem:`Each of the bonds below is a zero-coupon bond with a par value of $1,000. Assume annual
-          compounding throughout.`,
+    stem:`Each of the bonds below is a zero-coupon bond with a par value of $1,000. As is the
+          convention for bonds, the yields are quoted with semiannual compounding.`,
     parts:[
       {key:'a', ask:`A bond priced at $${money(P1)} matures in ${n1} years. What is its yield to
               maturity?`,
@@ -246,19 +248,21 @@ function zeroCoupon(){
        label:'Maturity', unit:'years', ans:n3, tol:0.01}
     ],
     explain:[
-      `A zero-coupon bond has a single cash flow, the $1,000 par value at maturity, so
-       Price = $1,000 &divide; (1 + y)<sup>n</sup>. Every part below is that one equation solved for
-       a different unknown.`,
-      `<span class="lbl">a.</span> $${money(P1)} = $1,000 &divide; (1 + y)<sup>${n1}</sup>, so
-       y = ($1,000 &divide; $${money(P1)})<sup>1/${n1}</sup> &minus; 1 =
+      `A zero-coupon bond has a single cash flow, the $1,000 par value at maturity. With the yield
+       quoted on a semiannual-compounding basis, Price = $1,000 &divide; (1 + y/2)<sup>2n</sup>,
+       where n is the maturity in years. Every part below is that one equation solved for a
+       different unknown.`,
+      `<span class="lbl">a.</span> $${money(P1)} = $1,000 &divide; (1 + y/2)<sup>${2*n1}</sup>, so
+       y = 2 &times; [($1,000 &divide; $${money(P1)})<sup>1/${2*n1}</sup> &minus; 1] =
        <span class="ans">${pc(y1)}</span>`,
-      `On a financial calculator: n = ${n1}, PV = &minus;${money(P1)}, FV = 1,000, PMT = 0, CPT I/Y.`,
-      `<span class="lbl">b.</span> Price = $1,000 &divide; (1 + ${d4(y2/100)})<sup>${n2}</sup> =
+      `On a financial calculator: n = ${2*n1}, PV = &minus;${money(P1)}, FV = 1,000, PMT = 0,
+       CPT I/Y. That is the semiannual rate, ${d4(y1/2)}%; double it to quote the yield.`,
+      `<span class="lbl">b.</span> Price = $1,000 &divide; (1 + ${d4(y2/200)})<sup>${2*n2}</sup> =
        <span class="ans">$${money(P2)}</span>`,
       `<span class="lbl">c.</span> Now the unknown is the exponent. Taking logarithms of
-       $${money(P3)} = $1,000 &divide; (1 + ${d4(y3/100)})<sup>n</sup> gives`,
-      `n = ln($1,000 &divide; $${money(P3)}) &divide; ln(1 + ${d4(y3/100)}) =
-       <span class="ans">${d2(n3)}</span> years`,
+       $${money(P3)} = $1,000 &divide; (1 + ${d4(y3/200)})<sup>2n</sup> gives`,
+      `2n = ln($1,000 &divide; $${money(P3)}) &divide; ln(1 + ${d4(y3/200)}) = ${d2(2*n3)}
+       half-years, so n = <span class="ans">${d2(n3)}</span> years`,
       `The price of a zero falls further below par the longer it has to run and the higher the yield.
        There is no coupon to cushion it, which is why zeros are the most interest-rate-sensitive
        bonds of any given maturity.`
@@ -300,11 +304,11 @@ function yieldToCall(){
               instead of ${callYrs}, at the same call price?`,
        note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
        label:'Yield to call', unit:'%', ans:ytc2, tol:0.01},
-      {key:'d', ask:'For an investor buying this bond today, which yield is the more realistic guide to the return they will actually earn?',
+      {key:'d', ask:'When is the issuer likely to call the bond?',
        type:'mc',
-       options:['The yield to call, because a bond trading at a premium is likely to be called',
-                'The yield to maturity, because the call is unlikely to matter',
-                'Whichever of the two is higher'],
+       options:['When interest rates at the call date are well below the coupon rate, so the debt can be refinanced more cheaply',
+                'When interest rates at the call date are well above the coupon rate',
+                'At the call date in any interest rate environment, because repaying early always saves the issuer money'],
        ansIdx:0}
     ],
     explain:[
@@ -325,10 +329,12 @@ function yieldToCall(){
            $${money(P-1000)} above par and have less time to recover it out of the high coupon.`
         : `Here the earlier call actually helps, because the call price sits far enough above the
            purchase price to more than offset the loss of coupon income.`}`,
-      `<span class="lbl">d.</span> <span class="ans">The yield to call.</span> A bond trading well
-       above its call price is exactly the bond an issuer wants to refinance: it is paying a coupon
-       above the current market yield. The yield to maturity assumes it survives another ${yrs}
-       years, which is optimistic.`
+      `<span class="lbl">d.</span> <span class="ans">When rates at the call date are well below the
+       coupon rate.</span> The decision is made at the call date, not today. If market rates then
+       sit below the ${pc(cRate)} coupon, the issuer can replace this bond with cheaper debt, so it
+       calls &mdash; and around such times the bond trades above its call price. If rates have risen
+       past the coupon by the call date, the bond is cheap financing and the issuer leaves it
+       outstanding.`
     ]
   };
 },
@@ -340,55 +346,50 @@ function holdingPeriod(){
   const y0    = cRate + pick([-1,-0.5,0.5,1]);       // never equal, so never bought at par
   const yrs   = pick([12,15,18,20]);
   const cpn   = F*cRate/100;                          // annual coupons
-  const P0    = bondPriceN(F, cpn, y0/100, yrs);
-  let yUp, yDn;                                      // the repriced bond must not land at par either
-  do { yUp = y0 + pick([1,1.5,2]); } while (Math.abs(yUp-cRate) < 1e-9);
-  do { yDn = y0 - pick([1,1.5,2]); } while (Math.abs(yDn-cRate) < 1e-9);
-  const Pup   = bondPriceN(F, cpn, yUp/100, yrs-1);
-  const Pdn   = bondPriceN(F, cpn, yDn/100, yrs-1);
-  const hUp   = (Pup - P0 + cpn)/P0*100;
-  const hDn   = (Pdn - P0 + cpn)/P0*100;
+  const dir   = pick([-1,1]);                         // yields rose or fell over the year
+  let y1;                                             // today's yield: positive, and never equal
+  do {                                                // to the coupon rate, so no price at par
+    y1 = y0 + dir*pick([1,1.5,2]);
+  } while (y1 < 1 || Math.abs(y1-cRate) < 1e-9);
+  const P0  = bondPriceN(F, cpn, y0/100, yrs);
+  const P1  = bondPriceN(F, cpn, y1/100, yrs-1);
+  const hpr = (P1 - P0 + cpn)/P0*100;
   return {
     tag:'Holding period return',
-    stem:`You have just bought a bond with ${yrs} years to maturity that pays an annual coupon of
-          $${money(cpn)} on a face value of $1,000. Bonds of this risk currently yield ${pc(y0)}.
-          You intend to sell after one year.`,
+    stem:`One year ago you bought a bond with ${yrs} years to maturity, paying an annual coupon of
+          $${money(cpn)} on a face value of $1,000. At the time, bonds of this risk yielded
+          ${pc(y0)}. Yields have since ${dir>0?'risen':'fallen'}: the bond now has ${yrs-1} years
+          left and bonds of this risk yield ${pc(y1)}. You have just collected this year&rsquo;s
+          coupon and plan to sell the bond today.`,
     parts:[
-      {key:'a', ask:'What did you pay for the bond?',
+      {key:'a', ask:'What did you pay for the bond one year ago?',
        note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
        label:'Purchase price', unit:'$', ans:P0, tol:0.01},
-      {key:'b-1', ask:`If the yield to maturity is ${pc(yUp)} one year from now, what will the bond
-              be worth then?`,
+      {key:'b', ask:'What is the bond worth today?',
        note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
-       label:'Price in one year', unit:'$', ans:Pup, tol:0.01},
-      {key:'b-2', ask:'What is your holding period return in that case?',
+       label:'Price today', unit:'$', ans:P1, tol:0.01},
+      {key:'c', ask:'What is your holding period return over the year?',
        note:'Indicate a negative value with a minus sign. Round your answer to 2 decimal places.',
-       label:'Holding period return', unit:'%', ans:hUp, tol:0.01},
-      {key:'c-1', ask:`If instead the yield to maturity is ${pc(yDn)} one year from now, what will
-              the bond be worth?`,
-       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
-       label:'Price in one year', unit:'$', ans:Pdn, tol:0.01},
-      {key:'c-2', ask:'What is your holding period return in that case?',
-       note:'Indicate a negative value with a minus sign. Round your answer to 2 decimal places.',
-       label:'Holding period return', unit:'%', ans:hDn, tol:0.01}
+       label:'Holding period return', unit:'%', ans:hpr, tol:0.01}
     ],
     explain:[
-      `<span class="lbl">a.</span> n = ${yrs}, PMT = $${money(cpn)}, FV = $1,000, I/Y = ${pc(y0)}
-       gives a purchase price of <span class="ans">$${money(P0)}</span>.`,
-      `<span class="lbl">b.</span> A year later the bond has ${yrs-1} years left. Repricing it at
-       ${pc(yUp)}: n = ${yrs-1}, PMT = $${money(cpn)}, FV = $1,000, I/Y = ${pc(yUp)} gives
-       <span class="ans">$${money(Pup)}</span>.`,
-      `The holding period return counts both the price change and the coupon collected along the way,
-       measured against what you originally paid:`,
-      `HPR = ($${money(Pup)} &minus; $${money(P0)} + $${money(cpn)}) &divide; $${money(P0)} =
-       <span class="ans">${pc(hUp)}</span>`,
-      `<span class="lbl">c.</span> At ${pc(yDn)} the bond is worth
-       <span class="ans">$${money(Pdn)}</span>, and`,
-      `HPR = ($${money(Pdn)} &minus; $${money(P0)} + $${money(cpn)}) &divide; $${money(P0)} =
-       <span class="ans">${pc(hDn)}</span>`,
-      `The coupon was the same in both cases. Everything that separates a return of ${pc(hUp)} from
-       one of ${pc(hDn)} came from the movement in yields &mdash; which is the whole of interest rate
-       risk, and the reason a bond held for less than its full term is not a safe investment.`
+      `<span class="lbl">a.</span> One year ago the bond had ${yrs} years to run: n = ${yrs},
+       PMT = $${money(cpn)}, FV = $1,000, I/Y = ${pc(y0)} gives a purchase price of
+       <span class="ans">$${money(P0)}</span>.`,
+      `<span class="lbl">b.</span> Today it has ${yrs-1} years left and the market yield is
+       ${pc(y1)}: n = ${yrs-1}, PMT = $${money(cpn)}, FV = $1,000, I/Y = ${pc(y1)} gives
+       <span class="ans">$${money(P1)}</span>.`,
+      `<span class="lbl">c.</span> The holding period return counts both the price change and the
+       coupon collected along the way, measured against what you originally paid:`,
+      `HPR = ($${money(P1)} &minus; $${money(P0)} + $${money(cpn)}) &divide; $${money(P0)} =
+       <span class="ans">${pc(hpr)}</span>`,
+      `${dir>0
+        ? `The coupon arrived in full, yet the year ended with a loss: the rise in yields cut the
+           bond&rsquo;s price by more than the coupon brought in. That is interest rate risk, and a
+           bond sold before maturity carries it even when the issuer never misses a payment.`
+        : `Falling yields lifted the bond&rsquo;s price, so the year returned more than the coupon
+           alone. The same force runs the other way: had yields risen instead, the fall in price
+           could have swamped the coupon and turned the year&rsquo;s return negative.`}`
     ]
   };
 },
@@ -423,33 +424,40 @@ function maturitySensitivity(){
       {key:'a-2', ask:'What is Brightwell Bond worth today?',
        note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
        label:'Brightwell Bond', unit:'$', ans:B0, tol:0.01},
-      {key:'b-1', ask:`If the yield to maturity on both bonds rises to ${pc(y1)}, what is the
-              percentage change in the value of Ashmore Bond?`,
+      {key:'b', ask:'Before computing anything further: which bond do you expect to be more sensitive to a change in interest rates?',
+       type:'mc', options:['Ashmore Bond','Brightwell Bond'], ansIdx:1},
+      {key:'c-1', ask:`Now suppose the yield to maturity on both bonds rises to ${pc(y1)}. Compute
+              the new price of Ashmore Bond.`,
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Ashmore Bond', unit:'$', ans:A1, tol:0.01},
+      {key:'c-2', ask:'What is the percentage change in the value of Ashmore Bond?',
        note:'Indicate a decline with a minus sign. Round your answer to 2 decimal places.',
        label:'Change in value', unit:'%', ans:dA, tol:0.01},
-      {key:'b-2', ask:'What is the percentage change in the value of Brightwell Bond?',
+      {key:'c-3', ask:'Compute the new price of Brightwell Bond.',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Brightwell Bond', unit:'$', ans:B1, tol:0.01},
+      {key:'c-4', ask:'What is the percentage change in the value of Brightwell Bond?',
        note:'Indicate a decline with a minus sign. Round your answer to 2 decimal places.',
-       label:'Change in value', unit:'%', ans:dB, tol:0.01},
-      {key:'c', ask:'Which bond is more sensitive to a change in interest rates?',
-       type:'mc', options:['Ashmore Bond','Brightwell Bond'], ansIdx:1}
+       label:'Change in value', unit:'%', ans:dB, tol:0.01}
     ],
     explain:[
       `<span class="lbl">a.</span> Both are priced the same way, in half-years at a periodic yield of
        ${d4(y0/2)}%. Only the number of periods differs.`,
       `Ashmore Bond (n = ${nA*2}): <span class="ans">$${money(A0)}</span> &nbsp;&nbsp;
        Brightwell Bond (n = ${nB*2}): <span class="ans">$${money(B0)}</span>`,
-      `<span class="lbl">b.</span> Repricing both at ${pc(y1)} gives $${money(A1)} and
-       $${money(B1)} respectively.`,
+      `<span class="lbl">b.</span> <span class="ans">Brightwell Bond.</span> A longer bond has more
+       of its value locked up in cash flows far in the future, and distant cash flows are the ones
+       whose present value a change in the discount rate affects most. Holding everything else
+       fixed, longer maturity means greater interest rate risk.`,
+      `<span class="lbl">c.</span> Repricing both at ${pc(y1)}:
+       Ashmore Bond (n = ${nA*2}): <span class="ans">$${money(A1)}</span> &nbsp;&nbsp;
+       Brightwell Bond (n = ${nB*2}): <span class="ans">$${money(B1)}</span>`,
       `Ashmore Bond: ($${money(A1)} &minus; $${money(A0)}) &divide; $${money(A0)} =
        <span class="ans">${pc(dA)}</span>`,
       `Brightwell Bond: ($${money(B1)} &minus; $${money(B0)}) &divide; $${money(B0)} =
        <span class="ans">${pc(dB)}</span>`,
-      `<span class="lbl">c.</span> <span class="ans">Brightwell Bond</span>, the longer bond, loses
-       ${pc(Math.abs(dB))} against ${pc(Math.abs(dA))} for the shorter one, from an identical change
-       in yield.`,
-      `The reason is that a longer bond has more of its value locked up in cash flows far in the
-       future, and distant cash flows are the ones whose present value a change in the discount rate
-       affects most. Holding everything else fixed, longer maturity means greater interest rate risk.`
+      `The numbers confirm the prediction in part b: the longer bond loses ${pc(Math.abs(dB))}
+       against ${pc(Math.abs(dA))} for the shorter one, from an identical change in yield.`
     ]
   };
 },
@@ -518,9 +526,9 @@ function accruedInterest(){
   const invoice = quoted + accrued;
   return {
     tag:'Accrued interest',
-    stem:`You buy a bond at a quoted price of $${money(quoted)}. It has a face value of $1,000 and a
-          coupon rate of ${pc(cRate)}, paid semiannually. ${d1} days have passed since the last
-          coupon date, and there are ${d2} days in the current coupon period.`,
+    stem:`You buy a bond quoted at ${(quoted/10).toFixed(3)} (percent of par). It has a face value
+          of $1,000 and a coupon rate of ${pc(cRate)}, paid semiannually. ${d1} days have passed
+          since the last coupon date, and there are ${d2} days in the current coupon period.`,
     parts:[
       {key:'a', ask:'What is the semiannual coupon payment?',
        note:'Round your answer to 2 decimal places.',
@@ -539,8 +547,9 @@ function accruedInterest(){
        is entitled to that share of the coming payment. Prorate it by actual days:`,
       `Accrued interest = (${d1} &divide; ${d2}) &times; $${money(cpn)} =
        <span class="ans">$${money(accrued)}</span>`,
-      `<span class="lbl">c.</span> The quoted price, also called the clean price, excludes accrued
-       interest. What changes hands is the invoice or dirty price:`,
+      `<span class="lbl">c.</span> A quote of ${(quoted/10).toFixed(3)} means ${(quoted/10).toFixed(3)}%
+       of the $1,000 face value, or $${money(quoted)}. The quoted price, also called the clean
+       price, excludes accrued interest; what changes hands is the invoice or dirty price:`,
       `$${money(quoted)} + $${money(accrued)} = <span class="ans">$${money(invoice)}</span>`,
       `The convention exists to stop quoted prices sawtoothing upward through each coupon period and
        dropping on the payment date. Quoting clean prices lets you compare two bonds without first
@@ -711,8 +720,6 @@ function bondTrueFalse(){
      'False. The quoted, or clean, price excludes accrued interest. What actually changes hands is the invoice price, which is the quoted price plus the seller’s share of the coming coupon.'],
     ['For a callable bond trading well above its call price, the yield to call is usually the more meaningful measure of return.', true,
      'True. Such a bond pays a coupon above current market rates, which is exactly the bond an issuer wants to refinance, so assuming it survives to maturity is optimistic.'],
-    ['A bond’s current yield and its yield to maturity are the same thing.', false,
-     'False. The current yield is just the annual coupon over the price and ignores the pull toward par as maturity approaches. The two coincide only for a bond trading exactly at par.'],
     ['Convexity is a desirable property for a bondholder.', true,
      'True. It means the price gains more when yields fall than it loses when yields rise by the same amount. The asymmetry favours the holder, which is why more convex bonds command higher prices for the same duration.'],
     ['Holding a bond to maturity removes all interest rate risk.', false,
@@ -778,27 +785,27 @@ function durationStats(F, cRatePct, ytmPct, yrs){
 
 /* Concept checks: one per numeric problem, indexed to match PROBLEMS. */
 const CONCEPTS = [
-  { ask:'If the market yield rose further, would this bond&rsquo;s current yield rise as well?',
+  { ask:'The instant the next coupon is paid, does the bond&rsquo;s full (dirty) value drop by about the amount of the coupon?',
     yesLabel:'Yes', noLabel:'No', ansYes:true,
-    why:'Yes. The annual coupon is fixed in dollars, so a higher yield lowers the price and the same coupon divided by a smaller price is a bigger number. The current yield always moves in the same direction as the yield to maturity — it just does not move as far.' },
+    why:'Yes. The value in part c includes the coupon that has been accruing since the last payment. The moment the coupon is paid out, that accrual resets to zero and the bond’s full value falls by the payment — which is why the market quotes clean prices, with the accrual stripped out, so quotes do not sawtooth through every coupon cycle.' },
   { ask:'Two zero-coupon bonds have the same yield but different maturities. Does the longer one sell for less?',
     yesLabel:'Yes', noLabel:'No', ansYes:true,
     why:'Yes. The single $1,000 payment is discounted over more periods, so its present value is smaller. This is why long zeros trade at deep discounts to par.' },
-  { ask:'A bond is trading below its call price. Is the issuer likely to call it?',
+  { ask:'A bond is trading below its call price around the call date. Is the issuer likely to call it?',
     yesLabel:'Yes', noLabel:'No', ansYes:false,
     why:'No. Calling means paying the call price for something worth less than that in the market, which would be a gift to the holders. Issuers call when rates have fallen and the bond trades above the call price, so refinancing at the new lower rate is cheaper.' },
-  { ask:'You held the bond for only one year rather than to maturity. Could your realised return be negative even though the bond never defaulted?',
+  { ask:'Could an investor who sells a bond before maturity earn a negative return even though the bond never defaults?',
     yesLabel:'Yes', noLabel:'No', ansYes:true,
-    why:'Yes, and one of the two cases above shows it. A rise in yields cuts the price by more than the coupon brings in. Default risk and interest rate risk are quite separate things, and a Treasury bond sold before maturity carries the second in full.' },
-  { ask:'If both bonds instead had zero coupons, would the gap between their price sensitivities be larger?',
+    why:'Yes. If yields rise over the holding period, the fall in price can exceed the coupons collected, and the total return turns negative. Default risk and interest rate risk are quite separate things, and a Treasury bond sold before maturity carries the second in full.' },
+  { ask:'If the yield on both bonds instead fell by the same amount, would Brightwell Bond again show the larger price change?',
     yesLabel:'Yes', noLabel:'No', ansYes:true,
-    why:'Yes. Stripping out the coupons pushes each bond’s duration all the way out to its maturity, so the short bond’s duration barely changes while the long bond’s rises sharply. Removing coupons widens the gap between them.' },
+    why:'Yes. Maturity drives the size of the response in both directions: the longer bond gains more when yields fall, just as it loses more when they rise. Interest rate sensitivity is about the magnitude of the swing, not its direction.' },
   { ask:'If the yield curve were flat, would every forward rate equal that same flat yield?',
     yesLabel:'Yes', noLabel:'No', ansYes:true,
     why:'Yes. Forward rates are the marginal rates that build up the average represented by the yields. If the average is the same at every maturity, nothing is pulling it up or down, so each marginal rate must equal it too.' },
-  { ask:'Does accrued interest change the yield to maturity a buyer earns on the bond?',
-    yesLabel:'Yes', noLabel:'No', ansYes:false,
-    why:'No. The buyer pays the accrued interest to the seller and gets it straight back a few days later in the full coupon payment. It is a transfer that settles the timing between the two parties, not a cost, and yields are computed from full prices in any case.' },
+  { ask:'Suppose instead that you buy the bond one day before its next coupon payment. Is the accrued interest you owe the seller close to a full coupon payment?',
+    yesLabel:'Yes', noLabel:'No', ansYes:true,
+    why:'Yes. The seller held the bond for nearly the entire coupon period, so almost all of the coming payment belongs to them. The day after the coupon is paid, accrued interest resets to zero and begins building again.' },
   { ask:'Would the duration rule on its own have predicted a price above or below the exact price?',
     yesLabel:'Below', noLabel:'Above', ansYes:true,
     why:'Below, and that is always the case. The price-yield curve is convex, so it lies above the straight tangent line the duration rule uses. The rule therefore understates the price whichever way the yield moves; the convexity term is what closes most of the gap.' },

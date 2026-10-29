@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>FIN 406 &middot; Quiz 4 Practice Set</title>
+<style>
+  :root{
+    --navy:#1E407C; --navy-dk:#001E44; --ink:#1a1a1a; --muted:#5a6472;
+    --line:#d7dce3; --bg:#f6f7f9; --card:#fff;
+    --ok:#1b6e3c; --ok-bg:#e8f5ec; --bad:#9b1c1c; --bad-bg:#fdeaea;
+    --warn:#8a5a00; --warn-bg:#fff5e0;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:1rem/1.55 "Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif}
+  .wrap{max-width:880px;margin:0 auto;padding:24px 18px 64px}
+  header.top{background:var(--navy);color:#fff;border-radius:10px;padding:22px 24px;margin-bottom:18px}
+  header.top h1{margin:0 0 4px;font-size:1.5rem}
+  header.top .sub{opacity:.92;font-size:.95rem}
+  header.top .dates{margin-top:12px;font-size:.9rem;opacity:.95;
+       border-top:1px solid rgba(255,255,255,.28);padding-top:10px}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:10px;
+         padding:18px 20px;margin-bottom:18px}
+  .panel h2{margin:0 0 8px;font-size:1.05rem;color:var(--navy-dk)}
+  ul.tight{margin:.4rem 0 .2rem;padding-left:1.15rem}
+  ul.tight li{margin:.25rem 0}
+  code.u{background:#eef1f6;padding:1px 6px;border-radius:4px;font-size:.92em}
+
+  .scorebar{position:sticky;top:0;z-index:5;background:var(--card);border:1px solid var(--line);
+       border-radius:10px;padding:10px 16px;margin-bottom:18px;display:flex;align-items:center;
+       gap:14px;flex-wrap:wrap;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+  .track{flex:1 1 180px;height:8px;background:#e6e9ee;border-radius:99px;overflow:hidden;min-width:140px}
+  .fill{height:100%;width:0;background:var(--navy);transition:width .3s}
+
+  .q{background:var(--card);border:1px solid var(--line);border-radius:10px;
+     padding:18px 20px;margin-bottom:16px}
+  .q > header{display:flex;align-items:baseline;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+  .qn{font-weight:700;color:var(--navy);font-size:1.02rem}
+  .tag{font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);
+       border:1px solid var(--line);border-radius:99px;padding:2px 9px}
+  .stem{margin:0 0 4px}
+  .req{font-weight:700;color:var(--navy-dk);margin:14px 0 2px}
+
+  table.data{border-collapse:collapse;margin:10px 0 6px;font-size:1rem}
+  table.data th,table.data td{border:1px solid var(--line);padding:5px 12px;text-align:right}
+  table.data th{background:#eef1f6;text-align:center}
+  table.data td:first-child,table.data th:first-child{text-align:left}
+
+  .part{margin:12px 0 0;padding-left:2px}
+  .part.concept{margin-top:16px;padding:12px 14px;background:#f2f6fb;
+       border:1px solid #cfdcec;border-left:4px solid var(--navy);border-radius:6px}
+  .concept-k{color:var(--navy);letter-spacing:.02em}
+  .part .ask{margin:0 0 6px}
+  .part .ask .k{font-weight:700}
+  .note{font-size:1rem;color:#a03;margin:.15rem 0 .4rem}
+  .row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:5px 0}
+  .row label.cap{font-size:1rem;color:var(--muted);min-width:250px}
+  .row input[type=text]{width:130px;padding:7px 9px;font-size:1rem;font-family:inherit;
+       border:1.5px solid var(--line);border-radius:6px;background:#fff;text-align:right}
+  .row input:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(30,64,124,.13)}
+  .row .unit{font-size:.92rem;color:var(--muted)}
+  .row.ok input{border-color:var(--ok);background:var(--ok-bg)}
+  .row.bad input{border-color:var(--bad);background:var(--bad-bg)}
+  .yn{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+  .yn label{font-size:1rem;display:flex;gap:5px;align-items:center;cursor:pointer}
+  .mc{display:flex;flex-direction:column;gap:5px;margin-top:4px}
+  .mc label{font-size:1rem;display:flex;gap:8px;align-items:flex-start;cursor:pointer;
+       padding:5px 8px;border-radius:5px}
+  .mc label:hover{background:#f2f6fb}
+  .mc.ok{outline:2px solid var(--ok);outline-offset:3px;border-radius:6px}
+  .mc.bad{outline:2px solid var(--bad);outline-offset:3px;border-radius:6px}
+
+  .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+  button{font:inherit;font-size:.92rem;padding:7px 14px;border-radius:6px;
+         border:1.5px solid var(--navy);background:var(--navy);color:#fff;cursor:pointer}
+  button.ghost{background:#fff;color:var(--navy)}
+  button:hover{filter:brightness(1.08)}
+  button:focus-visible{outline:3px solid rgba(30,64,124,.35);outline-offset:2px}
+
+  .fb{margin-top:12px;padding:11px 14px;border-radius:8px;font-size:1rem;display:none}
+  .fb.show{display:block}
+  .fb.ok{background:var(--ok-bg);border:1px solid #b9dfc7;color:var(--ok)}
+  .fb.bad{background:var(--bad-bg);border:1px solid #f0c2c2;color:var(--bad)}
+  .fb.warn{background:var(--warn-bg);border:1px solid #f0dcae;color:var(--warn)}
+  .fb.hint{background:#eef1f6;border:1px solid var(--line);color:var(--ink)}
+
+  .sol{display:none;margin-top:12px;padding:14px 16px;background:#fbfcfd;border:1px solid var(--line);
+       border-left:4px solid var(--navy);border-radius:6px;font-size:1rem}
+  .sol.show{display:block}
+  .sol h4{margin:0 0 8px;font-size:1rem;color:var(--navy-dk)}
+  .sol p{margin:.4rem 0}
+  .sol .ans{color:var(--navy-dk)}
+  .sol .lbl{font-weight:700}
+
+  footer.foot{color:var(--muted);font-size:.87rem;text-align:center;margin-top:26px}
+
+  @media (max-width:560px){
+    table.data th,table.data td{padding:4px 7px}
+    .row label.cap{min-width:0}
+  }
+
+  @media print{
+    body{background:#fff}
+    .btns,.scorebar{display:none}
+    .sol{display:block}
+    .q{break-inside:avoid;border-color:#999}
+    header.top{background:#fff;color:#000;border:1px solid #000}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>FIN 406 &middot; Quiz 4 Practice Set</h1>
+  <div class="sub">Bond prices and yields &middot; The term structure &middot; Duration and interest rate risk</div>
+  <div class="dates">Material cutoff: Tuesday 3 November &nbsp;|&nbsp; Quiz 4: Thursday 5 November</div>
+</header>
+
+<div class="panel">
+  <h2>How to use this set</h2>
+  <p>Work each problem on paper with your financial calculator, then type your answers and press
+     <b>Check</b>.</p>
+  <p><b>New numbers</b> regenerates a problem with different values. <b>Explanation</b> shows the
+     full working for the numbers currently on screen.</p>
+  <p>The shaded <b>Concept check</b> at the end of a problem is to help improve your conceptual understanding of the problem.</p>
+  <p>If you spot an error in any of the solutions, please email me (gxn13@psu.edu) as soon as possible and include a screenshot. The numbers change every time a problem is regenerated, so without one I cannot see the version you were looking at.</p>
+  <h2 style="margin-top:14px">Before you start</h2>
+  <ul class="tight">
+    <li>Percent boxes take percent: type <code class="u">7.20</code>, not <code class="u">0.0720</code>.</li>
+    <li>Prices are in dollars on a $1,000 face value. Type <code class="u">1054.32</code>, with or without the comma.</li>
+    <li>Duration and modified duration are in years, to 4 decimal places.</li>
+    <li>Negative answers may be typed either way: <code class="u">-14.10</code> or <code class="u">(14.10)</code>.</li>
+    <li>Do not round intermediate calculations. Round each final answer as the question asks.</li>
+  </ul>
+</div>
+
+<div class="scorebar">
+  Progress
+  <div class="track"><div class="fill" id="fill"></div></div>
+  <span id="scoretext"></span>
+  <button class="ghost" id="resetall" style="margin-left:auto">Reset all</button>
+</div>
+
+<div id="quiz"></div>
+
+<footer class="foot">
+  FIN 406: Security Analysis and Portfolio Management &middot; Prof. Nguyen &middot; Fall 2026
+</footer>
+</div>
+
+<script>
+/* =================== helpers =================== */
+const ri   = (a,b) => Math.floor(Math.random()*(b-a+1))+a;
+const pick = a => a[Math.floor(Math.random()*a.length)];
+const d1   = x => (Math.round(x*10)/10).toFixed(1);
+const d2   = x => (Math.round(x*100)/100).toFixed(2);
+const d4   = x => (Math.round(x*10000)/10000).toFixed(4);
+const pc   = x => d2(x)+'%';
+const shuffle = a => a.map(v=>[Math.random(),v]).sort((p,q)=>p[0]-q[0]).map(p=>p[1]);
+
+/* part = {key,label,unit,ans,tol}              numeric
+        | {key,type:'yesno',ansYes,...}         two-way choice
+        | {key,type:'mc',options:[],ansIdx}     multiple choice                     */
+const PROBLEMS = [
+/* 1 — bond price, current yield, premium or discount ---------------- */
+function bondPricing(){
+  const F = 1000;
+  const cRate = pick([3.5,4,4.5,5,5.5,6,6.5,7]);
+  const gap   = pick([-2,-1.5,-1,1,1.5,2]);        // never zero, so never priced at par
+  const ytm   = cRate + gap;
+  const yrs   = pick([8,10,12,15,20,25]);
+  const cpn   = F*cRate/100/2;
+  const P     = bondPriceN(F, cpn, ytm/100/2, yrs*2);
+  const cy    = F*cRate/100/P*100;
+  return {
+    tag:'Bond pricing',
+    stem:`Marchmont Industries has a bond outstanding with a face value of $1,000 and ${yrs} years
+          remaining to maturity. It carries a coupon rate of ${pc(cRate)}, paid semiannually. Bonds
+          of comparable risk are yielding ${pc(ytm)}.`,
+    parts:[
+      {key:'a', ask:'What is the semiannual coupon payment?',
+       note:'Round your answer to 2 decimal places.',
+       label:'Coupon payment', unit:'$', ans:cpn, tol:0.01},
+      {key:'b', ask:'What is the bond selling for today?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Price', unit:'$', ans:P, tol:0.01},
+      {key:'c', ask:'What is the current yield?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Current yield', unit:'%', ans:cy, tol:0.01},
+      {key:'d', ask:'The bond is selling at:',
+       type:'mc', options:['A premium','A discount','Par'], ansIdx: gap<0 ? 0 : 1}
+    ],
+    explain:[
+      `<span class="lbl">a.</span> The annual coupon is ${pc(cRate)} &times; $1,000 =
+       $${money(F*cRate/100)}, paid in two instalments, so each payment is
+       <span class="ans">$${money(cpn)}</span>.`,
+      `<span class="lbl">b.</span> Work in half-years throughout: n = ${yrs} &times; 2 = ${yrs*2}
+       periods, PMT = $${money(cpn)}, FV = $1,000, and the periodic yield is ${pc(ytm)} &divide; 2 =
+       ${d4(ytm/2)}%.`,
+      `Price = $${money(cpn)} &times; [1 &minus; (1 + ${d4(ytm/200)})<sup>&minus;${yrs*2}</sup>]
+       &divide; ${d4(ytm/200)} &nbsp;+&nbsp; $1,000 &divide; (1 + ${d4(ytm/200)})<sup>${yrs*2}</sup>
+       = <span class="ans">$${money(P)}</span>`,
+      `<span class="lbl">c.</span> The current yield relates the annual coupon to the price actually
+       paid: $${money(F*cRate/100)} &divide; $${money(P)} = <span class="ans">${pc(cy)}</span>`,
+      `<span class="lbl">d.</span> The coupon rate is ${pc(cRate)} and the market demands ${pc(ytm)}.
+       ${gap<0
+         ? `Because the bond pays more than the market requires, it must sell above face value: at
+            <span class="ans">a premium</span>.`
+         : `Because the bond pays less than the market requires, it must sell below face value: at
+            <span class="ans">a discount</span>.`}`,
+      `Note the ordering that always holds here: ${gap<0
+         ? `coupon rate &gt; current yield &gt; yield to maturity, for a premium bond.`
+         : `coupon rate &lt; current yield &lt; yield to maturity, for a discount bond.`}`
+    ]
+  };
+},
+
+/* 2 — zero-coupon bonds: fill in the missing quantity ---------------- */
+function zeroCoupon(){
+  const F  = 1000;
+  const P1 = pick([380,400,425,450,500,550,600]), n1 = pick([10,12,15,20]);
+  const y1 = (Math.pow(F/P1, 1/n1) - 1)*100;
+  const y2 = pick([4,4.5,5,6,7,8]),               n2 = pick([5,8,10,12]);
+  const P2 = F/Math.pow(1+y2/100, n2);
+  const P3 = pick([400,450,500,550]),             y3 = pick([6,7,8,9]);
+  const n3 = Math.log(F/P3)/Math.log(1+y3/100);
+  return {
+    tag:'Zero-coupon bonds',
+    stem:`Each of the bonds below is a zero-coupon bond with a par value of $1,000. Assume annual
+          compounding throughout.`,
+    parts:[
+      {key:'a', ask:`A bond priced at $${money(P1)} matures in ${n1} years. What is its yield to
+              maturity?`,
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Yield to maturity', unit:'%', ans:y1, tol:0.01},
+      {key:'b', ask:`A bond maturing in ${n2} years has a yield to maturity of ${pc(y2)}. What is
+              its price?`,
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Price', unit:'$', ans:P2, tol:0.01},
+      {key:'c', ask:`A bond priced at $${money(P3)} has a yield to maturity of ${pc(y3)}. How many
+              years until it matures?`,
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Maturity', unit:'years', ans:n3, tol:0.01}
+    ],
+    explain:[
+      `A zero-coupon bond has a single cash flow, the $1,000 par value at maturity, so
+       Price = $1,000 &divide; (1 + y)<sup>n</sup>. Every part below is that one equation solved for
+       a different unknown.`,
+      `<span class="lbl">a.</span> $${money(P1)} = $1,000 &divide; (1 + y)<sup>${n1}</sup>, so
+       y = ($1,000 &divide; $${money(P1)})<sup>1/${n1}</sup> &minus; 1 =
+       <span class="ans">${pc(y1)}</span>`,
+      `On a financial calculator: n = ${n1}, PV = &minus;${money(P1)}, FV = 1,000, PMT = 0, CPT I/Y.`,
+      `<span class="lbl">b.</span> Price = $1,000 &divide; (1 + ${d4(y2/100)})<sup>${n2}</sup> =
+       <span class="ans">$${money(P2)}</span>`,
+      `<span class="lbl">c.</span> Now the unknown is the exponent. Taking logarithms of
+       $${money(P3)} = $1,000 &divide; (1 + ${d4(y3/100)})<sup>n</sup> gives`,
+      `n = ln($1,000 &divide; $${money(P3)}) &divide; ln(1 + ${d4(y3/100)}) =
+       <span class="ans">${d2(n3)}</span> years`,
+      `The price of a zero falls further below par the longer it has to run and the higher the yield.
+       There is no coupon to cushion it, which is why zeros are the most interest-rate-sensitive
+       bonds of any given maturity.`
+    ]
+  };
+},
+
+/* 3 — yield to maturity and yield to call ---------------------------- */
+function yieldToCall(){
+  const F = 1000;
+  let cRate, ytm, yrs, callYrs, callP, cpn, P, ytc1, ytc2;
+  do {
+    cRate = pick([5,5.5,6,6.5,7]);
+    ytm   = cRate - pick([0.5,1,1.5,2]);             // premium bond, so the call bites
+    yrs   = pick([20,25,30]);
+    callYrs = pick([4,5,6]);
+    callP   = pick([1050,1075,1100,1120]);
+    cpn = F*cRate/100/2;
+    P   = bondPriceN(F, cpn, ytm/100/2, yrs*2);
+    ytc1 = solveYield(callP, cpn, callYrs*2, P)*2*100;
+    ytc2 = solveYield(callP, cpn, 2*2,       P)*2*100;   // callable in two years instead
+    // Keep both yields positive and below the coupon rate. A bond bought at a deep
+    // premium and called very early can imply a negative yield, which is arithmetically
+    // fine but a distraction in a first course.
+  } while (!(ytc2 > 0.5 && ytc1 > 0.5 && ytc1 < cRate && ytc2 < cRate && P > callP));
+  return {
+    tag:'Yield to call',
+    stem:`A ${yrs}-year maturity bond with a ${pc(cRate)} coupon, paid semiannually, is callable in
+          ${callYrs} years at a call price of $${money(callP)}. The bond currently sells at a yield
+          to maturity of ${pc(ytm)}.`,
+    parts:[
+      {key:'a', ask:'What is the bond selling for today?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Price', unit:'$', ans:P, tol:0.01},
+      {key:'b', ask:'What is the yield to call?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Yield to call', unit:'%', ans:ytc1, tol:0.01},
+      {key:'c', ask:`What would the yield to call be if the bond could be called in two years
+              instead of ${callYrs}, at the same call price?`,
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Yield to call', unit:'%', ans:ytc2, tol:0.01},
+      {key:'d', ask:'For an investor buying this bond today, which yield is the more realistic guide to the return they will actually earn?',
+       type:'mc',
+       options:['The yield to call, because a bond trading at a premium is likely to be called',
+                'The yield to maturity, because the call is unlikely to matter',
+                'Whichever of the two is higher'],
+       ansIdx:0}
+    ],
+    explain:[
+      `<span class="lbl">a.</span> Price the bond to maturity first, in half-years: n = ${yrs*2},
+       PMT = $${money(cpn)}, FV = $1,000, periodic yield = ${d4(ytm/2)}%.`,
+      `Price = <span class="ans">$${money(P)}</span>. Because the coupon of ${pc(cRate)} exceeds the
+       market yield of ${pc(ytm)}, the bond trades at a premium.`,
+      `<span class="lbl">b.</span> The yield to call is the same internal rate of return calculation,
+       but the bond is assumed to be redeemed early and at the call price. Keep the price you just
+       paid, shorten the horizon, and replace the redemption value:`,
+      `n = ${callYrs*2} half-years, PV = &minus;$${money(P)}, PMT = $${money(cpn)},
+       FV = $${money(callP)}. Solving gives ${d4(ytc1/2)}% per half-year, or
+       <span class="ans">${pc(ytc1)}</span> a year.`,
+      `<span class="lbl">c.</span> Shortening the call protection to two years leaves n = 4:
+       the answer becomes <span class="ans">${pc(ytc2)}</span>.`,
+      `${ytc2 < ytc1
+        ? `Being called sooner makes matters worse for the holder. They paid a premium of
+           $${money(P-1000)} above par and have less time to recover it out of the high coupon.`
+        : `Here the earlier call actually helps, because the call price sits far enough above the
+           purchase price to more than offset the loss of coupon income.`}`,
+      `<span class="lbl">d.</span> <span class="ans">The yield to call.</span> A bond trading well
+       above its call price is exactly the bond an issuer wants to refinance: it is paying a coupon
+       above the current market yield. The yield to maturity assumes it survives another ${yrs}
+       years, which is optimistic.`
+    ]
+  };
+},
+
+/* 4 — one-year holding period return --------------------------------- */
+function holdingPeriod(){
+  const F = 1000;
+  const cRate = pick([3,3.2,3.5,4,4.5,5]);
+  const y0    = cRate + pick([-1,-0.5,0.5,1]);       // never equal, so never bought at par
+  const yrs   = pick([12,15,18,20]);
+  const cpn   = F*cRate/100;                          // annual coupons
+  const P0    = bondPriceN(F, cpn, y0/100, yrs);
+  let yUp, yDn;                                      // the repriced bond must not land at par either
+  do { yUp = y0 + pick([1,1.5,2]); } while (Math.abs(yUp-cRate) < 1e-9);
+  do { yDn = y0 - pick([1,1.5,2]); } while (Math.abs(yDn-cRate) < 1e-9);
+  const Pup   = bondPriceN(F, cpn, yUp/100, yrs-1);
+  const Pdn   = bondPriceN(F, cpn, yDn/100, yrs-1);
+  const hUp   = (Pup - P0 + cpn)/P0*100;
+  const hDn   = (Pdn - P0 + cpn)/P0*100;
+  return {
+    tag:'Holding period return',
+    stem:`You have just bought a bond with ${yrs} years to maturity that pays an annual coupon of
+          $${money(cpn)} on a face value of $1,000. Bonds of this risk currently yield ${pc(y0)}.
+          You intend to sell after one year.`,
+    parts:[
+      {key:'a', ask:'What did you pay for the bond?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Purchase price', unit:'$', ans:P0, tol:0.01},
+      {key:'b-1', ask:`If the yield to maturity is ${pc(yUp)} one year from now, what will the bond
+              be worth then?`,
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Price in one year', unit:'$', ans:Pup, tol:0.01},
+      {key:'b-2', ask:'What is your holding period return in that case?',
+       note:'Indicate a negative value with a minus sign. Round your answer to 2 decimal places.',
+       label:'Holding period return', unit:'%', ans:hUp, tol:0.01},
+      {key:'c-1', ask:`If instead the yield to maturity is ${pc(yDn)} one year from now, what will
+              the bond be worth?`,
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Price in one year', unit:'$', ans:Pdn, tol:0.01},
+      {key:'c-2', ask:'What is your holding period return in that case?',
+       note:'Indicate a negative value with a minus sign. Round your answer to 2 decimal places.',
+       label:'Holding period return', unit:'%', ans:hDn, tol:0.01}
+    ],
+    explain:[
+      `<span class="lbl">a.</span> n = ${yrs}, PMT = $${money(cpn)}, FV = $1,000, I/Y = ${pc(y0)}
+       gives a purchase price of <span class="ans">$${money(P0)}</span>.`,
+      `<span class="lbl">b.</span> A year later the bond has ${yrs-1} years left. Repricing it at
+       ${pc(yUp)}: n = ${yrs-1}, PMT = $${money(cpn)}, FV = $1,000, I/Y = ${pc(yUp)} gives
+       <span class="ans">$${money(Pup)}</span>.`,
+      `The holding period return counts both the price change and the coupon collected along the way,
+       measured against what you originally paid:`,
+      `HPR = ($${money(Pup)} &minus; $${money(P0)} + $${money(cpn)}) &divide; $${money(P0)} =
+       <span class="ans">${pc(hUp)}</span>`,
+      `<span class="lbl">c.</span> At ${pc(yDn)} the bond is worth
+       <span class="ans">$${money(Pdn)}</span>, and`,
+      `HPR = ($${money(Pdn)} &minus; $${money(P0)} + $${money(cpn)}) &divide; $${money(P0)} =
+       <span class="ans">${pc(hDn)}</span>`,
+      `The coupon was the same in both cases. Everything that separates a return of ${pc(hUp)} from
+       one of ${pc(hDn)} came from the movement in yields &mdash; which is the whole of interest rate
+       risk, and the reason a bond held for less than its full term is not a safe investment.`
+    ]
+  };
+},
+
+/* 5 — maturity and interest rate sensitivity ------------------------- */
+function maturitySensitivity(){
+  const F = 1000;
+  const cRate = pick([4,4.5,4.75,5,5.5,6]);
+  const y0 = cRate + pick([1,1.5,2,2.5]);            // both start at a discount, never at par
+  const y1 = y0 + pick([1.5,2,2.5,3]);
+  const nA = pick([4,5,6]);
+  const nB = pick([20,25,30]);
+  const cpn = F*cRate/100/2;
+  const A0 = bondPriceN(F,cpn,y0/100/2,nA*2), A1 = bondPriceN(F,cpn,y1/100/2,nA*2);
+  const B0 = bondPriceN(F,cpn,y0/100/2,nB*2), B1 = bondPriceN(F,cpn,y1/100/2,nB*2);
+  const dA = (A1-A0)/A0*100, dB = (B1-B0)/B0*100;
+  return {
+    tag:'Maturity and interest rate risk',
+    stem:`Two bonds both have a par value of $1,000 and pay a ${pc(cRate)} coupon semiannually.
+          Ashmore Bond matures in ${nA} years and Brightwell Bond matures in ${nB} years. Both
+          currently yield ${pc(y0)}.
+      <table class="data">
+        <tr><th></th><th>Ashmore Bond</th><th>Brightwell Bond</th></tr>
+        <tr><td>Coupon rate</td><td>${pc(cRate)}</td><td>${pc(cRate)}</td></tr>
+        <tr><td>Time to maturity</td><td>${nA} years</td><td>${nB} years</td></tr>
+        <tr><td>Yield to maturity</td><td>${pc(y0)}</td><td>${pc(y0)}</td></tr>
+      </table>`,
+    parts:[
+      {key:'a-1', ask:'What is Ashmore Bond worth today?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Ashmore Bond', unit:'$', ans:A0, tol:0.01},
+      {key:'a-2', ask:'What is Brightwell Bond worth today?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Brightwell Bond', unit:'$', ans:B0, tol:0.01},
+      {key:'b-1', ask:`If the yield to maturity on both bonds rises to ${pc(y1)}, what is the
+              percentage change in the value of Ashmore Bond?`,
+       note:'Indicate a decline with a minus sign. Round your answer to 2 decimal places.',
+       label:'Change in value', unit:'%', ans:dA, tol:0.01},
+      {key:'b-2', ask:'What is the percentage change in the value of Brightwell Bond?',
+       note:'Indicate a decline with a minus sign. Round your answer to 2 decimal places.',
+       label:'Change in value', unit:'%', ans:dB, tol:0.01},
+      {key:'c', ask:'Which bond is more sensitive to a change in interest rates?',
+       type:'mc', options:['Ashmore Bond','Brightwell Bond'], ansIdx:1}
+    ],
+    explain:[
+      `<span class="lbl">a.</span> Both are priced the same way, in half-years at a periodic yield of
+       ${d4(y0/2)}%. Only the number of periods differs.`,
+      `Ashmore Bond (n = ${nA*2}): <span class="ans">$${money(A0)}</span> &nbsp;&nbsp;
+       Brightwell Bond (n = ${nB*2}): <span class="ans">$${money(B0)}</span>`,
+      `<span class="lbl">b.</span> Repricing both at ${pc(y1)} gives $${money(A1)} and
+       $${money(B1)} respectively.`,
+      `Ashmore Bond: ($${money(A1)} &minus; $${money(A0)}) &divide; $${money(A0)} =
+       <span class="ans">${pc(dA)}</span>`,
+      `Brightwell Bond: ($${money(B1)} &minus; $${money(B0)}) &divide; $${money(B0)} =
+       <span class="ans">${pc(dB)}</span>`,
+      `<span class="lbl">c.</span> <span class="ans">Brightwell Bond</span>, the longer bond, loses
+       ${pc(Math.abs(dB))} against ${pc(Math.abs(dA))} for the shorter one, from an identical change
+       in yield.`,
+      `The reason is that a longer bond has more of its value locked up in cash flows far in the
+       future, and distant cash flows are the ones whose present value a change in the discount rate
+       affects most. Holding everything else fixed, longer maturity means greater interest rate risk.`
+    ]
+  };
+},
+
+/* 6 — forward rates from the yield curve ----------------------------- */
+function forwardRates(){
+  let y;
+  do {
+    y = [pick([3,3.5,4,4.5]), 0, 0, 0];
+    y[1] = y[0] + pick([0.5,0.75,1]);
+    y[2] = y[1] + pick([0.25,0.5,0.75]);
+    y[3] = y[2] + pick([0.25,0.5,0.75]);
+  } while (y[3] > 9);
+  const fwd = k =>                                    // forward rate applying in year k (1-based)
+    (Math.pow(1+y[k-1]/100, k)/Math.pow(1+y[k-2]/100, k-1) - 1)*100;
+  const f2 = fwd(2), f4 = fwd(4);
+  const rows = y.map((v,k)=>`<tr><td>${k+1}</td><td>${pc(v)}</td></tr>`).join('');
+  return {
+    tag:'The term structure',
+    stem:`Consider the following yield curve on zero-coupon bonds. Assume annual compounding.
+      <table class="data">
+        <tr><th>Years until maturity</th><th>Yield to maturity</th></tr>
+        ${rows}
+      </table>`,
+    parts:[
+      {key:'a', ask:'What is the forward rate for year 2?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Forward rate', unit:'%', ans:f2, tol:0.01},
+      {key:'b', ask:'What is the forward rate for year 4?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Forward rate', unit:'%', ans:f4, tol:0.01},
+      {key:'c', ask:'Under the pure expectations theory, an upward-sloping yield curve like this one indicates that investors expect short-term interest rates to:',
+       type:'mc', options:['Rise','Fall','Stay where they are'], ansIdx:0}
+    ],
+    explain:[
+      `A forward rate is the one-year rate implied for some future year by today&rsquo;s curve. It is
+       whatever rate makes rolling a shorter zero into that year equivalent to buying the longer zero
+       outright:`,
+      `(1 + y<sub>n</sub>)<sup>n</sup> = (1 + y<sub>n&minus;1</sub>)<sup>n&minus;1</sup> &times;
+       (1 + f<sub>n</sub>)`,
+      `<span class="lbl">a.</span> f<sub>2</sub> = (1 + ${d4(y[1]/100)})<sup>2</sup> &divide;
+       (1 + ${d4(y[0]/100)}) &minus; 1 = <span class="ans">${pc(f2)}</span>`,
+      `<span class="lbl">b.</span> f<sub>4</sub> = (1 + ${d4(y[3]/100)})<sup>4</sup> &divide;
+       (1 + ${d4(y[2]/100)})<sup>3</sup> &minus; 1 = <span class="ans">${pc(f4)}</span>`,
+      `Notice that each forward rate sits above the yield of the same maturity. That is arithmetic
+       rather than economics: a rising average can only be produced by marginal values above it.`,
+      `<span class="lbl">c.</span> <span class="ans">Rise.</span> Under the pure expectations theory
+       forward rates are the market&rsquo;s forecasts of future short rates, so an upward-sloping
+       curve means the market expects short rates to be higher.`,
+      `The liquidity preference theory disputes this reading. It holds that forward rates also
+       contain a liquidity premium demanded for tying money up for longer, so a mildly upward-sloping
+       curve is consistent with short rates that are expected to stay flat.`
+    ]
+  };
+},
+
+/* 7 — accrued interest and the invoice price ------------------------- */
+function accruedInterest(){
+  const F = 1000;
+  const cRate = ri(300,750)/100;
+  const quoted = ri(88000,112000)/100;
+  const d1 = ri(20,170);                              // days since the last coupon
+  const d2 = pick([181,182,184]);                     // days in the coupon period
+  const cpn = F*cRate/100/2;
+  const accrued = d1/d2*cpn;
+  const invoice = quoted + accrued;
+  return {
+    tag:'Accrued interest',
+    stem:`You buy a bond at a quoted price of $${money(quoted)}. It has a face value of $1,000 and a
+          coupon rate of ${pc(cRate)}, paid semiannually. ${d1} days have passed since the last
+          coupon date, and there are ${d2} days in the current coupon period.`,
+    parts:[
+      {key:'a', ask:'What is the semiannual coupon payment?',
+       note:'Round your answer to 2 decimal places.',
+       label:'Coupon payment', unit:'$', ans:cpn, tol:0.01},
+      {key:'b', ask:'How much accrued interest is owed to the seller?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Accrued interest', unit:'$', ans:accrued, tol:0.01},
+      {key:'c', ask:'What is the full price you actually pay?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Invoice price', unit:'$', ans:invoice, tol:0.01}
+    ],
+    explain:[
+      `<span class="lbl">a.</span> ${pc(cRate)} &divide; 2 &times; $1,000 =
+       <span class="ans">$${money(cpn)}</span>`,
+      `<span class="lbl">b.</span> The seller held the bond for part of the current coupon period and
+       is entitled to that share of the coming payment. Prorate it by actual days:`,
+      `Accrued interest = (${d1} &divide; ${d2}) &times; $${money(cpn)} =
+       <span class="ans">$${money(accrued)}</span>`,
+      `<span class="lbl">c.</span> The quoted price, also called the clean price, excludes accrued
+       interest. What changes hands is the invoice or dirty price:`,
+      `$${money(quoted)} + $${money(accrued)} = <span class="ans">$${money(invoice)}</span>`,
+      `The convention exists to stop quoted prices sawtoothing upward through each coupon period and
+       dropping on the payment date. Quoting clean prices lets you compare two bonds without first
+       working out where each sits in its coupon cycle.`
+    ]
+  };
+},
+
+/* 8 — duration, modified duration and the convexity correction ------- */
+function durationConvexity(){
+  const F = 1000;
+  let cRate, ytm, dy;
+  do {                                               // never priced at par, today or after the move
+    cRate = pick([4,5,6,7,8]);
+    ytm   = pick([5,6,7,8,9]);
+    dy    = pick([-1,-0.5,0.5,1]);
+  } while (cRate === ytm || Math.abs(ytm+dy-cRate) < 1e-9);
+  const yrs   = pick([3,4]);
+  const { P, D, C } = durationStats(F, cRate, ytm, yrs);
+  const modD  = D/(1+ytm/100);
+  const y1    = ytm + dy;
+  const exact = bondPriceN(F, F*cRate/100, y1/100, yrs);
+  const pDur  = P*(1 - modD*(dy/100));
+  const pConv = P*(1 - modD*(dy/100) + 0.5*C*Math.pow(dy/100,2));
+  const rows = [];
+  for (let t=1;t<=yrs;t++){
+    const cf = F*cRate/100 + (t===yrs ? F : 0);
+    const pv = cf/Math.pow(1+ytm/100,t);
+    rows.push(`<tr><td>${t}</td><td>${money(cf)}</td><td>${money(pv)}</td>
+                   <td>${d4(pv/P)}</td><td>${d4(t*pv/P)}</td></tr>`);
+  }
+  return {
+    tag:'Duration and convexity',
+    stem:`Fenwick Corporation has a bond with a face value of $1,000 and ${yrs} years to maturity,
+          paying a ${pc(cRate)} coupon once a year. Its yield to maturity is ${pc(ytm)} and its
+          convexity is ${d2(C)}.`,
+    parts:[
+      {key:'a', ask:'What is the price of the bond?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Price', unit:'$', ans:P, tol:0.01},
+      {key:'b', ask:'What is its Macaulay duration?',
+       note:'Do not round intermediate calculations. Round your answer to 4 decimal places.',
+       label:'Duration', unit:'years', ans:D, tol:0.0001},
+      {key:'c', ask:'What is its modified duration?',
+       note:'Do not round intermediate calculations. Round your answer to 4 decimal places.',
+       label:'Modified duration', unit:'years', ans:modD, tol:0.0001},
+      {key:'d', ask:`If the yield to maturity ${dy>0?'rises':'falls'} to ${pc(y1)}, what price does
+              the duration rule predict?`,
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Predicted price', unit:'$', ans:pDur, tol:0.02},
+      {key:'e', ask:'What price does the duration-with-convexity rule predict?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Predicted price', unit:'$', ans:pConv, tol:0.02},
+      {key:'f', ask:'What is the exact new price?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Exact price', unit:'$', ans:exact, tol:0.01}
+    ],
+    explain:[
+      `<span class="lbl">a and b.</span> Duration is the weighted average time to receive the
+       bond&rsquo;s cash flows, weighted by each flow&rsquo;s share of the price.`,
+      `<table class="data">
+         <tr><th>Year</th><th>Cash flow</th><th>PV at ${pc(ytm)}</th><th>Weight</th>
+             <th>Year &times; weight</th></tr>
+         ${rows.join('')}
+         <tr><td><b>Total</b></td><td></td><td><b>${money(P)}</b></td><td><b>1.0000</b></td>
+             <td><b>${d4(D)}</b></td></tr>
+       </table>`,
+      `The column of present values sums to the price, <span class="ans">$${money(P)}</span>, and the
+       last column sums to the Macaulay duration, <span class="ans">${d4(D)}</span> years.`,
+      `<span class="lbl">c.</span> Modified duration converts that into a price sensitivity by
+       dividing by one plus the yield: ${d4(D)} &divide; (1 + ${d4(ytm/100)}) =
+       <span class="ans">${d4(modD)}</span>`,
+      `<span class="lbl">d.</span> The duration rule says &Delta;P/P &asymp; &minus;D* &times;
+       &Delta;y, with &Delta;y = ${d2(dy)}% = ${d4(dy/100)}.`,
+      `&Delta;P/P &asymp; &minus;${d4(modD)} &times; ${d4(dy/100)} = ${pc(-modD*dy)}, so the
+       predicted price is $${money(P)} &times; (1 ${-modD*dy>=0?'+':'&minus;'}
+       ${d4(Math.abs(modD*dy/100))}) = <span class="ans">$${money(pDur)}</span>`,
+      `<span class="lbl">e.</span> The convexity correction adds &frac12; &times; C &times;
+       (&Delta;y)<sup>2</sup> = 0.5 &times; ${d2(C)} &times; ${d4(dy/100)}<sup>2</sup> =
+       ${d4(0.5*C*Math.pow(dy/100,2))}.`,
+      `Predicted price = $${money(P)} &times; (1 ${-modD*dy>=0?'+':'&minus;'}
+       ${d4(Math.abs(modD*dy/100))} + ${d4(0.5*C*Math.pow(dy/100,2))}) =
+       <span class="ans">$${money(pConv)}</span>`,
+      `<span class="lbl">f.</span> Pricing the bond directly at ${pc(y1)} gives
+       <span class="ans">$${money(exact)}</span>.`,
+      `Compare the three. The duration rule is out by $${money(Math.abs(pDur-exact))} and the
+       duration-with-convexity rule by only $${money(Math.abs(pConv-exact))}. The duration rule is a
+       straight line drawn tangent to a curved price-yield relationship, so it always understates the
+       true price, whichever way the yield moves. Convexity supplies the curvature it misses.`
+    ]
+  };
+},
+
+/* 9 — bond and term-structure concepts, multiple choice -------------- */
+function bondConcepts(){
+  const a = shuffle([
+    ['longer; lower', true],
+    ['longer; higher', false],
+    ['shorter; higher', false],
+    ['shorter; lower', false]
+  ]);
+  const b = shuffle([
+    ['a higher yield on long-term bonds than on short-term bonds', true],
+    ['a higher yield on short-term bonds than on long-term bonds', false],
+    ['the same yield on both short-term and long-term bonds', false],
+    ['a yield that depends only on default risk', false]
+  ]);
+  const c = shuffle([
+    ['decrease', true],
+    ['increase', false],
+    ['not change', false],
+    ['change unpredictably', false]
+  ]);
+  const d = shuffle([
+    ['always be higher than', true],
+    ['sometimes be higher than', false],
+    ['always be lower than', false],
+    ['sometimes be lower than', false]
+  ]);
+  return {
+    tag:'Bond concepts',
+    stem:`Four short questions on bonds and the term structure. There is nothing to calculate here
+          &mdash; reason each one through.`,
+    parts:[
+      {key:'a', ask:'Everything else equal, the ______ the maturity of a bond and the ______ the coupon, the greater the sensitivity of its price to interest rate changes.',
+       type:'mc', options:a.map(o=>o[0]), ansIdx:a.findIndex(o=>o[1])},
+      {key:'b', ask:'Under the liquidity preference theory of the term structure, one would on average expect investors to require ______.',
+       type:'mc', options:b.map(o=>o[0]), ansIdx:b.findIndex(o=>o[1])},
+      {key:'c', ask:'Under the expectations theory, a downward-sloping yield curve indicates that investors expect short-term interest rates to ______ in the future.',
+       type:'mc', options:c.map(o=>o[0]), ansIdx:c.findIndex(o=>o[1])},
+      {key:'d', ask:'Because of convexity, when interest rates change the actual bond price will ______ the price predicted by the duration rule.',
+       type:'mc', options:d.map(o=>o[0]), ansIdx:d.findIndex(o=>o[1])}
+    ],
+    explain:[
+      `<span class="lbl">a.</span> <span class="ans">Longer; lower.</span> Both work through the same
+       channel. A longer maturity pushes cash flows further out, and a lower coupon shifts weight
+       toward the distant principal repayment. Either way more of the bond&rsquo;s value sits far in
+       the future, where discounting bites hardest. A zero-coupon bond is the extreme case.`,
+      `<span class="lbl">b.</span> <span class="ans">A higher yield on long-term bonds.</span>
+       Liquidity preference holds that investors must be paid to tie money up, so long bonds carry a
+       premium over and above expected future short rates. This is why the yield curve slopes upward
+       more often than not, even when rates are not expected to rise.`,
+      `<span class="lbl">c.</span> <span class="ans">Decrease.</span> Under pure expectations the
+       long rate is an average of expected future short rates. Long rates below short rates can only
+       be produced by expected future short rates lower than today&rsquo;s.`,
+      `<span class="lbl">d.</span> <span class="ans">Always be higher than.</span> The price-yield
+       relationship is convex, so it lies above the tangent line the duration rule draws. When yields
+       fall, the actual price rises by more than duration predicts; when yields rise, it falls by
+       less. Convexity works in the holder&rsquo;s favour in both directions.`
+    ]
+  };
+},
+
+/* 10 — interest rate risk, true or false ----------------------------- */
+function bondTrueFalse(){
+  const POOL = [
+    ['A bond selling at a discount has a yield to maturity above its coupon rate.', true,
+     'True. The discount is precisely what raises the return: the buyer collects the par value at maturity as well as the coupons, and that capital gain lifts the yield above the coupon rate. For a premium bond the ordering reverses.'],
+    ['The yield to maturity is the return an investor will earn provided the bond is held to maturity, whatever happens to interest rates in the meantime.', false,
+     'False, and the omission matters. Yield to maturity assumes every coupon is reinvested at the yield to maturity itself. If rates move, the coupons are reinvested at something else and the realised compound return differs — this is reinvestment risk.'],
+    ['Between two bonds identical except for coupon, the lower-coupon bond has the longer duration.', true,
+     'True. A low coupon leaves more of the bond’s value in the final principal repayment, pushing the weighted average time of the cash flows further out.'],
+    ['Duration always increases when the yield to maturity increases.', false,
+     'False. It falls. A higher discount rate reduces the present value of distant cash flows more than near ones, shifting weight toward the early payments and shortening the weighted average.'],
+    ['The price of a zero-coupon bond is more sensitive to interest rates than that of a coupon bond of the same maturity.', true,
+     'True. A zero has one cash flow, at maturity, so its duration equals its maturity — the longest possible for that term. Any coupon shortens duration by moving value earlier.'],
+    ['The quoted price of a bond is the amount the buyer actually hands over.', false,
+     'False. The quoted, or clean, price excludes accrued interest. What actually changes hands is the invoice price, which is the quoted price plus the seller’s share of the coming coupon.'],
+    ['For a callable bond trading well above its call price, the yield to call is usually the more meaningful measure of return.', true,
+     'True. Such a bond pays a coupon above current market rates, which is exactly the bond an issuer wants to refinance, so assuming it survives to maturity is optimistic.'],
+    ['A bond’s current yield and its yield to maturity are the same thing.', false,
+     'False. The current yield is just the annual coupon over the price and ignores the pull toward par as maturity approaches. The two coincide only for a bond trading exactly at par.'],
+    ['Convexity is a desirable property for a bondholder.', true,
+     'True. It means the price gains more when yields fall than it loses when yields rise by the same amount. The asymmetry favours the holder, which is why more convex bonds command higher prices for the same duration.'],
+    ['Holding a bond to maturity removes all interest rate risk.', false,
+     'False. It removes price risk at the horizon, since the bond redeems at par, but not reinvestment risk: the rate at which the coupons can be reinvested is still unknown and still affects the compound return actually earned.']
+  ];
+  let sel;
+  do {
+    sel = [...POOL].sort(()=>Math.random()-0.5).slice(0,4);
+  } while (!(sel.some(s=>s[1]) && sel.some(s=>!s[1])));
+  const roman = ['I','II','III','IV'];
+  return {
+    tag:'Interest rate risk',
+    stem:`Consider the following statements about bonds and interest rate risk. Decide whether each
+          is true or false. There is nothing to calculate here &mdash; reason it through.`,
+    parts: sel.map((s,k)=>({
+      key: roman[k], ask: s[0], type:'yesno', yesLabel:'True', noLabel:'False', ansYes: s[1]
+    })),
+    explain: sel.map((s,k)=>
+      `<span class="lbl">${roman[k]}.</span> ${s[0]} &nbsp;&mdash;&nbsp; ${s[2]}`)
+  };
+}
+];
+
+/* ---- bond arithmetic, shared by the problems above ----------------- */
+function money(x){
+  return x.toLocaleString('en-US',{minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+/* price from a per-period coupon, per-period yield and number of periods */
+function bondPriceN(F, c, y, n){
+  if (Math.abs(y) < 1e-12) return c*n + F;
+  const disc = Math.pow(1+y, -n);
+  return c*(1-disc)/y + F*disc;
+}
+
+/* The per-period yield that makes the cash flows worth `price`. Price falls
+   monotonically as the yield rises, so a plain bisection is safe. The bracket runs
+   below zero as well: a bond bought at a large premium and redeemed early really can
+   imply a negative yield, and silently clamping that at zero would be a wrong answer
+   rather than an ugly one. */
+function solveYield(redeem, c, n, price){
+  let lo = -0.5, hi = 1;
+  for (let k = 0; k < 200; k++){
+    const mid = (lo+hi)/2;
+    if (bondPriceN(redeem, c, mid, n) > price) lo = mid; else hi = mid;
+  }
+  return (lo+hi)/2;
+}
+
+/* price, Macaulay duration and convexity of an annual-coupon bond */
+function durationStats(F, cRatePct, ytmPct, yrs){
+  const c = F*cRatePct/100, y = ytmPct/100;
+  let P = 0, W = 0, X = 0;
+  for (let t = 1; t <= yrs; t++){
+    const cf = c + (t === yrs ? F : 0);
+    const pv = cf/Math.pow(1+y, t);
+    P += pv;
+    W += t*pv;
+    X += t*(t+1)*cf/Math.pow(1+y, t+2);
+  }
+  return { P, D: W/P, C: X/P };
+}
+
+/* Concept checks: one per numeric problem, indexed to match PROBLEMS. */
+const CONCEPTS = [
+  { ask:'If the market yield rose further, would this bond&rsquo;s current yield rise as well?',
+    yesLabel:'Yes', noLabel:'No', ansYes:true,
+    why:'Yes. The annual coupon is fixed in dollars, so a higher yield lowers the price and the same coupon divided by a smaller price is a bigger number. The current yield always moves in the same direction as the yield to maturity — it just does not move as far.' },
+  { ask:'Two zero-coupon bonds have the same yield but different maturities. Does the longer one sell for less?',
+    yesLabel:'Yes', noLabel:'No', ansYes:true,
+    why:'Yes. The single $1,000 payment is discounted over more periods, so its present value is smaller. This is why long zeros trade at deep discounts to par.' },
+  { ask:'A bond is trading below its call price. Is the issuer likely to call it?',
+    yesLabel:'Yes', noLabel:'No', ansYes:false,
+    why:'No. Calling means paying the call price for something worth less than that in the market, which would be a gift to the holders. Issuers call when rates have fallen and the bond trades above the call price, so refinancing at the new lower rate is cheaper.' },
+  { ask:'You held the bond for only one year rather than to maturity. Could your realised return be negative even though the bond never defaulted?',
+    yesLabel:'Yes', noLabel:'No', ansYes:true,
+    why:'Yes, and one of the two cases above shows it. A rise in yields cuts the price by more than the coupon brings in. Default risk and interest rate risk are quite separate things, and a Treasury bond sold before maturity carries the second in full.' },
+  { ask:'If both bonds instead had zero coupons, would the gap between their price sensitivities be larger?',
+    yesLabel:'Yes', noLabel:'No', ansYes:true,
+    why:'Yes. Stripping out the coupons pushes each bond’s duration all the way out to its maturity, so the short bond’s duration barely changes while the long bond’s rises sharply. Removing coupons widens the gap between them.' },
+  { ask:'If the yield curve were flat, would every forward rate equal that same flat yield?',
+    yesLabel:'Yes', noLabel:'No', ansYes:true,
+    why:'Yes. Forward rates are the marginal rates that build up the average represented by the yields. If the average is the same at every maturity, nothing is pulling it up or down, so each marginal rate must equal it too.' },
+  { ask:'Does accrued interest change the yield to maturity a buyer earns on the bond?',
+    yesLabel:'Yes', noLabel:'No', ansYes:false,
+    why:'No. The buyer pays the accrued interest to the seller and gets it straight back a few days later in the full coupon payment. It is a transfer that settles the timing between the two parties, not a cost, and yields are computed from full prices in any case.' },
+  { ask:'Would the duration rule on its own have predicted a price above or below the exact price?',
+    yesLabel:'Below', noLabel:'Above', ansYes:true,
+    why:'Below, and that is always the case. The price-yield curve is convex, so it lies above the straight tangent line the duration rule uses. The rule therefore understates the price whichever way the yield moves; the convexity term is what closes most of the gap.' },
+  null,   // problem 9 is entirely conceptual
+  null    // problem 10 is entirely conceptual
+];
+
+/* =================== rendering =================== */
+const state = PROBLEMS.map(()=>({solved:false}));
+
+function parseNum(s){
+  s = String(s).trim().replace(/[$,%\s]/g,'');
+  if(/^\(.*\)$/.test(s)) s = '-' + s.slice(1,-1);      // (85.60) => -85.60
+  return s === '' ? NaN : parseFloat(s);
+}
+
+function build(i){
+  const p = PROBLEMS[i]();
+  if(CONCEPTS[i]){
+    const c = CONCEPTS[i];
+    p.parts = p.parts.concat([{ key:'concept', concept:true, type:'yesno',
+                                ask:c.ask, yesLabel:c.yesLabel, noLabel:c.noLabel,
+                                ansYes:c.ansYes }]);
+    p.explain = p.explain.concat([`<span class="lbl">Concept check.</span> ${c.why}`]);
+  }
+  const el = document.createElement('section');
+  el.className = 'q';
+
+  const partsHTML = p.parts.map((pt,j)=>{
+    let inner;
+    if(pt.type === 'yesno'){
+      inner = `<div class="yn" id="f${i}_${j}">
+                 <label><input type="radio" name="g${i}_${j}" value="y"> ${pt.yesLabel||'Yes'}</label>
+                 <label><input type="radio" name="g${i}_${j}" value="n"> ${pt.noLabel||'No'}</label>
+               </div>`;
+    } else if(pt.type === 'mc'){
+      inner = `<div class="mc" id="f${i}_${j}">` + pt.options.map((o,k)=>
+                 `<label><input type="radio" name="g${i}_${j}" value="${k}"> <span>${o}</span></label>`
+               ).join('') + `</div>`;
+    } else {
+      inner = `<div class="row" id="f${i}_${j}">
+                 <label class="cap" for="in${i}_${j}">${pt.label}</label>
+                 ${pt.unit==='$' ? '<span class="unit">$</span>' : ''}
+                 <input id="in${i}_${j}" type="text" inputmode="decimal" autocomplete="off"
+                        aria-label="${pt.label}">
+                 ${pt.unit==='%' ? '<span class="unit">%</span>' : ''}
+               </div>`;
+    }
+    if(pt.cont) return inner;                       // extra answer row under the same question
+    const head = pt.concept
+      ? '<span class="k concept-k">Concept check.</span>'
+      : `<span class="k">${pt.key}.</span>`;
+    return `<div class="part${pt.concept?' concept':''}">
+              <p class="ask">${head} ${pt.ask}</p>
+              ${pt.note ? `<p class="note">Note: ${pt.note}</p>` : ''}
+              ${inner}
+            </div>`;
+  }).join('');
+
+  el.innerHTML = `
+    <header><span class="qn">Problem ${i+1}</span><span class="tag">${p.tag}</span></header>
+    <div class="stem">${p.stem}</div>
+    <p class="req">Required:</p>
+    ${partsHTML}
+    <div class="btns">
+      <button data-act="check">Check</button>
+      <button class="ghost" data-act="sol">Explanation</button>
+      <button class="ghost" data-act="new">New numbers</button>
+    </div>
+    <div class="fb" id="fb${i}"></div>
+    <div class="sol" id="sol${i}">
+      <h4>Explanation</h4>
+      ${p.explain.map(s=>`<p>${s}</p>`).join('')}
+    </div>`;
+
+  const fb  = el.querySelector('#fb'+i);
+  const sol = el.querySelector('#sol'+i);
+
+  el.querySelector('[data-act="check"]').onclick = () => {
+    let blank = 0, wrong = 0, unitsNote = '';
+    p.parts.forEach((pt,j)=>{
+      const box = el.querySelector('#f'+i+'_'+j);
+      box.classList.remove('ok','bad');
+      if(pt.type === 'yesno' || pt.type === 'mc'){
+        const sel = el.querySelector(`input[name="g${i}_${j}"]:checked`);
+        if(!sel){ blank++; return; }
+        const right = pt.type === 'mc' ? (+sel.value === pt.ansIdx)
+                                       : ((sel.value === 'y') === pt.ansYes);
+        if(right) box.classList.add('ok'); else { box.classList.add('bad'); wrong++; }
+        return;
+      }
+      const v = parseNum(el.querySelector('#in'+i+'_'+j).value);
+      if(isNaN(v)){ blank++; return; }
+      if(Math.abs(v-pt.ans) <= pt.tol + 1e-9){ box.classList.add('ok'); return; }
+      if(pt.varianceUnits && Math.abs(v*10000-pt.ans) <= Math.max(pt.tol,0.5)){
+        unitsNote = `Your ${pt.label.toLowerCase()} is right, but in decimal units. Multiply by
+                     10,000 for percent squared: ${d2(pt.ans)}.`;
+      } else if(pt.unit==='%' && Math.abs(v*100-pt.ans) <= Math.max(pt.tol,0.02)){
+        unitsNote = `That is the right number in decimal form. This box expects percent &mdash;
+                     enter ${d2(pt.ans)}, not ${v}.`;
+      }
+      box.classList.add('bad'); wrong++;
+    });
+
+    fb.className = 'fb show';
+    if(blank === p.parts.length){
+      fb.classList.add('hint');
+      fb.innerHTML = 'Work the problem first, then enter your answers and press Check.';
+    } else if(!wrong && !blank){
+      fb.classList.add('ok');
+      fb.innerHTML = 'All correct. Press <b>New numbers</b> to work this problem type again.';
+      if(!state[i].solved){ state[i].solved = true; updateScore(); }
+    } else if(unitsNote){
+      fb.classList.add('warn');
+      fb.innerHTML = 'Check your units. ' + unitsNote;
+    } else if(wrong){
+      fb.classList.add('bad');
+      fb.innerHTML = `Not right yet &mdash; ${wrong} answer${wrong>1?'s are':' is'} wrong.
+                      Rework it on paper before checking again; open <b>Explanation</b> if you are stuck.`;
+    } else {
+      fb.classList.add('hint');
+      fb.innerHTML = 'Some answers are still blank.';
+    }
+  };
+
+  el.querySelector('[data-act="sol"]').onclick = e => {
+    sol.classList.toggle('show');
+    e.target.textContent = sol.classList.contains('show') ? 'Hide explanation' : 'Explanation';
+  };
+  el.querySelector('[data-act="new"]').onclick = () => el.replaceWith(build(i));
+  return el;
+}
+
+function updateScore(){
+  const n = state.filter(s=>s.solved).length;
+  document.getElementById('scoretext').textContent = `${n} of ${PROBLEMS.length} complete`;
+  document.getElementById('fill').style.width = (100*n/PROBLEMS.length)+'%';
+}
+
+const quiz = document.getElementById('quiz');
+PROBLEMS.forEach((_,i)=> quiz.appendChild(build(i)));
+updateScore();
+
+document.getElementById('resetall').onclick = () => {
+  quiz.innerHTML = '';
+  state.forEach(s=> s.solved = false);
+  PROBLEMS.forEach((_,i)=> quiz.appendChild(build(i)));
+  updateScore();
+  window.scrollTo({top:0,behavior:'smooth'});
+};
+</script>
+</body>
+</html>

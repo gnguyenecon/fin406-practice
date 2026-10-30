@@ -177,17 +177,18 @@ function bondPricing(){
   const Pnc   = P*Math.pow(1+ytm/200, 60/180);     // 10/15 to 12/15 is 60 of 180 days, 30/360
   return {
     tag:'Bond pricing',
-    stem:`Today is December 15, 2026. Marchmont Industries has a bond outstanding with a face value
-          of $1,000 that matures on October 15, ${2026+yrs}. It carries a coupon rate of
-          ${pc(cRate)}, paid semiannually. Bonds of comparable risk are yielding ${pc(ytm)}.`,
+    stem:`Today is October 15, 2026, a coupon payment date for the bond below. Marchmont Industries
+          has a bond outstanding with a face value of $1,000 that matures on October 15,
+          ${2026+yrs}. It carries a coupon rate of ${pc(cRate)}, paid semiannually. Bonds of
+          comparable risk are yielding ${pc(ytm)}.`,
     parts:[
       {key:'a', ask:'What is the semiannual coupon payment?',
        note:'Round your answer to 2 decimal places.',
        label:'Coupon payment', unit:'$', ans:cpn, tol:0.01},
-      {key:'b', ask:'What was the bond selling for on October 15, 2026, immediately after the coupon payment on that date?',
+      {key:'b', ask:'What is the bond worth today, immediately after today&rsquo;s coupon payment?',
        note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
-       label:'Price on 10/15/2026', unit:'$', ans:P, tol:0.01},
-      {key:'c', ask:'What is the bond worth today, December 15, 2026, if the yield is unchanged? Use the 30/360 day count convention.',
+       label:'Price today', unit:'$', ans:P, tol:0.01},
+      {key:'c', ask:'What will the bond be worth on December 15, 2026, if the yield stays unchanged? Use the 30/360 day count convention.',
        note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
        label:'Value on 12/15/2026', unit:'$', ans:Pnc, tol:0.01},
       {key:'d', ask:'The bond is selling at:',
@@ -202,20 +203,18 @@ function bondPricing(){
       `<span class="lbl">a.</span> The annual coupon is ${pc(cRate)} &times; $1,000 =
        $${money(F*cRate/100)}, paid in two instalments, so each payment is
        <span class="ans">$${money(cpn)}</span>.`,
-      `<span class="lbl">b.</span> First pin down the coupon dates: the bond matures on
-       October 15, ${2026+yrs} and pays semiannually, so its coupons fall every April 15 and
-       October 15. October 15, 2026 is therefore a coupon date, and on it the bond has exactly
-       ${yrs} years to run. Work in half-years: n = ${yrs} &times; 2 = ${yrs*2} periods,
-       PMT = $${money(cpn)}, FV = $1,000, and the periodic yield is ${pc(ytm)} &divide; 2 =
-       ${d4(ytm/2)}%.`,
+      `<span class="lbl">b.</span> Today is a coupon date and the coupon has just been paid, so the
+       bond has exactly ${yrs} years &mdash; ${yrs*2} half-year periods &mdash; left to run. Work
+       in half-years: n = ${yrs*2}, PMT = $${money(cpn)}, FV = $1,000, and the periodic yield is
+       ${pc(ytm)} &divide; 2 = ${d4(ytm/2)}%.`,
       `Price = $${money(cpn)} &times; [1 &minus; (1 + ${d4(ytm/200)})<sup>&minus;${yrs*2}</sup>]
        &divide; ${d4(ytm/200)} &nbsp;+&nbsp; $1,000 &divide; (1 + ${d4(ytm/200)})<sup>${yrs*2}</sup>
        = <span class="ans">$${money(P)}</span>`,
-      `<span class="lbl">c.</span> The last coupon before today was paid on October 15, 2026, so
-       the value today is the part-b price grown at the semiannual yield for the time elapsed
-       since. Under the 30/360 convention every month counts 30 days: October 15 to December 15 is
-       60 days of the 180-day coupon period &mdash; 1/3 of a half-year:`,
-      `Value today = $${money(P)} &times; (1 + ${d4(ytm/200)})<sup>60/180</sup> =
+      `<span class="lbl">c.</span> Between coupon dates the bond&rsquo;s value grows at the
+       semiannual yield from its coupon-date price. Under the 30/360 convention every month counts
+       30 days, so October 15 to December 15 is 60 days of the 180-day coupon period &mdash; 1/3 of
+       a half-year:`,
+      `Value on December 15 = $${money(P)} &times; (1 + ${d4(ytm/200)})<sup>60/180</sup> =
        <span class="ans">$${money(Pnc)}</span>`,
       `<span class="lbl">d.</span> The coupon rate is ${pc(cRate)} and the market demands ${pc(ytm)}.
        ${gap<0
@@ -293,8 +292,11 @@ function yieldToCall(){
     ytc2 = solveYield(callP, cpn, 2*2,       P)*2*100;   // callable in two years instead
     // Keep both yields positive and below the coupon rate. A bond bought at a deep
     // premium and called very early can imply a negative yield, which is arithmetically
-    // fine but a distraction in a first course.
-  } while (!(ytc2 > 0.5 && ytc1 > 0.5 && ytc1 < cRate && ytc2 < cRate && P > callP));
+    // fine but a distraction in a first course. The YTC must also sit below the YTM
+    // (a rich call price can push it above), so the yield to worst in part d is the
+    // YTC and the premium-bond call story in part e holds.
+  } while (!(ytc2 > 0.5 && ytc1 > 0.5 && ytc1 < cRate && ytc2 < cRate && P > callP &&
+             ytc1 < ytm));
   return {
     tag:'Yield to call',
     stem:`A ${yrs}-year maturity bond with a ${pc(cRate)} coupon, paid semiannually, is callable in
@@ -311,10 +313,14 @@ function yieldToCall(){
               instead of ${callYrs}, at the same call price?`,
        note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
        label:'Yield to call', unit:'%', ans:ytc2, tol:0.01},
-      {key:'d', ask:'When is the issuer likely to call the bond?',
+      {key:'d', ask:`What is the yield to worst on this bond, based on its actual call provision
+              (callable in ${callYrs} years)?`,
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Yield to worst', unit:'%', ans:Math.min(ytm,ytc1), tol:0.01},
+      {key:'e', ask:'When is the issuer likely to call the bond?',
        type:'mc',
        options:['When interest rates at the call date are well below the coupon rate, so the debt can be refinanced more cheaply',
-                'When interest rates at the call date are well above the coupon rate',
+                'When interest rates at the call date are well above the coupon rate, so that investors can reinvest their money at higher rates',
                 'At the call date in any interest rate environment, because repaying early always saves the issuer money'],
        ansIdx:0}
     ],
@@ -336,12 +342,19 @@ function yieldToCall(){
            $${money(P-1000)} above par and have less time to recover it out of the high coupon.`
         : `Here the earlier call actually helps, because the call price sits far enough above the
            purchase price to more than offset the loss of coupon income.`}`,
-      `<span class="lbl">d.</span> <span class="ans">When rates at the call date are well below the
+      `<span class="lbl">d.</span> The yield to worst is the lowest of the yields the bondholder
+       might end up locked into &mdash; the smaller of the yield to maturity (${pc(ytm)}) and the
+       yield to call (${pc(ytc1)}): <span class="ans">${pc(Math.min(ytm,ytc1))}</span>. For a
+       premium bond trading above its call price, the call scenario is the unfavourable one, so the
+       yield to worst is the yield to call. A conservative investor evaluates a callable bond at
+       its yield to worst.`,
+      `<span class="lbl">e.</span> <span class="ans">When rates at the call date are well below the
        coupon rate.</span> The decision is made at the call date, not today. If market rates then
        sit below the ${pc(cRate)} coupon, the issuer can replace this bond with cheaper debt, so it
        calls &mdash; and around such times the bond trades above its call price. If rates have risen
        past the coupon by the call date, the bond is cheap financing and the issuer leaves it
-       outstanding.`
+       outstanding; the call exists for the issuer&rsquo;s benefit, not to hand investors a
+       reinvestment opportunity.`
     ]
   };
 },
@@ -362,14 +375,11 @@ function holdingPeriod(){
   const P1  = bondPriceN(F, cpn, y1/100, yrs-1);
   const hpr = (P1 - P0 + cpn)/P0*100;
   const dOpts = shuffle([
-    [`The yield to maturity at purchase is the return from holding the bond all the way to
-      maturity; selling after one year exposed you to the price ${dir>0?'drop':'gain'} caused by
-      ${dir>0?'rising':'falling'} yields`, true],
-    [`The issuer ${dir>0?'cut':'raised'} the coupon payment when market yields
-      ${dir>0?'rose':'fell'}`, false],
-    [`You ${dir>0?'lost':'gained'} a year of coupon income by selling before maturity`, false],
-    [`The bond&rsquo;s price ${dir>0?'fell':'rose'} simply because its remaining maturity shortened
-      by a year`, false]
+    [`Yields ${dir>0?'rose':'fell'} after you bought, so the bond&rsquo;s price ${dir>0?'fell':'rose'}`, true],
+    [`The issuer ${dir>0?'cut':'raised'} the coupon payment`, false],
+    [`The bond is one year closer to maturity`, false],
+    [dir>0 ? `You sold before collecting this year&rsquo;s coupon`
+           : `You collected an extra coupon payment this year`, false]
   ]);
   return {
     tag:'Holding period return',
@@ -410,13 +420,13 @@ function holdingPeriod(){
         : `Falling yields lifted the bond&rsquo;s price, so the year returned more than the coupon
            alone. The same force runs the other way: had yields risen instead, the fall in price
            could have swamped the coupon and turned the year&rsquo;s return negative.`}`,
-      `<span class="lbl">d.</span> <span class="ans">The yield to maturity at purchase is the
-       return from holding to maturity; selling after one year exposed you to the price
-       ${dir>0?'drop':'gain'} caused by ${dir>0?'rising':'falling'} yields.</span> Had the yield
+      `<span class="lbl">d.</span> <span class="ans">Yields ${dir>0?'rose':'fell'}, so the
+       bond&rsquo;s price ${dir>0?'fell':'rose'}.</span> That is the entire story. Had the yield
        stayed at ${pc(y0)}, the year&rsquo;s return would have been exactly ${pc(y0)} &mdash; at an
-       unchanged yield, the coupon and the price&rsquo;s pull toward par add up to precisely the
-       yield, which also rules out the &ldquo;maturity shortened&rdquo; explanation. The coupon was
-       fixed and collected in full. The entire gap comes from the yield moving to ${pc(y1)}.`
+       unchanged yield the coupon plus the price&rsquo;s drift toward par add up to the yield, so
+       being a year closer to maturity explains nothing on its own. The coupon was fixed and
+       collected in full. The yield to maturity you buy at is a promise about holding to maturity,
+       not about any single year.`
     ]
   };
 },

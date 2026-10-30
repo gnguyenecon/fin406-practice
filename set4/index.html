@@ -177,15 +177,14 @@ function bondPricing(){
   const Pnc   = P*Math.pow(1+ytm/200, 60/180);     // 10/15 to 12/15 is 60 of 180 days, 30/360
   return {
     tag:'Bond pricing',
-    stem:`Today is October 15, 2026, a coupon payment date for the bond below. Marchmont Industries
-          has a bond outstanding with a face value of $1,000 that matures on October 15,
-          ${2026+yrs}. It carries a coupon rate of ${pc(cRate)}, paid semiannually. Bonds of
-          comparable risk are yielding ${pc(ytm)}.`,
+    stem:`Marchmont Industries has a bond outstanding with a face value of $1,000 that matures on
+          October 15, ${2026+yrs}. It carries a coupon rate of ${pc(cRate)}, paid semiannually.
+          Bonds of comparable risk are yielding ${pc(ytm)}.`,
     parts:[
       {key:'a', ask:'What is the semiannual coupon payment?',
        note:'Round your answer to 2 decimal places.',
        label:'Coupon payment', unit:'$', ans:cpn, tol:0.01},
-      {key:'b', ask:'What is the bond worth today, immediately after today&rsquo;s coupon payment?',
+      {key:'b', ask:'What is the bond worth today, October 15, 2026?',
        note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
        label:'Price today', unit:'$', ans:P, tol:0.01},
       {key:'c', ask:'What will the bond be worth on December 15, 2026, if the yield stays unchanged? Use the 30/360 day count convention.',
@@ -203,9 +202,11 @@ function bondPricing(){
       `<span class="lbl">a.</span> The annual coupon is ${pc(cRate)} &times; $1,000 =
        $${money(F*cRate/100)}, paid in two instalments, so each payment is
        <span class="ans">$${money(cpn)}</span>.`,
-      `<span class="lbl">b.</span> Today is a coupon date and the coupon has just been paid, so the
-       bond has exactly ${yrs} years &mdash; ${yrs*2} half-year periods &mdash; left to run. Work
-       in half-years: n = ${yrs*2}, PMT = $${money(cpn)}, FV = $1,000, and the periodic yield is
+      `<span class="lbl">b.</span> First pin down the coupon dates: the bond matures on October 15,
+       ${2026+yrs} and pays semiannually, so its coupons fall every April 15 and October 15. Today,
+       October 15, 2026, is therefore a coupon date; with today&rsquo;s coupon just paid, the bond
+       has exactly ${yrs} years &mdash; ${yrs*2} half-year periods &mdash; left to run. Work in
+       half-years: n = ${yrs*2}, PMT = $${money(cpn)}, FV = $1,000, and the periodic yield is
        ${pc(ytm)} &divide; 2 = ${d4(ytm/2)}%.`,
       `Price = $${money(cpn)} &times; [1 &minus; (1 + ${d4(ytm/200)})<sup>&minus;${yrs*2}</sup>]
        &divide; ${d4(ytm/200)} &nbsp;+&nbsp; $1,000 &divide; (1 + ${d4(ytm/200)})<sup>${yrs*2}</sup>
@@ -292,11 +293,10 @@ function yieldToCall(){
     ytc2 = solveYield(callP, cpn, 2*2,       P)*2*100;   // callable in two years instead
     // Keep both yields positive and below the coupon rate. A bond bought at a deep
     // premium and called very early can imply a negative yield, which is arithmetically
-    // fine but a distraction in a first course. The YTC must also sit below the YTM
-    // (a rich call price can push it above), so the yield to worst in part d is the
-    // YTC and the premium-bond call story in part e holds.
-  } while (!(ytc2 > 0.5 && ytc1 > 0.5 && ytc1 < cRate && ytc2 < cRate && P > callP &&
-             ytc1 < ytm));
+    // fine but a distraction in a first course. The YTC is deliberately NOT forced
+    // below the YTM: a rich call price can push it above, and part c's yield to worst
+    // teaches min(YTM, YTC) in both configurations (instructor, 29 Oct 2026).
+  } while (!(ytc2 > 0.5 && ytc1 > 0.5 && ytc1 < cRate && ytc2 < cRate && P > callP));
   return {
     tag:'Yield to call',
     stem:`A ${yrs}-year maturity bond with a ${pc(cRate)} coupon, paid semiannually, is callable in
@@ -309,14 +309,13 @@ function yieldToCall(){
       {key:'b', ask:'What is the yield to call?',
        note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
        label:'Yield to call', unit:'%', ans:ytc1, tol:0.01},
-      {key:'c', ask:`What would the yield to call be if the bond could be called in two years
+      {key:'c', ask:'What is the yield to worst on this bond?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Yield to worst', unit:'%', ans:Math.min(ytm,ytc1), tol:0.01},
+      {key:'d', ask:`What would the yield to call be if the bond could be called in two years
               instead of ${callYrs}, at the same call price?`,
        note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
        label:'Yield to call', unit:'%', ans:ytc2, tol:0.01},
-      {key:'d', ask:`What is the yield to worst on this bond, based on its actual call provision
-              (callable in ${callYrs} years)?`,
-       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
-       label:'Yield to worst', unit:'%', ans:Math.min(ytm,ytc1), tol:0.01},
       {key:'e', ask:'When is the issuer likely to call the bond?',
        type:'mc',
        options:['When interest rates at the call date are well below the coupon rate, so the debt can be refinanced more cheaply',
@@ -335,19 +334,21 @@ function yieldToCall(){
       `n = ${callYrs*2} half-years, PV = &minus;$${money(P)}, PMT = $${money(cpn)},
        FV = $${money(callP)}. Solving gives ${d4(ytc1/2)}% per half-year, or
        <span class="ans">${pc(ytc1)}</span> a year.`,
-      `<span class="lbl">c.</span> Shortening the call protection to two years leaves n = 4:
+      `<span class="lbl">c.</span> The yield to worst is the lowest of the yields the bondholder
+       might end up locked into &mdash; the smaller of the yield to maturity (${pc(ytm)}) and the
+       yield to call (${pc(ytc1)}): <span class="ans">${pc(Math.min(ytm,ytc1))}</span>.
+       ${ytc1 < ytm
+         ? `Here the call scenario is the worse one, so the yield to worst is the yield to call.`
+         : `Here the call price is rich enough that being called is actually the better outcome,
+            so the yield to worst is the yield to maturity itself.`}
+       A conservative investor evaluates a callable bond at its yield to worst.`,
+      `<span class="lbl">d.</span> Shortening the call protection to two years leaves n = 4:
        the answer becomes <span class="ans">${pc(ytc2)}</span>.`,
       `${ytc2 < ytc1
         ? `Being called sooner makes matters worse for the holder. They paid a premium of
            $${money(P-1000)} above par and have less time to recover it out of the high coupon.`
         : `Here the earlier call actually helps, because the call price sits far enough above the
            purchase price to more than offset the loss of coupon income.`}`,
-      `<span class="lbl">d.</span> The yield to worst is the lowest of the yields the bondholder
-       might end up locked into &mdash; the smaller of the yield to maturity (${pc(ytm)}) and the
-       yield to call (${pc(ytc1)}): <span class="ans">${pc(Math.min(ytm,ytc1))}</span>. For a
-       premium bond trading above its call price, the call scenario is the unfavourable one, so the
-       yield to worst is the yield to call. A conservative investor evaluates a callable bond at
-       its yield to worst.`,
       `<span class="lbl">e.</span> <span class="ans">When rates at the call date are well below the
        coupon rate.</span> The decision is made at the call date, not today. If market rates then
        sit below the ${pc(cRate)} coupon, the issuer can replace this bond with cheaper debt, so it
@@ -375,11 +376,10 @@ function holdingPeriod(){
   const P1  = bondPriceN(F, cpn, y1/100, yrs-1);
   const hpr = (P1 - P0 + cpn)/P0*100;
   const dOpts = shuffle([
-    [`Yields ${dir>0?'rose':'fell'} after you bought, so the bond&rsquo;s price ${dir>0?'fell':'rose'}`, true],
-    [`The issuer ${dir>0?'cut':'raised'} the coupon payment`, false],
-    [`The bond is one year closer to maturity`, false],
-    [dir>0 ? `You sold before collecting this year&rsquo;s coupon`
-           : `You collected an extra coupon payment this year`, false]
+    [`Yields rose after you bought, so the bond&rsquo;s price declined and you realized a capital loss`, dir>0],
+    [`Yields fell after you bought, so the bond&rsquo;s price rose and you realized a capital gain`, dir<0],
+    [`The issuer changed the coupon payment`, false],
+    [`The bond is one year closer to maturity`, false]
   ]);
   return {
     tag:'Holding period return',
@@ -398,8 +398,8 @@ function holdingPeriod(){
       {key:'c', ask:'What is your holding period return over the year?',
        note:'Indicate a negative value with a minus sign. Round your answer to 2 decimal places.',
        label:'Holding period return', unit:'%', ans:hpr, tol:0.01},
-      {key:'d', ask:`Your holding period return came out ${dir>0?'well below':'well above'} the
-              ${pc(y0)} yield to maturity at which you bought the bond. Why?`,
+      {key:'d', ask:`Your holding period return came out different from the ${pc(y0)} yield to
+              maturity at which you bought the bond. Why?`,
        type:'mc', options:dOpts.map(o=>o[0]), ansIdx:dOpts.findIndex(o=>o[1])}
     ],
     explain:[
@@ -420,13 +420,14 @@ function holdingPeriod(){
         : `Falling yields lifted the bond&rsquo;s price, so the year returned more than the coupon
            alone. The same force runs the other way: had yields risen instead, the fall in price
            could have swamped the coupon and turned the year&rsquo;s return negative.`}`,
-      `<span class="lbl">d.</span> <span class="ans">Yields ${dir>0?'rose':'fell'}, so the
-       bond&rsquo;s price ${dir>0?'fell':'rose'}.</span> That is the entire story. Had the yield
-       stayed at ${pc(y0)}, the year&rsquo;s return would have been exactly ${pc(y0)} &mdash; at an
-       unchanged yield the coupon plus the price&rsquo;s drift toward par add up to the yield, so
-       being a year closer to maturity explains nothing on its own. The coupon was fixed and
-       collected in full. The yield to maturity you buy at is a promise about holding to maturity,
-       not about any single year.`
+      `<span class="lbl">d.</span> <span class="ans">Yields ${dir>0?'rose':'fell'} after you bought,
+       so the bond&rsquo;s price ${dir>0?'declined and you realized a capital loss'
+                                       :'rose and you realized a capital gain'}.</span> That is the
+       entire story. Had the yield stayed at ${pc(y0)}, the year&rsquo;s return would have been
+       exactly ${pc(y0)} &mdash; at an unchanged yield the coupon plus the price&rsquo;s drift
+       toward par add up to the yield, so being a year closer to maturity explains nothing on its
+       own. The coupon was fixed and collected in full. The yield to maturity you buy at is a
+       promise about holding to maturity, not about any single year.`
     ]
   };
 },
@@ -641,9 +642,12 @@ function durationConvexity(){
       {key:'e', ask:'What price does the duration-with-convexity rule predict?',
        note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
        label:'Predicted price', unit:'$', ans:pConv, tol:0.02},
-      {key:'f', ask:'What is the exact new price?',
-       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
-       label:'Exact price', unit:'$', ans:exact, tol:0.01}
+      {key:'f', ask:'Which rule gives the better approximation of the bond&rsquo;s actual new price?',
+       type:'mc',
+       options:['The duration-with-convexity rule: the duration rule is a straight line tangent to a curved price-yield relationship, and the convexity term corrects for that curvature',
+                'The duration-only rule: adding the convexity term piles a second approximation on top of the first',
+                'They are equally accurate: both are built from the same modified duration'],
+       ansIdx:0}
     ],
     explain:[
       `<span class="lbl">a and b.</span> Duration is the weighted average time to receive the
@@ -671,12 +675,12 @@ function durationConvexity(){
       `Predicted price = $${money(P)} &times; (1 ${-modD*dy>=0?'+':'&minus;'}
        ${d4(Math.abs(modD*dy/100))} + ${d4(0.5*C*Math.pow(dy/100,2))}) =
        <span class="ans">$${money(pConv)}</span>`,
-      `<span class="lbl">f.</span> Pricing the bond directly at ${pc(y1)} gives
-       <span class="ans">$${money(exact)}</span>.`,
-      `Compare the three. The duration rule is out by $${money(Math.abs(pDur-exact))} and the
-       duration-with-convexity rule by only $${money(Math.abs(pConv-exact))}. The duration rule is a
-       straight line drawn tangent to a curved price-yield relationship, so it always understates the
-       true price, whichever way the yield moves. Convexity supplies the curvature it misses.`
+      `<span class="lbl">f.</span> <span class="ans">The duration-with-convexity rule.</span>
+       Pricing the bond directly at ${pc(y1)} gives $${money(exact)}: the duration rule misses it by
+       $${money(Math.abs(pDur-exact))}, while adding convexity shrinks the miss to
+       $${money(Math.abs(pConv-exact))}. The duration rule is a straight line drawn tangent to a
+       curved price-yield relationship, so it always understates the true price, whichever way the
+       yield moves; the convexity term supplies the curvature it misses.`
     ]
   };
 },
@@ -746,8 +750,10 @@ function bondTrueFalse(){
   const POOL = [
     ['A bond selling at a discount has a yield to maturity above its coupon rate.', true,
      'True. The discount is precisely what raises the return: the buyer collects the par value at maturity as well as the coupons, and that capital gain lifts the yield above the coupon rate. For a premium bond the ordering reverses.'],
-    ['Between two bonds identical except for coupon, the lower-coupon bond has the longer duration.', true,
-     'True. A low coupon leaves more of the bond’s value in the final principal repayment, pushing the weighted average time of the cash flows further out.'],
+    ['Between two bonds identical except for coupon, the lower-coupon bond has greater price sensitivity to interest rate changes.', true,
+     'True. A low coupon leaves more of the bond’s value in the final principal repayment, pushing the weighted average time of the cash flows — the duration — further out. Longer duration means a bigger price response to any change in yield.'],
+    ['Between two bonds identical except for maturity, the longer-maturity bond has greater price sensitivity to interest rate changes.', true,
+     'True. The longer bond has more of its value in distant cash flows, and distant cash flows are the ones whose present value a change in the discount rate affects most. Everything else equal, longer maturity means greater interest rate risk.'],
     ['Duration always increases when the yield to maturity increases.', false,
      'False. It falls. A higher discount rate reduces the present value of distant cash flows more than near ones, shifting weight toward the early payments and shortening the weighted average.'],
     ['The price of a zero-coupon bond is more sensitive to interest rates than that of a coupon bond of the same maturity.', true,
@@ -758,6 +764,10 @@ function bondTrueFalse(){
      'True. Such a bond pays a coupon above current market rates, which is exactly the bond an issuer wants to refinance, so assuming it survives to maturity is optimistic.'],
     ['Convexity is a desirable property for a bondholder.', true,
      'True. It means the price gains more when yields fall than it loses when yields rise by the same amount. The asymmetry favours the holder, which is why more convex bonds command higher prices for the same duration.'],
+    ['An investor who holds a bond to maturity is insulated from price risk.', true,
+     'True. Whatever yields do along the way, the bond redeems at its face value, so the amount received at the horizon is fixed. Price swings in the meantime matter only to an investor who sells before maturity.'],
+    ['A rise in yield and a fall in yield of the same size change the bond’s price by equal amounts in opposite directions.', false,
+     'False. The price-yield relationship is convex, so a fall in yield raises the price by more than an equal rise in yield lowers it. The asymmetry runs in the holder’s favour, and it is exactly what convexity measures.'],
   ];
   let sel;
   do {

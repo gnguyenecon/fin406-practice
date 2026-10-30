@@ -746,8 +746,6 @@ function bondTrueFalse(){
   const POOL = [
     ['A bond selling at a discount has a yield to maturity above its coupon rate.', true,
      'True. The discount is precisely what raises the return: the buyer collects the par value at maturity as well as the coupons, and that capital gain lifts the yield above the coupon rate. For a premium bond the ordering reverses.'],
-    ['The yield to maturity is the return an investor will earn provided the bond is held to maturity, whatever happens to interest rates in the meantime.', false,
-     'False, and the omission matters. Yield to maturity assumes every coupon is reinvested at the yield to maturity itself. If rates move, the coupons are reinvested at something else and the realised compound return differs — this is reinvestment risk.'],
     ['Between two bonds identical except for coupon, the lower-coupon bond has the longer duration.', true,
      'True. A low coupon leaves more of the bond’s value in the final principal repayment, pushing the weighted average time of the cash flows further out.'],
     ['Duration always increases when the yield to maturity increases.', false,
@@ -760,8 +758,6 @@ function bondTrueFalse(){
      'True. Such a bond pays a coupon above current market rates, which is exactly the bond an issuer wants to refinance, so assuming it survives to maturity is optimistic.'],
     ['Convexity is a desirable property for a bondholder.', true,
      'True. It means the price gains more when yields fall than it loses when yields rise by the same amount. The asymmetry favours the holder, which is why more convex bonds command higher prices for the same duration.'],
-    ['Holding a bond to maturity removes all interest rate risk.', false,
-     'False. It removes price risk at the horizon, since the bond redeems at par, but not reinvestment risk: the rate at which the coupons can be reinvested is still unknown and still affects the compound return actually earned.']
   ];
   let sel;
   do {

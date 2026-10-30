@@ -171,44 +171,51 @@ function bondPricing(){
   const cRate = pick([3.5,4,4.5,5,5.5,6,6.5,7]);
   const gap   = pick([-2,-1.5,-1,1,1.5,2]);        // never zero, so never priced at par
   const ytm   = cRate + gap;
-  const yrs   = pick([8,10,12,15,20,25]);
-  const mos   = pick([1,2,4,5]);                   // months past the last coupon, in part c
+  const yrs   = pick([8,10,12,15,20,25]);          // matures on 10/15 of 2026+yrs
   const cpn   = F*cRate/100/2;
   const P     = bondPriceN(F, cpn, ytm/100/2, yrs*2);
-  const Pnc   = P*Math.pow(1+ytm/200, mos/6);
+  const Pnc   = P*Math.pow(1+ytm/200, 60/180);     // 10/15 to 12/15 is 60 of 180 days, 30/360
   return {
     tag:'Bond pricing',
-    stem:`Marchmont Industries has a bond outstanding with a face value of $1,000 and ${yrs} years
-          remaining to maturity. It carries a coupon rate of ${pc(cRate)}, paid semiannually. Bonds
-          of comparable risk are yielding ${pc(ytm)}.`,
+    stem:`Today is December 15, 2026. Marchmont Industries has a bond outstanding with a face value
+          of $1,000 that matures on October 15, ${2026+yrs}. It carries a coupon rate of
+          ${pc(cRate)}, paid semiannually. Bonds of comparable risk are yielding ${pc(ytm)}.`,
     parts:[
       {key:'a', ask:'What is the semiannual coupon payment?',
        note:'Round your answer to 2 decimal places.',
        label:'Coupon payment', unit:'$', ans:cpn, tol:0.01},
-      {key:'b', ask:'What is the bond selling for today? Assume today is a coupon date.',
+      {key:'b', ask:'What was the bond selling for on October 15, 2026, immediately after the coupon payment on that date?',
        note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
-       label:'Price', unit:'$', ans:P, tol:0.01},
-      {key:'c', ask:`Suppose instead that ${mos} month${mos>1?'s have':' has'} passed since the
-              last coupon payment, with the yield unchanged. What is the bond worth on that date?`,
+       label:'Price on 10/15/2026', unit:'$', ans:P, tol:0.01},
+      {key:'c', ask:'What is the bond worth today, December 15, 2026, if the yield is unchanged? Use the 30/360 day count convention.',
        note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
-       label:'Value', unit:'$', ans:Pnc, tol:0.01},
+       label:'Value on 12/15/2026', unit:'$', ans:Pnc, tol:0.01},
       {key:'d', ask:'The bond is selling at:',
-       type:'mc', options:['A premium','A discount','Par'], ansIdx: gap<0 ? 0 : 1}
+       type:'mc',
+       options:['A premium, because its yield to maturity is below the coupon rate',
+                'A premium, because its yield to maturity is above the coupon rate',
+                'A discount, because its yield to maturity is below the coupon rate',
+                'A discount, because its yield to maturity is above the coupon rate'],
+       ansIdx: gap<0 ? 0 : 3}
     ],
     explain:[
       `<span class="lbl">a.</span> The annual coupon is ${pc(cRate)} &times; $1,000 =
        $${money(F*cRate/100)}, paid in two instalments, so each payment is
        <span class="ans">$${money(cpn)}</span>.`,
-      `<span class="lbl">b.</span> Work in half-years throughout: n = ${yrs} &times; 2 = ${yrs*2}
-       periods, PMT = $${money(cpn)}, FV = $1,000, and the periodic yield is ${pc(ytm)} &divide; 2 =
+      `<span class="lbl">b.</span> First pin down the coupon dates: the bond matures on
+       October 15, ${2026+yrs} and pays semiannually, so its coupons fall every April 15 and
+       October 15. October 15, 2026 is therefore a coupon date, and on it the bond has exactly
+       ${yrs} years to run. Work in half-years: n = ${yrs} &times; 2 = ${yrs*2} periods,
+       PMT = $${money(cpn)}, FV = $1,000, and the periodic yield is ${pc(ytm)} &divide; 2 =
        ${d4(ytm/2)}%.`,
       `Price = $${money(cpn)} &times; [1 &minus; (1 + ${d4(ytm/200)})<sup>&minus;${yrs*2}</sup>]
        &divide; ${d4(ytm/200)} &nbsp;+&nbsp; $1,000 &divide; (1 + ${d4(ytm/200)})<sup>${yrs*2}</sup>
        = <span class="ans">$${money(P)}</span>`,
-      `<span class="lbl">c.</span> Between coupon dates the bond&rsquo;s value grows at the
-       semiannual yield from its last coupon-date price, and ${mos} month${mos>1?'s':''} is
-       ${mos}/6 of the six-month coupon period:`,
-      `Value = $${money(P)} &times; (1 + ${d4(ytm/200)})<sup>${mos}/6</sup> =
+      `<span class="lbl">c.</span> The last coupon before today was paid on October 15, 2026, so
+       the value today is the part-b price grown at the semiannual yield for the time elapsed
+       since. Under the 30/360 convention every month counts 30 days: October 15 to December 15 is
+       60 days of the 180-day coupon period &mdash; 1/3 of a half-year:`,
+      `Value today = $${money(P)} &times; (1 + ${d4(ytm/200)})<sup>60/180</sup> =
        <span class="ans">$${money(Pnc)}</span>`,
       `<span class="lbl">d.</span> The coupon rate is ${pc(cRate)} and the market demands ${pc(ytm)}.
        ${gap<0
@@ -354,6 +361,16 @@ function holdingPeriod(){
   const P0  = bondPriceN(F, cpn, y0/100, yrs);
   const P1  = bondPriceN(F, cpn, y1/100, yrs-1);
   const hpr = (P1 - P0 + cpn)/P0*100;
+  const dOpts = shuffle([
+    [`The yield to maturity at purchase is the return from holding the bond all the way to
+      maturity; selling after one year exposed you to the price ${dir>0?'drop':'gain'} caused by
+      ${dir>0?'rising':'falling'} yields`, true],
+    [`The issuer ${dir>0?'cut':'raised'} the coupon payment when market yields
+      ${dir>0?'rose':'fell'}`, false],
+    [`You ${dir>0?'lost':'gained'} a year of coupon income by selling before maturity`, false],
+    [`The bond&rsquo;s price ${dir>0?'fell':'rose'} simply because its remaining maturity shortened
+      by a year`, false]
+  ]);
   return {
     tag:'Holding period return',
     stem:`One year ago you bought a bond with ${yrs} years to maturity, paying an annual coupon of
@@ -370,7 +387,10 @@ function holdingPeriod(){
        label:'Price today', unit:'$', ans:P1, tol:0.01},
       {key:'c', ask:'What is your holding period return over the year?',
        note:'Indicate a negative value with a minus sign. Round your answer to 2 decimal places.',
-       label:'Holding period return', unit:'%', ans:hpr, tol:0.01}
+       label:'Holding period return', unit:'%', ans:hpr, tol:0.01},
+      {key:'d', ask:`Your holding period return came out ${dir>0?'well below':'well above'} the
+              ${pc(y0)} yield to maturity at which you bought the bond. Why?`,
+       type:'mc', options:dOpts.map(o=>o[0]), ansIdx:dOpts.findIndex(o=>o[1])}
     ],
     explain:[
       `<span class="lbl">a.</span> One year ago the bond had ${yrs} years to run: n = ${yrs},
@@ -389,7 +409,14 @@ function holdingPeriod(){
            bond sold before maturity carries it even when the issuer never misses a payment.`
         : `Falling yields lifted the bond&rsquo;s price, so the year returned more than the coupon
            alone. The same force runs the other way: had yields risen instead, the fall in price
-           could have swamped the coupon and turned the year&rsquo;s return negative.`}`
+           could have swamped the coupon and turned the year&rsquo;s return negative.`}`,
+      `<span class="lbl">d.</span> <span class="ans">The yield to maturity at purchase is the
+       return from holding to maturity; selling after one year exposed you to the price
+       ${dir>0?'drop':'gain'} caused by ${dir>0?'rising':'falling'} yields.</span> Had the yield
+       stayed at ${pc(y0)}, the year&rsquo;s return would have been exactly ${pc(y0)} &mdash; at an
+       unchanged yield, the coupon and the price&rsquo;s pull toward par add up to precisely the
+       yield, which also rules out the &ldquo;maturity shortened&rdquo; explanation. The coupon was
+       fixed and collected in full. The entire gap comes from the yield moving to ${pc(y1)}.`
     ]
   };
 },
@@ -567,7 +594,8 @@ function durationConvexity(){
     ytm   = pick([5,6,7,8,9]);
     dy    = pick([-1,-0.5,0.5,1]);
   } while (cRate === ytm || Math.abs(ytm+dy-cRate) < 1e-9);
-  const yrs   = pick([3,4]);
+  const yrs   = pick([3,4]);   // annual coupons: at most 4 cash flows, so the table stays short
+                               // (instructor cap, 29 Oct 2026 — a checker rule enforces it)
   const { P, D, C } = durationStats(F, cRate, ytm, yrs);
   const modD  = D/(1+ytm/100);
   const y1    = ytm + dy;
@@ -596,8 +624,8 @@ function durationConvexity(){
       {key:'c', ask:'What is its modified duration?',
        note:'Do not round intermediate calculations. Round your answer to 4 decimal places.',
        label:'Modified duration', unit:'years', ans:modD, tol:0.0001},
-      {key:'d', ask:`If the yield to maturity ${dy>0?'rises':'falls'} to ${pc(y1)}, what price does
-              the duration rule predict?`,
+      {key:'d', ask:`If the yield to maturity changes to ${pc(y1)}, what price does the duration
+              rule predict?`,
        note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
        label:'Predicted price', unit:'$', ans:pDur, tol:0.02},
       {key:'e', ask:'What price does the duration-with-convexity rule predict?',
@@ -785,9 +813,7 @@ function durationStats(F, cRatePct, ytmPct, yrs){
 
 /* Concept checks: one per numeric problem, indexed to match PROBLEMS. */
 const CONCEPTS = [
-  { ask:'The instant the next coupon is paid, does the bond&rsquo;s full (dirty) value drop by about the amount of the coupon?',
-    yesLabel:'Yes', noLabel:'No', ansYes:true,
-    why:'Yes. The value in part c includes the coupon that has been accruing since the last payment. The moment the coupon is paid out, that accrual resets to zero and the bond’s full value falls by the payment — which is why the market quotes clean prices, with the accrual stripped out, so quotes do not sawtooth through every coupon cycle.' },
+  null,   // problem 1's concept check moved to problem 7 (instructor, 29 Oct 2026)
   { ask:'Two zero-coupon bonds have the same yield but different maturities. Does the longer one sell for less?',
     yesLabel:'Yes', noLabel:'No', ansYes:true,
     why:'Yes. The single $1,000 payment is discounted over more periods, so its present value is smaller. This is why long zeros trade at deep discounts to par.' },
@@ -803,11 +829,11 @@ const CONCEPTS = [
   { ask:'If the yield curve were flat, would every forward rate equal that same flat yield?',
     yesLabel:'Yes', noLabel:'No', ansYes:true,
     why:'Yes. Forward rates are the marginal rates that build up the average represented by the yields. If the average is the same at every maturity, nothing is pulling it up or down, so each marginal rate must equal it too.' },
-  { ask:'Suppose instead that you buy the bond one day before its next coupon payment. Is the accrued interest you owe the seller close to a full coupon payment?',
+  { ask:'The instant the next coupon is paid, does the bond&rsquo;s full (dirty) value drop by about the amount of the coupon?',
     yesLabel:'Yes', noLabel:'No', ansYes:true,
-    why:'Yes. The seller held the bond for nearly the entire coupon period, so almost all of the coming payment belongs to them. The day after the coupon is paid, accrued interest resets to zero and begins building again.' },
+    why:'Yes. The invoice price includes the interest that has accrued since the last payment. The moment the coupon is paid out, that accrual resets to zero and the bond’s full value falls by the payment — which is why the market quotes clean prices, with the accrual stripped out, so quotes do not sawtooth through every coupon cycle.' },
   { ask:'Would the duration rule on its own have predicted a price above or below the exact price?',
-    yesLabel:'Below', noLabel:'Above', ansYes:true,
+    options:['Below','Above','Sometimes below, sometimes above'], ansIdx:0,
     why:'Below, and that is always the case. The price-yield curve is convex, so it lies above the straight tangent line the duration rule uses. The rule therefore understates the price whichever way the yield moves; the convexity term is what closes most of the gap.' },
   null,   // problem 9 is entirely conceptual
   null    // problem 10 is entirely conceptual
@@ -826,9 +852,10 @@ function build(i){
   const p = PROBLEMS[i]();
   if(CONCEPTS[i]){
     const c = CONCEPTS[i];
-    p.parts = p.parts.concat([{ key:'concept', concept:true, type:'yesno',
-                                ask:c.ask, yesLabel:c.yesLabel, noLabel:c.noLabel,
-                                ansYes:c.ansYes }]);
+    p.parts = p.parts.concat([ c.options
+      ? { key:'concept', concept:true, type:'mc', ask:c.ask, options:c.options, ansIdx:c.ansIdx }
+      : { key:'concept', concept:true, type:'yesno', ask:c.ask, yesLabel:c.yesLabel,
+          noLabel:c.noLabel, ansYes:c.ansYes }]);
     p.explain = p.explain.concat([`<span class="lbl">Concept check.</span> ${c.why}`]);
   }
   const el = document.createElement('section');

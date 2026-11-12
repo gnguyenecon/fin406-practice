@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>FIN 406 &middot; Quiz 5 Practice Set</title>
+<style>
+  :root{
+    --navy:#1E407C; --navy-dk:#001E44; --ink:#1a1a1a; --muted:#5a6472;
+    --line:#d7dce3; --bg:#f6f7f9; --card:#fff;
+    --ok:#1b6e3c; --ok-bg:#e8f5ec; --bad:#9b1c1c; --bad-bg:#fdeaea;
+    --warn:#8a5a00; --warn-bg:#fff5e0;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:1rem/1.55 "Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif}
+  .wrap{max-width:880px;margin:0 auto;padding:24px 18px 64px}
+  header.top{background:var(--navy);color:#fff;border-radius:10px;padding:22px 24px;margin-bottom:18px}
+  header.top h1{margin:0 0 4px;font-size:1.5rem}
+  header.top .sub{opacity:.92;font-size:.95rem}
+  header.top .dates{margin-top:12px;font-size:.9rem;opacity:.95;
+       border-top:1px solid rgba(255,255,255,.28);padding-top:10px}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:10px;
+         padding:18px 20px;margin-bottom:18px}
+  .panel h2{margin:0 0 8px;font-size:1.05rem;color:var(--navy-dk)}
+  ul.tight{margin:.4rem 0 .2rem;padding-left:1.15rem}
+  ul.tight li{margin:.25rem 0}
+  code.u{background:#eef1f6;padding:1px 6px;border-radius:4px;font-size:.92em}
+
+  .scorebar{position:sticky;top:0;z-index:5;background:var(--card);border:1px solid var(--line);
+       border-radius:10px;padding:10px 16px;margin-bottom:18px;display:flex;align-items:center;
+       gap:14px;flex-wrap:wrap;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+  .track{flex:1 1 180px;height:8px;background:#e6e9ee;border-radius:99px;overflow:hidden;min-width:140px}
+  .fill{height:100%;width:0;background:var(--navy);transition:width .3s}
+
+  .q{background:var(--card);border:1px solid var(--line);border-radius:10px;
+     padding:18px 20px;margin-bottom:16px}
+  .q > header{display:flex;align-items:baseline;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+  .qn{font-weight:700;color:var(--navy);font-size:1.02rem}
+  .tag{font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);
+       border:1px solid var(--line);border-radius:99px;padding:2px 9px}
+  .stem{margin:0 0 4px}
+  .req{font-weight:700;color:var(--navy-dk);margin:14px 0 2px}
+
+  table.data{border-collapse:collapse;margin:10px 0 6px;font-size:1rem}
+  table.data th,table.data td{border:1px solid var(--line);padding:5px 12px;text-align:right}
+  table.data th{background:#eef1f6;text-align:center}
+  table.data td:first-child,table.data th:first-child{text-align:left}
+
+  .part{margin:12px 0 0;padding-left:2px}
+  .part.concept{margin-top:16px;padding:12px 14px;background:#f2f6fb;
+       border:1px solid #cfdcec;border-left:4px solid var(--navy);border-radius:6px}
+  .concept-k{color:var(--navy);letter-spacing:.02em}
+  .part .ask{margin:0 0 6px}
+  .part .ask .k{font-weight:700}
+  .note{font-size:1rem;color:#a03;margin:.15rem 0 .4rem}
+  .row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:5px 0}
+  .row label.cap{font-size:1rem;color:var(--muted);min-width:250px}
+  .row input[type=text]{width:130px;padding:7px 9px;font-size:1rem;font-family:inherit;
+       border:1.5px solid var(--line);border-radius:6px;background:#fff;text-align:right}
+  .row input:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(30,64,124,.13)}
+  .row .unit{font-size:.92rem;color:var(--muted)}
+  .row.ok input{border-color:var(--ok);background:var(--ok-bg)}
+  .row.bad input{border-color:var(--bad);background:var(--bad-bg)}
+  .yn{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+  .yn label{font-size:1rem;display:flex;gap:5px;align-items:center;cursor:pointer}
+  .mc{display:flex;flex-direction:column;gap:5px;margin-top:4px}
+  .mc label{font-size:1rem;display:flex;gap:8px;align-items:flex-start;cursor:pointer;
+       padding:5px 8px;border-radius:5px}
+  .mc label:hover{background:#f2f6fb}
+  .mc.ok{outline:2px solid var(--ok);outline-offset:3px;border-radius:6px}
+  .mc.bad{outline:2px solid var(--bad);outline-offset:3px;border-radius:6px}
+
+  .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+  button{font:inherit;font-size:.92rem;padding:7px 14px;border-radius:6px;
+         border:1.5px solid var(--navy);background:var(--navy);color:#fff;cursor:pointer}
+  button.ghost{background:#fff;color:var(--navy)}
+  button:hover{filter:brightness(1.08)}
+  button:focus-visible{outline:3px solid rgba(30,64,124,.35);outline-offset:2px}
+
+  .fb{margin-top:12px;padding:11px 14px;border-radius:8px;font-size:1rem;display:none}
+  .fb.show{display:block}
+  .fb.ok{background:var(--ok-bg);border:1px solid #b9dfc7;color:var(--ok)}
+  .fb.bad{background:var(--bad-bg);border:1px solid #f0c2c2;color:var(--bad)}
+  .fb.warn{background:var(--warn-bg);border:1px solid #f0dcae;color:var(--warn)}
+  .fb.hint{background:#eef1f6;border:1px solid var(--line);color:var(--ink)}
+
+  .sol{display:none;margin-top:12px;padding:14px 16px;background:#fbfcfd;border:1px solid var(--line);
+       border-left:4px solid var(--navy);border-radius:6px;font-size:1rem}
+  .sol.show{display:block}
+  .sol h4{margin:0 0 8px;font-size:1rem;color:var(--navy-dk)}
+  .sol p{margin:.4rem 0}
+  .sol .ans{color:var(--navy-dk)}
+  .sol .lbl{font-weight:700}
+
+  footer.foot{color:var(--muted);font-size:.87rem;text-align:center;margin-top:26px}
+
+  @media (max-width:560px){
+    table.data th,table.data td{padding:4px 7px}
+    .row label.cap{min-width:0}
+  }
+
+  @media print{
+    body{background:#fff}
+    .btns,.scorebar{display:none}
+    .sol{display:block}
+    .q{break-inside:avoid;border-color:#999}
+    header.top{background:#fff;color:#000;border:1px solid #000}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>FIN 406 &middot; Quiz 5 Practice Set</h1>
+  <div class="sub">Dividend discount models &middot; Free cash flow valuation &middot; The cost of capital</div>
+  <div class="dates">Material cutoff: Tuesday 17 November &nbsp;|&nbsp; Quiz 5: Thursday 19 November</div>
+</header>
+
+<div class="panel">
+  <h2>How to use this set</h2>
+  <p>Work each problem on paper with your financial calculator, then type your answers and press
+     <b>Check</b>.</p>
+  <p><b>New numbers</b> regenerates a problem with different values. <b>Explanation</b> shows the
+     full working for the numbers currently on screen.</p>
+  <p>The shaded <b>Concept check</b> at the end of a problem is to help improve your conceptual understanding of the problem.</p>
+  <p>If you spot an error in any of the solutions, please email me (gxn13@psu.edu) as soon as possible and include a screenshot. The numbers change every time a problem is regenerated, so without one I cannot see the version you were looking at.</p>
+  <h2 style="margin-top:14px">Before you start</h2>
+  <ul class="tight">
+    <li>Percent boxes take percent: type <code class="u">11.50</code>, not <code class="u">0.1150</code>.</li>
+    <li>Betas are plain numbers, to 4 decimal places where asked.</li>
+    <li>Where a question is in millions, answer in millions: type <code class="u">1250.00</code>, not the full figure in dollars.</li>
+    <li>Negative answers may be typed either way: <code class="u">-3.50</code> or <code class="u">(3.50)</code>.</li>
+    <li>Do not round intermediate calculations. Round each final answer as the question asks.</li>
+  </ul>
+</div>
+
+<div class="scorebar">
+  Progress
+  <div class="track"><div class="fill" id="fill"></div></div>
+  <span id="scoretext"></span>
+  <button class="ghost" id="resetall" style="margin-left:auto">Reset all</button>
+</div>
+
+<div id="quiz"></div>
+
+<footer class="foot">
+  FIN 406: Security Analysis and Portfolio Management &middot; Prof. Nguyen &middot; Fall 2026
+</footer>
+</div>
+
+<script>
+/* =================== helpers =================== */
+const ri   = (a,b) => Math.floor(Math.random()*(b-a+1))+a;
+const pick = a => a[Math.floor(Math.random()*a.length)];
+const d1   = x => (Math.round(x*10)/10).toFixed(1);
+const d2   = x => (Math.round(x*100)/100).toFixed(2);
+const d4   = x => (Math.round(x*10000)/10000).toFixed(4);
+const pc   = x => d2(x)+'%';
+const shuffle = a => a.map(v=>[Math.random(),v]).sort((p,q)=>p[0]-q[0]).map(p=>p[1]);
+
+/* part = {key,label,unit,ans,tol}              numeric
+        | {key,type:'yesno',ansYes,...}         two-way choice
+        | {key,type:'mc',options:[],ansIdx}     multiple choice                     */
+const PROBLEMS = [
+/* 1 — the constant-dividend model (preferred stock) ------------------ */
+function constantDividend(){
+  const D = pick([4,5,6,7,8,9,10]);
+  const k = pick([6,6.5,7,7.5,8,9]);
+  const V = D/(k/100);
+  const P = V * pick([0.85,0.9,1.12,1.2]);            // market price, deliberately off V
+  const kImp = D/P*100;
+  return {
+    tag:'The constant dividend model',
+    stem:`A preferred share of Braemar Utilities will pay a dividend of $${money(D)} in the coming
+          year and the same amount every year thereafter; that is, the dividend is not expected to
+          grow. You require a return of ${pc(k)} on a holding of this risk. The shares currently
+          trade at $${money(P)}.`,
+    parts:[
+      {key:'a', ask:'Using the constant dividend model, what is a preferred share worth to you?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Intrinsic value', unit:'$', ans:V, tol:0.01},
+      {key:'b', ask:'What return does the market price imply that other investors require?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Implied required return', unit:'%', ans:kImp, tol:0.01},
+      {key:'c', ask:'Relative to your own valuation, the shares are:',
+       type:'mc', options:['Undervalued','Overvalued','Correctly valued'],
+       ansIdx: P < V ? 0 : 1}
+    ],
+    explain:[
+      `<span class="lbl">a.</span> A dividend that never changes and never ends is a perpetuity, so
+       the whole infinite sum collapses to a single division:`,
+      `V<sub>0</sub> = D &divide; k = $${money(D)} &divide; ${d4(k/100)} =
+       <span class="ans">$${money(V)}</span>`,
+      `<span class="lbl">b.</span> Run the same equation backwards. If the market is willing to pay
+       $${money(P)} for that dividend stream, the return it is content with is`,
+      `k = D &divide; P = $${money(D)} &divide; $${money(P)} = <span class="ans">${pc(kImp)}</span>`,
+      `<span class="lbl">c.</span> You would pay up to $${money(V)}; the market asks $${money(P)}.
+       The shares are therefore <span class="ans">${P<V?'undervalued':'overvalued'}</span> on your
+       own numbers.`,
+      `${P<V
+        ? `Equivalently, the market requires ${pc(kImp)} while you require only ${pc(k)}. Demanding
+           less compensation for the same dividend means being willing to pay more.`
+        : `Equivalently, the market is content with ${pc(kImp)} while you require ${pc(k)}. You want
+           more compensation than the current price offers, so you would not buy at this level.`}`,
+      `Notice that nothing here depends on a forecast of growth. That is what makes this model the
+       natural one for preferred shares, whose dividends are fixed by contract.`
+    ]
+  };
+},
+
+/* 2 — constant-growth DDM with a CAPM required return ---------------- */
+function gordonWithCapm(){
+  let rf,erM,beta,D1,g,k,V0;
+  do {
+    rf   = ri(2,5);
+    erM  = rf + pick([6,8,10,12]);
+    beta = pick([0.75,0.9,1.0,1.1,1.25,1.4]);
+    D1   = pick([1.5,2,2.5,3,3.5,4]);
+    g    = pick([2,3,4,5,6,7]);
+    k    = rf + beta*(erM-rf);
+    V0   = D1/((k-g)/100);
+  } while (!(k - g >= 3 && V0 < 400));            // keep k comfortably above g
+  const V1 = V0*(1+g/100);
+  return {
+    tag:'The constant-growth DDM',
+    stem:`Halloran Chemical is expected to pay a dividend of $${money(D1)} per share in the coming
+          year, and dividends are expected to grow at ${pc(g)} a year indefinitely. The risk-free
+          rate is ${rf}%, the expected return on the market portfolio is ${erM}%, and Halloran
+          Chemical&rsquo;s stock has a beta of ${beta.toFixed(2)}.`,
+    parts:[
+      {key:'a', ask:'What rate of return should you require on this stock?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Required return', unit:'%', ans:k, tol:0.01},
+      {key:'b', ask:'Using the constant-growth DDM, what is the intrinsic value of the stock today?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Intrinsic value', unit:'$', ans:V0, tol:0.01},
+      {key:'c', ask:'What should the stock be worth one year from now?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Value in one year', unit:'$', ans:V1, tol:0.02}
+    ],
+    explain:[
+      `<span class="lbl">a.</span> The required return is not given directly, so take it from the
+       CAPM. The market risk premium is ${erM}% &minus; ${rf}% = ${pc(erM-rf)}.`,
+      `k = ${rf}% + ${beta.toFixed(2)} &times; ${pc(erM-rf)} = <span class="ans">${pc(k)}</span>`,
+      `<span class="lbl">b.</span> Now apply the Gordon model. Note that the dividend in the
+       numerator is next year&rsquo;s, D<sub>1</sub>, which is what the question gives you:`,
+      `V<sub>0</sub> = D<sub>1</sub> &divide; (k &minus; g) = $${money(D1)} &divide;
+       (${d4(k/100)} &minus; ${d4(g/100)}) = <span class="ans">$${money(V0)}</span>`,
+      `<span class="lbl">c.</span> Under this model the whole dividend stream shifts up by ${pc(g)}
+       each year, so the value does too:`,
+      `V<sub>1</sub> = V<sub>0</sub> &times; (1 + g) = $${money(V0)} &times; ${d4(1+g/100)} =
+       <span class="ans">$${money(V1)}</span>`,
+      `You can check that against the model directly: V<sub>1</sub> = D<sub>2</sub> &divide;
+       (k &minus; g) = $${money(D1*(1+g/100))} &divide; ${d4((k-g)/100)} = $${money(V1)}. This is why
+       the model implies a capital gain of exactly ${pc(g)} a year, and why the total expected return
+       splits into a dividend yield of ${pc(D1/V0*100)} plus growth of ${pc(g)}, which add to
+       ${pc(k)}.`
+    ]
+  };
+},
+
+/* 3 — D0 versus D1, and the return the market is pricing in ---------- */
+function dividendYieldGrowth(){
+  let D0,g,k,D1,V0,P;
+  do {
+    D0 = pick([1.2,1.6,2,2.4,3,3.6]);
+    g  = pick([3,4,5,6]);
+    k  = pick([9,10,11,12,13]);
+    D1 = D0*(1+g/100);
+    V0 = D1/((k-g)/100);
+    P  = Math.round(V0*pick([0.8,0.85,1.15,1.25])*100)/100;
+  } while (!(k-g >= 4 && isCents(D1)));         // D1 is a whole number of cents, so rounding it changes nothing
+  const kImp = D1/P*100 + g;
+  return {
+    tag:'Dividend yield and growth',
+    stem:`Inglewood Foods has just paid an annual dividend of $${money(D0)} per share. Its dividends
+          are expected to grow at ${pc(g)} a year indefinitely. You require a return of ${pc(k)} on
+          a holding of this risk. The shares currently trade at $${money(P)}.`,
+    parts:[
+      {key:'a', ask:'What dividend do you expect the company to pay next year?',
+       note:'Round your answer to 2 decimal places.',
+       label:'Next dividend', unit:'$', ans:D1, tol:0.01},
+      {key:'b', ask:'What is the stock worth to you?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Intrinsic value', unit:'$', ans:V0, tol:0.01},
+      {key:'c', ask:'What total return is the market price pricing in, if the growth forecast is right?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Expected return at the market price', unit:'%', ans:kImp, tol:0.01}
+    ],
+    explain:[
+      `<span class="lbl">a.</span> The $${money(D0)} has already been paid, so it is D<sub>0</sub>,
+       not D<sub>1</sub>. The Gordon model needs next year&rsquo;s dividend:`,
+      `D<sub>1</sub> = D<sub>0</sub> &times; (1 + g) = $${money(D0)} &times; ${d4(1+g/100)} =
+       <span class="ans">$${money(D1)}</span>`,
+      `Using $${money(D0)} in the numerator by mistake would undervalue the stock by ${pc(g)}. This
+       is the single most common slip in DDM questions, and the wording &mdash; &ldquo;has just
+       paid&rdquo; against &ldquo;is expected to pay&rdquo; &mdash; is what tells you which you have.`,
+      `<span class="lbl">b.</span> V<sub>0</sub> = $${money(D1)} &divide; (${d4(k/100)} &minus;
+       ${d4(g/100)}) = <span class="ans">$${money(V0)}</span>`,
+      `<span class="lbl">c.</span> Rearranging the model gives the expected return as a dividend
+       yield plus a growth rate:`,
+      `k = D<sub>1</sub> &divide; P + g = $${money(D1)} &divide; $${money(P)} + ${pc(g)} =
+       ${pc(D1/P*100)} + ${pc(g)} = <span class="ans">${pc(kImp)}</span>`,
+      `${kImp>k
+        ? `That is above the ${pc(k)} you require, so at $${money(P)} the stock looks like a buy on
+           your own assumptions.`
+        : `That is below the ${pc(k)} you require, so at $${money(P)} the stock does not compensate
+           you for its risk.`}`
+    ]
+  };
+},
+
+/* 4 — the two-stage DDM ---------------------------------------------- */
+function twoStageDDM(){
+  let D1,D2,D3,g,k,TV,pv123,V0;
+  do {
+    D1 = pick([1,1.5,2,2.5]);
+    D2 = D1 + pick([0.5,1,1.5]);
+    D3 = D2 + pick([0.5,1,1.5]);
+    g  = pick([3,4,5,6,7]);
+    k  = pick([10,11,12,13,14]);
+    TV = D3*(1+g/100)/((k-g)/100);
+    pv123 = D1/(1+k/100) + D2/Math.pow(1+k/100,2) + D3/Math.pow(1+k/100,3);
+    V0 = pv123 + TV/Math.pow(1+k/100,3);
+  } while (!(k-g >= 5 && isCents(D3*(1+g/100)))); // D4 is a whole number of cents, so rounding it changes nothing
+  return {
+    tag:'The two-stage DDM',
+    stem:`Stanhope Technologies is expected to pay a dividend of $${money(D1)} in year 1,
+          $${money(D2)} in year 2 and $${money(D3)} in year 3. After year 3, dividends are expected
+          to grow at a steady ${pc(g)} a year forever. The required return on the stock is ${pc(k)}.`,
+    parts:[
+      {key:'a', ask:'What will the stock be worth at the end of year 3, once steady growth has set in?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Terminal value', unit:'$', ans:TV, tol:0.01},
+      {key:'b', ask:'What is the present value of the three dividends paid in years 1 to 3?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'PV of the first three dividends', unit:'$', ans:pv123, tol:0.02},
+      {key:'c', ask:'What is the stock worth today?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Intrinsic value', unit:'$', ans:V0, tol:0.02}
+    ],
+    explain:[
+      `The stock is worth the present value of everything it will ever pay. The first three years are
+       discounted one dividend at a time; from year 4 onward the growth is constant, so the Gordon
+       model handles the rest in one step.`,
+      `<span class="lbl">a.</span> Standing at the end of year 3, the next dividend is
+       D<sub>4</sub> = $${money(D3)} &times; ${d4(1+g/100)} = $${money(D3*(1+g/100))}, growing at
+       ${pc(g)} forever:`,
+      `TV<sub>3</sub> = D<sub>4</sub> &divide; (k &minus; g) = $${money(D3*(1+g/100))} &divide;
+       (${d4(k/100)} &minus; ${d4(g/100)}) = <span class="ans">$${money(TV)}</span>`,
+      `Note carefully what TV<sub>3</sub> is: a value as at the end of year 3, not today. It still
+       has to be brought back three years.`,
+      `<span class="lbl">b.</span> $${money(D1)} &divide; ${d4(1+k/100)} + $${money(D2)} &divide;
+       ${d4(1+k/100)}<sup>2</sup> + $${money(D3)} &divide; ${d4(1+k/100)}<sup>3</sup>`,
+      `= $${money(D1/(1+k/100))} + $${money(D2/Math.pow(1+k/100,2))} +
+       $${money(D3/Math.pow(1+k/100,3))} = <span class="ans">$${money(pv123)}</span>`,
+      `<span class="lbl">c.</span> Add the discounted terminal value:`,
+      `V<sub>0</sub> = $${money(pv123)} + $${money(TV)} &divide; ${d4(1+k/100)}<sup>3</sup> =
+       $${money(pv123)} + $${money(TV/Math.pow(1+k/100,3))} =
+       <span class="ans">$${money(V0)}</span>`,
+      `The terminal value accounts for ${pc(TV/Math.pow(1+k/100,3)/V0*100)} of the total. That is
+       typical, and it is worth remembering when you are tempted to agonise over the individual
+       near-term dividend forecasts: the long-run growth rate matters far more.`
+    ]
+  };
+},
+
+/* 5 — the weighted average cost of capital --------------------------- */
+function wacc(){
+  const wD = pick([0.2,0.25,0.3,0.35,0.4,0.45]);
+  const wE = Math.round((1-wD)*100)/100;
+  const kD = pick([5,5.5,6,6.5,7,7.5]);
+  const t  = pick([21,25]);
+  const rf = ri(2,5);
+  const mrp = pick([5,5.5,6,7]);
+  const beta = pick([0.85,1.0,1.15,1.23,1.35,1.5]);
+  const kE = rf + beta*mrp;
+  const atkD = kD*(1-t/100);
+  const w = wD*atkD + wE*kE;
+  return {
+    tag:'Cost of capital',
+    stem:`The capital structure of Merriweather Group is ${pc(wD*100)} debt and ${pc(wE*100)}
+          equity. Its cost of debt is ${pc(kD)} and the corporate tax rate is ${t}%. The
+          company&rsquo;s stock has a beta of ${beta.toFixed(2)}. The risk-free rate is ${rf}% and
+          the market risk premium is ${pc(mrp)}.`,
+    parts:[
+      {key:'a', ask:'What is the cost of equity?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Cost of equity', unit:'%', ans:kE, tol:0.01},
+      {key:'b', ask:'What is the after-tax cost of debt?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'After-tax cost of debt', unit:'%', ans:atkD, tol:0.01},
+      {key:'c', ask:'What is the appropriate rate at which to discount the free cash flows to the firm?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'WACC', unit:'%', ans:w, tol:0.02}
+    ],
+    explain:[
+      `<span class="lbl">a.</span> The cost of equity is what shareholders require, and the CAPM
+       supplies it:`,
+      `k<sub>E</sub> = ${rf}% + ${beta.toFixed(2)} &times; ${pc(mrp)} =
+       <span class="ans">${pc(kE)}</span>`,
+      `<span class="lbl">b.</span> Interest is deductible, so the company does not bear the whole
+       ${pc(kD)}. The government effectively pays ${t}% of it:`,
+      `k<sub>D</sub>(1 &minus; t) = ${pc(kD)} &times; (1 &minus; ${d2(t/100)}) =
+       <span class="ans">${pc(atkD)}</span>`,
+      `<span class="lbl">c.</span> Free cash flow to the firm is the cash available to every provider
+       of capital, so it is discounted at the blended rate they collectively require:`,
+      `WACC = ${d2(wD)} &times; ${pc(atkD)} + ${d2(wE)} &times; ${pc(kE)} =
+       ${pc(wD*atkD)} + ${pc(wE*kE)} = <span class="ans">${pc(w)}</span>`,
+      `Only the debt term is tax-adjusted. Dividends are not deductible, so there is no equivalent
+       shield on the equity side.`
+    ]
+  };
+},
+
+/* 6 — de-levering and re-levering a peer beta ------------------------ */
+function releverBeta(){
+  const bL = pick([1.05,1.15,1.2,1.35,1.45,1.6]);
+  const dP = pick([0.2,0.25,0.3,0.35,0.4]);
+  const eP = Math.round((1-dP)*100)/100;
+  const dT = pick([0.1,0.15,0.2,0.5,0.55]);
+  const eT = Math.round((1-dT)*100)/100;
+  const t  = pick([21,25]);
+  const bU = bL/(1 + (1-t/100)*(dP/eP));
+  const bR = bU*(1 + (1-t/100)*(dT/eT));
+  const rf = ri(2,5), mrp = pick([5,5.5,6,7]);
+  const kE = rf + bR*mrp;
+  return {
+    tag:'Unlevering and relevering beta',
+    stem:`Vandermere Holdings is privately held, so its beta cannot be estimated from market prices.
+          A comparable public company in the same industry has an equity beta of ${bL.toFixed(2)}.
+          That peer is financed ${pc(dP*100)} debt and ${pc(eP*100)} equity, whereas Vandermere is
+          ${pc(dT*100)} debt and ${pc(eT*100)} equity. The corporate tax rate is ${t}%, the
+          risk-free rate is ${rf}% and the market risk premium is ${pc(mrp)}.`,
+    parts:[
+      {key:'a', ask:'What is the peer&rsquo;s unlevered (asset) beta?',
+       note:'Do not round intermediate calculations. Round your answer to 4 decimal places.',
+       label:'Unlevered beta', unit:'', ans:bU, tol:0.0001},
+      {key:'b', ask:'What is the appropriate equity beta for Vandermere Holdings?',
+       note:'Do not round intermediate calculations. Round your answer to 4 decimal places.',
+       label:'Relevered beta', unit:'', ans:bR, tol:0.0003},
+      {key:'c', ask:'What cost of equity does that imply for Vandermere?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Cost of equity', unit:'%', ans:kE, tol:0.01}
+    ],
+    explain:[
+      `An equity beta reflects two quite different things: the riskiness of the underlying business,
+       and the amount of leverage bolted on top. Borrowing the peer&rsquo;s beta wholesale would
+       import the peer&rsquo;s leverage as well, which is not what you want.`,
+      `<span class="lbl">a.</span> Strip the peer&rsquo;s leverage out first. Its debt-to-equity
+       ratio is ${pc(dP*100)} &divide; ${pc(eP*100)} = ${d4(dP/eP)}.`,
+      `&beta;<sub>U</sub> = &beta;<sub>L</sub> &divide; [1 + (1 &minus; t) &times; D/E]
+       = ${bL.toFixed(2)} &divide; [1 + ${d2(1-t/100)} &times; ${d4(dP/eP)}] =
+       <span class="ans">${d4(bU)}</span>`,
+      `What is left is the beta of the business itself, with no financing in it.`,
+      `<span class="lbl">b.</span> Now add Vandermere&rsquo;s own leverage. Its debt-to-equity ratio
+       is ${pc(dT*100)} &divide; ${pc(eT*100)} = ${d4(dT/eT)}.`,
+      `&beta;<sub>L</sub> = &beta;<sub>U</sub> &times; [1 + (1 &minus; t) &times; D/E]
+       = ${d4(bU)} &times; [1 + ${d2(1-t/100)} &times; ${d4(dT/eT)}] =
+       <span class="ans">${d4(bR)}</span>`,
+      `${dT>dP
+        ? `Vandermere carries more debt than the peer, so its equity beta comes out above the
+           peer&rsquo;s ${bL.toFixed(2)}. Leverage magnifies whatever risk the business already has.`
+        : `Vandermere carries less debt than the peer, so its equity beta comes out below the
+           peer&rsquo;s ${bL.toFixed(2)}. With less leverage the shareholders absorb less magnified
+           risk.`}`,
+      `<span class="lbl">c.</span> k<sub>E</sub> = ${rf}% + ${d4(bR)} &times; ${pc(mrp)} =
+       <span class="ans">${pc(kE)}</span>`
+    ]
+  };
+},
+
+/* 7 — free cash flow to the firm, and the value of the firm ---------- */
+function fcffValuation(){
+  let ebit,dep,capex,dnwc,t,wacc0,g,debt,shares,fcff,vFirm,vEq;
+  do {
+    ebit  = pick([120,150,180,200,240,300]);
+    dep   = pick([20,25,30,40]);
+    capex = pick([30,40,50,60,70]);
+    dnwc  = pick([0,5,10,15,20]);
+    t     = pick([21,25]);
+    wacc0 = pick([9,10,11,12]);
+    g     = pick([2,3,4,5]);
+    debt  = pick([200,300,400,500]);
+    shares= pick([40,50,60,80,100]);
+    fcff  = ebit*(1-t/100) + dep - capex - dnwc;
+    vFirm = fcff/((wacc0-g)/100);
+    vEq   = vFirm - debt;
+  } while (!(wacc0-g >= 5 && fcff > 40 && vEq > 300));
+  return {
+    tag:'Free cash flow to the firm',
+    stem:`Oakhurst Energy expects EBIT of $${money(ebit)} million next year. Depreciation will be
+          $${money(dep)} million, capital expenditure $${money(capex)} million, and net working
+          capital will ${dnwc===0?'be unchanged':`increase by $${money(dnwc)} million`}. The tax rate
+          is ${t}%, the weighted average cost of capital is ${pc(wacc0)}, and free cash flow is
+          expected to grow at ${pc(g)} a year forever. The company has $${money(debt)} million of
+          debt outstanding and ${money(shares)} million shares.`,
+    parts:[
+      {key:'a', ask:'What is next year&rsquo;s free cash flow to the firm?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'FCFF', unit:'$ million', ans:fcff, tol:0.01},
+      {key:'b', ask:'What is the value of the firm?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Value of the firm', unit:'$ million', ans:vFirm, tol:0.01},
+      {key:'c', ask:'What is the value of the equity?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Value of the equity', unit:'$ million', ans:vEq, tol:0.01},
+      {key:'d', ask:'What is the value per share?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Value per share', unit:'$', ans:vEq/shares, tol:0.01}
+    ],
+    explain:[
+      `<span class="lbl">a.</span> Free cash flow to the firm is the cash the business throws off
+       before any payment to lenders or shareholders. Start from after-tax operating profit, add back
+       the non-cash charge, and subtract the cash actually reinvested:`,
+      `<table class="data">
+         <tr><td>EBIT</td><td>$${money(ebit)}</td></tr>
+         <tr><td>EBIT &times; (1 &minus; t)</td><td>$${money(ebit*(1-t/100))}</td></tr>
+         <tr><td>+ Depreciation</td><td>$${money(dep)}</td></tr>
+         <tr><td>&minus; Capital expenditure</td><td>&minus;$${money(capex)}</td></tr>
+         <tr><td>&minus; Increase in net working capital</td><td>&minus;$${money(dnwc)}</td></tr>
+         <tr><td><b>FCFF</b></td><td><b>$${money(fcff)}</b></td></tr>
+       </table>
+       FCFF<sub>1</sub> = <span class="ans">$${money(fcff)} million</span>`,
+      `Depreciation is added back because it reduced EBIT without any cash leaving the business.
+       Capital expenditure is subtracted because it is cash that left without ever appearing in EBIT.`,
+      `<span class="lbl">b.</span> Discount that growing stream at the WACC, since FCFF belongs to
+       lenders and shareholders together:`,
+      `V<sub>firm</sub> = FCFF<sub>1</sub> &divide; (WACC &minus; g) = $${money(fcff)} &divide;
+       (${d4(wacc0/100)} &minus; ${d4(g/100)}) = <span class="ans">$${money(vFirm)} million</span>`,
+      `<span class="lbl">c.</span> That figure is the whole enterprise. The lenders have first claim
+       on $${money(debt)} million of it, so what is left for shareholders is`,
+      `$${money(vFirm)} &minus; $${money(debt)} = <span class="ans">$${money(vEq)} million</span>`,
+      `<span class="lbl">d.</span> $${money(vEq)} million &divide; ${money(shares)} million shares =
+       <span class="ans">$${money(vEq/shares)}</span> per share`,
+      `A common error is to discount FCFF at the cost of equity and call the answer the value of the
+       equity. It is not: FCFF is a pre-financing cash flow, so it belongs with the WACC, and the
+       debt has to be subtracted afterwards.`
+    ]
+  };
+},
+
+/* 8 — free cash flow to equity --------------------------------------- */
+function fcfeValuation(){
+  let fcff,interest,t,netDebt,kE,g,fcfe,vEq;
+  do {
+    fcff     = pick([180,205,240,300,360,405]);
+    interest = pick([15,22,30,40,55,76]);
+    t        = pick([21,25,35]);
+    netDebt  = pick([10,25,30,50,60]);
+    kE       = pick([10,11,12,13,14]);
+    g        = pick([2,3,4]);
+    fcfe     = fcff - interest*(1-t/100) + netDebt;
+    vEq      = fcfe*(1+g/100)/((kE-g)/100);
+  } while (!(kE-g >= 7 && fcfe > 100 && isCents(fcfe*(1+g/100)))); // next year's FCFE is whole cents
+  return {
+    tag:'Free cash flow to equity',
+    stem:`Pinecrest Media reports free cash flow to the firm of $${money(fcff)} million. Its interest
+          expense is $${money(interest)} million and the tax rate is ${t}%. Over the year its net
+          debt increased by $${money(netDebt)} million. Free cash flow to equity is expected to grow
+          at ${pc(g)} a year and the cost of equity is ${pc(kE)}.`,
+    parts:[
+      {key:'a', ask:'What is the free cash flow to equity?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'FCFE', unit:'$ million', ans:fcfe, tol:0.01},
+      {key:'b', ask:'What is the market value of the equity?',
+       note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
+       label:'Value of the equity', unit:'$ million', ans:vEq, tol:0.01},
+      {key:'c', ask:'Which discount rate belongs with free cash flow to equity?',
+       type:'mc',
+       options:['The cost of equity, because the cash flow is what is left for shareholders',
+                'The WACC, because the firm is financed by both debt and equity',
+                'The after-tax cost of debt'],
+       ansIdx:0}
+    ],
+    explain:[
+      `<span class="lbl">a.</span> Free cash flow to equity is what remains after the lenders have
+       been dealt with. Take out the after-tax interest actually paid, and add back any new borrowing,
+       which is cash the shareholders received without earning it:`,
+      `FCFE = FCFF &minus; interest &times; (1 &minus; t) + net increase in debt`,
+      `= $${money(fcff)} &minus; $${money(interest)} &times; (1 &minus; ${d2(t/100)}) +
+       $${money(netDebt)} = $${money(fcff)} &minus; $${money(interest*(1-t/100))} +
+       $${money(netDebt)} = <span class="ans">$${money(fcfe)} million</span>`,
+      `Interest is taken out after tax because it was deductible, so its true cost to the firm was
+       only ${pc(100-t)} of the amount paid.`,
+      `<span class="lbl">b.</span> This year&rsquo;s FCFE is $${money(fcfe)} million, so next
+       year&rsquo;s is $${money(fcfe)} &times; ${d4(1+g/100)} = $${money(fcfe*(1+g/100))} million.
+       Discount the growing stream at the cost of equity:`,
+      `V<sub>E</sub> = $${money(fcfe*(1+g/100))} &divide; (${d4(kE/100)} &minus; ${d4(g/100)}) =
+       <span class="ans">$${money(vEq)} million</span>`,
+      `<span class="lbl">c.</span> <span class="ans">The cost of equity.</span> The rule is to match
+       the cash flow to the claimants. FCFE is what shareholders can take out once the lenders are
+       satisfied, so it is discounted at what shareholders require, and the answer is the value of
+       the equity directly &mdash; no subtraction of debt at the end.`,
+      `FCFF is the mirror image: it is available to everyone, it goes with the WACC, and the result
+       is the value of the whole firm, from which debt must then be subtracted.`
+    ]
+  };
+},
+
+/* 9 — valuation concepts, multiple choice ---------------------------- */
+function valuationConcepts(){
+  const a = shuffle([
+    ['k, the required rate of return', true],
+    ['D<sub>1</sub>, next year&rsquo;s dividend', false],
+    ['D<sub>0</sub>, the dividend just paid', false],
+    ['g, the dividend growth rate', false]
+  ]);
+  const b = shuffle([
+    ['the weighted average cost of capital', true],
+    ['the cost of equity', false],
+    ['the after-tax cost of debt', false],
+    ['the risk-free rate', false]
+  ]);
+  const c = shuffle([
+    ['will be higher than the intrinsic value of stock B', true],
+    ['will be lower than the intrinsic value of stock B', false],
+    ['will be the same as the intrinsic value of stock B', false],
+    ['cannot be determined from the information given', false]
+  ]);
+  const d = shuffle([
+    ['the required return must exceed the growth rate', true],
+    ['the growth rate must exceed the required return', false],
+    ['the growth rate must be positive', false],
+    ['the dividend must be constant', false]
+  ]);
+  return {
+    tag:'Valuation concepts',
+    stem:`Four short questions on valuing equity. There is nothing to calculate here &mdash; reason
+          each one through.`,
+    parts:[
+      {key:'a', ask:'Everything else equal, which variable is negatively related to the intrinsic value of a company?',
+       type:'mc', options:a.map(o=>o[0]), ansIdx:a.findIndex(o=>o[1])},
+      {key:'b', ask:'Free cash flow to the firm should be discounted at ______.',
+       type:'mc', options:b.map(o=>o[0]), ansIdx:b.findIndex(o=>o[1])},
+      {key:'c', ask:'You require 10% on each of two stocks. Both are expected to pay a $4 dividend next year. Dividends are expected to grow at 6% for stock A and 5% for stock B. Under the constant-growth DDM, the intrinsic value of stock A ______.',
+       type:'mc', options:c.map(o=>o[0]), ansIdx:c.findIndex(o=>o[1])},
+      {key:'d', ask:'For the constant-growth DDM to give a sensible answer, ______.',
+       type:'mc', options:d.map(o=>o[0]), ansIdx:d.findIndex(o=>o[1])}
+    ],
+    explain:[
+      `<span class="lbl">a.</span> <span class="ans">k, the required rate of return.</span> In
+       V<sub>0</sub> = D<sub>1</sub> &divide; (k &minus; g), raising k enlarges the denominator and
+       shrinks the value. Value rises with D<sub>0</sub>, D<sub>1</sub> and g, and falls with k
+       alone. Economically: a riskier stock is discounted harder and is therefore worth less.`,
+      `<span class="lbl">b.</span> <span class="ans">The weighted average cost of capital.</span>
+       FCFF is the cash available to lenders and shareholders together, so it must be discounted at
+       the blended rate they jointly require. Discounting it at the cost of equity would overstate
+       the value of the equity, sometimes badly.`,
+      `<span class="lbl">c.</span> <span class="ans">Will be higher.</span> Same dividend, same
+       required return, higher growth: the denominator (k &minus; g) is 4% for A against 5% for B, so
+       A is worth $100 and B $80. Growth and intrinsic value move together, and the effect is
+       strongest when k and g are close.`,
+      `<span class="lbl">d.</span> <span class="ans">The required return must exceed the growth
+       rate.</span> If g were equal to or above k, the denominator would be zero or negative and the
+       formula would return an infinite or negative value. Economically, no company can grow faster
+       than its discount rate forever &mdash; it would eventually exceed the whole economy.`
+    ]
+  };
+},
+
+/* 10 — valuation, true or false -------------------------------------- */
+function valuationTrueFalse(){
+  const POOL = [
+    ['In the constant-growth DDM the numerator is next year’s dividend, not the one just paid.', true,
+     'True. The model discounts future dividends, and the dividend already paid is not one of them. If a question gives you D₀, multiply by (1 + g) before using the formula.'],
+    ['Under the constant-growth DDM a stock’s price is expected to grow at the same rate as its dividends.', true,
+     'True. Every future dividend shifts up by g each year, so the present value of the whole stream does too. This is why the model implies a capital gains yield of exactly g.'],
+    ['Free cash flow to the firm is calculated after deducting interest payments.', false,
+     'False. FCFF is deliberately measured before any payment to providers of capital, which is precisely what makes it discountable at the WACC. Deducting interest gives you a cash flow on the way to FCFE instead.'],
+    ['The value obtained by discounting FCFF at the WACC is the value of the equity.', false,
+     'False. It is the value of the whole firm, debt and equity together. Subtract the market value of debt to reach the equity value.'],
+    ['Depreciation is added back when computing free cash flow because it is not a cash expense.', true,
+     'True. It reduced EBIT without any cash leaving the business, so it has to be restored to get back to cash. The actual cash spent on assets enters separately as capital expenditure.'],
+    ['A company with no growth prospects should be valued with the constant dividend model rather than the Gordon model.', true,
+     'True, though the two are really the same formula. Setting g to zero in the Gordon model gives V = D / k exactly, which is the constant dividend model — the natural choice for preferred stock.'],
+    ['An increase in the risk-free rate, with everything else held constant, raises the intrinsic value of a stock.', false,
+     'False. A higher risk-free rate raises the CAPM required return, which enlarges (k − g) and lowers the value. This is the channel through which interest rates affect equity prices as well as bond prices.'],
+    ['The after-tax cost of debt is below the stated cost of debt because interest is tax deductible.', true,
+     'True. The deduction reduces the tax bill, so the company bears only (1 − t) of the interest. There is no equivalent shield on dividends, which is why only the debt term is adjusted in the WACC.'],
+    ['An equity beta borrowed from a comparable public company can be used directly, whatever the two firms’ capital structures.', false,
+     'False. An equity beta contains the peer’s leverage as well as its business risk. It must be unlevered at the peer’s capital structure and relevered at the target’s before use.'],
+    ['In a two-stage DDM the terminal value computed at the end of the fast-growth phase must still be discounted back to today.', true,
+     'True, and forgetting to do so is a common and large error. The terminal value is a value as at that future date; leaving it undiscounted overstates the stock substantially.']
+  ];
+  let sel;
+  do {
+    sel = [...POOL].sort(()=>Math.random()-0.5).slice(0,4);
+  } while (!(sel.some(s=>s[1]) && sel.some(s=>!s[1])));
+  const roman = ['I','II','III','IV'];
+  return {
+    tag:'Valuation, true or false',
+    stem:`Consider the following statements about valuing equity. Decide whether each is true or
+          false. There is nothing to calculate here &mdash; reason it through.`,
+    parts: sel.map((s,k)=>({
+      key: roman[k], ask: s[0], type:'yesno', yesLabel:'True', noLabel:'False', ansYes: s[1]
+    })),
+    explain: sel.map((s,k)=>
+      `<span class="lbl">${roman[k]}.</span> ${s[0]} &nbsp;&mdash;&nbsp; ${s[2]}`)
+  };
+}
+];
+
+/* ---- shared formatting -------------------------------------------- */
+function isCents(x){ return Math.abs(x*100 - Math.round(x*100)) < 1e-6; }
+function money(x){
+  return x.toLocaleString('en-US',{minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+/* Concept checks: one per numeric problem, indexed to match PROBLEMS. */
+const CONCEPTS = [
+  { ask:'If your required return were higher, would the preferred share be worth less to you?',
+    yesLabel:'Yes', noLabel:'No', ansYes:true,
+    why:'Yes. The dividend is fixed, so the only way to earn a higher return is to pay a lower price. Value and required return always move in opposite directions — this is the same relationship that makes bond prices fall when yields rise.' },
+  { ask:'Under the constant-growth model, does the expected total return split into a dividend yield plus the growth rate?',
+    yesLabel:'Yes', noLabel:'No', ansYes:true,
+    why:'Yes. Rearranging V₀ = D₁/(k − g) gives k = D₁/V₀ + g. The first term is the dividend yield and the second is the capital gains yield, because the price grows at g. It is worth knowing this rearrangement in both directions.' },
+  { ask:'A question says a company “has just paid” a dividend. Is that D&#8321;?',
+    yesLabel:'Yes, it is D&#8321;', noLabel:'No, it is D&#8320;', ansYes:false,
+    why:'No, it is D₀. A dividend already paid is not part of what you are buying. Multiply it by (1 + g) to get the D₁ the Gordon model needs. Reading this wrongly understates the value by exactly the growth rate.' },
+  { ask:'Does the terminal value in a two-stage model need to be discounted back to today?',
+    yesLabel:'Yes', noLabel:'No, it is already a present value', ansYes:true,
+    why:'Yes. The terminal value is the stock’s worth as at the end of the fast-growth phase, not today. It has to be brought back the same number of years. Leaving it undiscounted is one of the largest single errors you can make in a valuation.' },
+  { ask:'If the company issued more debt and less equity, would the WACC necessarily fall because debt is cheaper?',
+    yesLabel:'Yes', noLabel:'No', ansYes:false,
+    why:'No. More leverage makes the equity riskier, so its beta and its required return rise. The weights shift toward the cheaper source, but the cost of that source rises at the same time. That offsetting effect is exactly what the relevering formula in the next problem captures.' },
+  { ask:'Two firms run identical businesses but one borrows more. Do they have the same unlevered beta?',
+    yesLabel:'Yes', noLabel:'No', ansYes:true,
+    why:'Yes. The unlevered, or asset, beta measures the risk of the business itself with the financing stripped out. Identical businesses have identical asset betas; it is only their equity betas that differ, and only because of leverage.' },
+  { ask:'Should free cash flow to the firm be discounted at the cost of equity?',
+    yesLabel:'Yes', noLabel:'No', ansYes:false,
+    why:'No. FCFF is the cash available to lenders and shareholders together, so it belongs with the WACC, and the result is the value of the whole firm. Match the cash flow to the claimants: FCFE goes with the cost of equity, FCFF with the WACC.' },
+  { ask:'If the company had borrowed nothing new during the year, would FCFE be lower?',
+    yesLabel:'Yes', noLabel:'No', ansYes:true,
+    why:'Yes. New borrowing is cash that reaches the shareholders without the business having earned it, so removing it lowers FCFE by exactly that amount. It is a real cash flow to equity, but it is worth noticing that a firm can flatter its FCFE simply by borrowing more.' },
+  null,   // problem 9 is entirely conceptual
+  null    // problem 10 is entirely conceptual
+];
+
+/* =================== rendering =================== */
+const state = PROBLEMS.map(()=>({solved:false}));
+
+function parseNum(s){
+  s = String(s).trim().replace(/[$,%\s]/g,'');
+  if(/^\(.*\)$/.test(s)) s = '-' + s.slice(1,-1);      // (85.60) => -85.60
+  return s === '' ? NaN : parseFloat(s);
+}
+
+function build(i){
+  const p = PROBLEMS[i]();
+  if(CONCEPTS[i]){
+    const c = CONCEPTS[i];
+    p.parts = p.parts.concat([{ key:'concept', concept:true, type:'yesno',
+                                ask:c.ask, yesLabel:c.yesLabel, noLabel:c.noLabel,
+                                ansYes:c.ansYes }]);
+    p.explain = p.explain.concat([`<span class="lbl">Concept check.</span> ${c.why}`]);
+  }
+  const el = document.createElement('section');
+  el.className = 'q';
+
+  const partsHTML = p.parts.map((pt,j)=>{
+    let inner;
+    if(pt.type === 'yesno'){
+      inner = `<div class="yn" id="f${i}_${j}">
+                 <label><input type="radio" name="g${i}_${j}" value="y"> ${pt.yesLabel||'Yes'}</label>
+                 <label><input type="radio" name="g${i}_${j}" value="n"> ${pt.noLabel||'No'}</label>
+               </div>`;
+    } else if(pt.type === 'mc'){
+      inner = `<div class="mc" id="f${i}_${j}">` + pt.options.map((o,k)=>
+                 `<label><input type="radio" name="g${i}_${j}" value="${k}"> <span>${o}</span></label>`
+               ).join('') + `</div>`;
+    } else {
+      inner = `<div class="row" id="f${i}_${j}">
+                 <label class="cap" for="in${i}_${j}">${pt.label}</label>
+                 ${pt.unit==='$' ? '<span class="unit">$</span>' : ''}
+                 <input id="in${i}_${j}" type="text" inputmode="decimal" autocomplete="off"
+                        aria-label="${pt.label}">
+                 ${pt.unit==='%' ? '<span class="unit">%</span>' : ''}
+               </div>`;
+    }
+    if(pt.cont) return inner;                       // extra answer row under the same question
+    const head = pt.concept
+      ? '<span class="k concept-k">Concept check.</span>'
+      : `<span class="k">${pt.key}.</span>`;
+    return `<div class="part${pt.concept?' concept':''}">
+              <p class="ask">${head} ${pt.ask}</p>
+              ${pt.note ? `<p class="note">Note: ${pt.note}</p>` : ''}
+              ${inner}
+            </div>`;
+  }).join('');
+
+  el.innerHTML = `
+    <header><span class="qn">Problem ${i+1}</span><span class="tag">${p.tag}</span></header>
+    <div class="stem">${p.stem}</div>
+    <p class="req">Required:</p>
+    ${partsHTML}
+    <div class="btns">
+      <button data-act="check">Check</button>
+      <button class="ghost" data-act="sol">Explanation</button>
+      <button class="ghost" data-act="new">New numbers</button>
+    </div>
+    <div class="fb" id="fb${i}"></div>
+    <div class="sol" id="sol${i}">
+      <h4>Explanation</h4>
+      ${p.explain.map(s=>`<p>${s}</p>`).join('')}
+    </div>`;
+
+  const fb  = el.querySelector('#fb'+i);
+  const sol = el.querySelector('#sol'+i);
+
+  el.querySelector('[data-act="check"]').onclick = () => {
+    let blank = 0, wrong = 0, unitsNote = '';
+    p.parts.forEach((pt,j)=>{
+      const box = el.querySelector('#f'+i+'_'+j);
+      box.classList.remove('ok','bad');
+      if(pt.type === 'yesno' || pt.type === 'mc'){
+        const sel = el.querySelector(`input[name="g${i}_${j}"]:checked`);
+        if(!sel){ blank++; return; }
+        const right = pt.type === 'mc' ? (+sel.value === pt.ansIdx)
+                                       : ((sel.value === 'y') === pt.ansYes);
+        if(right) box.classList.add('ok'); else { box.classList.add('bad'); wrong++; }
+        return;
+      }
+      const v = parseNum(el.querySelector('#in'+i+'_'+j).value);
+      if(isNaN(v)){ blank++; return; }
+      if(Math.abs(v-pt.ans) <= pt.tol + 1e-9){ box.classList.add('ok'); return; }
+      if(pt.varianceUnits && Math.abs(v*10000-pt.ans) <= Math.max(pt.tol,0.5)){
+        unitsNote = `Your ${pt.label.toLowerCase()} is right, but in decimal units. Multiply by
+                     10,000 for percent squared: ${d2(pt.ans)}.`;
+      } else if(pt.unit==='%' && Math.abs(v*100-pt.ans) <= Math.max(pt.tol,0.02)){
+        unitsNote = `That is the right number in decimal form. This box expects percent &mdash;
+                     enter ${d2(pt.ans)}, not ${v}.`;
+      }
+      box.classList.add('bad'); wrong++;
+    });
+
+    fb.className = 'fb show';
+    if(blank === p.parts.length){
+      fb.classList.add('hint');
+      fb.innerHTML = 'Work the problem first, then enter your answers and press Check.';
+    } else if(!wrong && !blank){
+      fb.classList.add('ok');
+      fb.innerHTML = 'All correct. Press <b>New numbers</b> to work this problem type again.';
+      if(!state[i].solved){ state[i].solved = true; updateScore(); }
+    } else if(unitsNote){
+      fb.classList.add('warn');
+      fb.innerHTML = 'Check your units. ' + unitsNote;
+    } else if(wrong){
+      fb.classList.add('bad');
+      fb.innerHTML = `Not right yet &mdash; ${wrong} answer${wrong>1?'s are':' is'} wrong.
+                      Rework it on paper before checking again; open <b>Explanation</b> if you are stuck.`;
+    } else {
+      fb.classList.add('hint');
+      fb.innerHTML = 'Some answers are still blank.';
+    }
+  };
+
+  el.querySelector('[data-act="sol"]').onclick = e => {
+    sol.classList.toggle('show');
+    e.target.textContent = sol.classList.contains('show') ? 'Hide explanation' : 'Explanation';
+  };
+  el.querySelector('[data-act="new"]').onclick = () => el.replaceWith(build(i));
+  return el;
+}
+
+function updateScore(){
+  const n = state.filter(s=>s.solved).length;
+  document.getElementById('scoretext').textContent = `${n} of ${PROBLEMS.length} complete`;
+  document.getElementById('fill').style.width = (100*n/PROBLEMS.length)+'%';
+}
+
+const quiz = document.getElementById('quiz');
+PROBLEMS.forEach((_,i)=> quiz.appendChild(build(i)));
+updateScore();
+
+document.getElementById('resetall').onclick = () => {
+  quiz.innerHTML = '';
+  state.forEach(s=> s.solved = false);
+  PROBLEMS.forEach((_,i)=> quiz.appendChild(build(i)));
+  updateScore();
+  window.scrollTo({top:0,behavior:'smooth'});
+};
+</script>
+</body>
+</html>

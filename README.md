@@ -24,7 +24,7 @@ this repository and pushes. Editing a file here directly will be overwritten on 
 | `/set2/` | `practice_sets\Set2\Unit2_Practice_Set.html` | Yes — published 17 Sep 2026 |
 | `/set3/` | `practice_sets\Set3\Unit3_Practice_Set.html` | Yes — published 8 Oct 2026 |
 | `/set4/` | `practice_sets\Set4\Unit4_Practice_Set.html` | Yes — published 29 Oct 2026 |
-| `/set5/` | `practice_sets\Set5\Unit5_Practice_Set.html` | No — draft |
+| `/set5/` | `practice_sets\Set5\Unit5_Practice_Set.html` | Yes — published 11 Nov 2026 |
 | `/set6/` | `practice_sets\Set6\Unit6_Practice_Set.html` | No — draft |
 
 All six sets exist in Dropbox, but only the ones marked published are on the web. The rest show as

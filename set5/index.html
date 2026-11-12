@@ -186,8 +186,8 @@ function constantDividend(){
        note:'Do not round intermediate calculations. Round your answer to 2 decimal places.',
        label:'Implied required return', unit:'%', ans:kImp, tol:0.01},
       {key:'c', ask:'Relative to your own valuation, the shares are:',
-       type:'mc', options:['Undervalued','Overvalued','Correctly valued'],
-       ansIdx: P < V ? 0 : 1}
+       type:'mc', options:['Overpriced','Underpriced','Correctly priced'],
+       ansIdx: P < V ? 1 : 0}
     ],
     explain:[
       `<span class="lbl">a.</span> A dividend that never changes and never ends is a perpetuity, so
@@ -197,9 +197,9 @@ function constantDividend(){
       `<span class="lbl">b.</span> Run the same equation backwards. If the market is willing to pay
        $${money(P)} for that dividend stream, the return it is content with is`,
       `k = D &divide; P = $${money(D)} &divide; $${money(P)} = <span class="ans">${pc(kImp)}</span>`,
-      `<span class="lbl">c.</span> You would pay up to $${money(V)}; the market asks $${money(P)}.
-       The shares are therefore <span class="ans">${P<V?'undervalued':'overvalued'}</span> on your
-       own numbers.`,
+      `<span class="lbl">c.</span> You would pay up to $${money(V)}; the market price is
+       $${money(P)}. The price is ${P<V?'below':'above'} your intrinsic value, so the shares are
+       <span class="ans">${P<V?'underpriced':'overpriced'}</span> on your own numbers.`,
       `${P<V
         ? `Equivalently, the market requires ${pc(kImp)} while you require only ${pc(k)}. Demanding
            less compensation for the same dividend means being willing to pay more.`

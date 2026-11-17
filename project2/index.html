@@ -38,9 +38,8 @@
   .card dd{margin:0;font-weight:600}
   .err{border:1px solid var(--line);border-left:5px solid var(--bad);border-radius:8px;
        background:#fdf4f3;padding:14px 18px}
-  table{border-collapse:collapse;width:100%;margin-top:6px}
-  th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;font-size:.95rem}
-  th{background:#eef1f5;color:var(--navy-dk)}
+  ol{margin:6px 0 0;padding-left:24px}
+  ol li{margin-bottom:5px}
   code{background:#eef1f5;padding:1px 5px;border-radius:4px}
   footer{color:var(--muted);font-size:.88rem;margin-top:8px}
 </style>
@@ -69,30 +68,13 @@
   <h2>What to do next</h2>
   <p><b>Valuing the wrong company earns a zero</b>, so check this page before you start and
      keep the ticker in front of you.</p>
-  <p>From the Project 2 page on Canvas, download four things: the project instructions, the
-     Value Line sheet for your company, <code>companies_financial_statements.xlsx</code> (use the
-     tab with your ticker) and <code>financial_markets_data.xlsx</code>.</p>
-  <p>Assignments were made at random and are fixed. If you believe there is an error, or you
-     joined the course recently and your Access ID is not found, e-mail Professor Nguyen.</p>
-</div>
-
-<div class="panel">
-  <h2>The ten companies</h2>
-  <table>
-    <tr><th>Ticker</th><th>Company</th><th>Value this company as of</th></tr>
-    <tr><td><b>NKE</b></td><td>Nike, Inc.</td><td>May 31, 2026</td></tr>
-    <tr><td><b>HD</b></td><td>The Home Depot, Inc.</td><td>January 31, 2026</td></tr>
-    <tr><td><b>CAT</b></td><td>Caterpillar Inc.</td><td>December 31, 2025</td></tr>
-    <tr><td><b>KO</b></td><td>The Coca-Cola Company</td><td>December 31, 2025</td></tr>
-    <tr><td><b>DUK</b></td><td>Duke Energy Corporation</td><td>December 31, 2025</td></tr>
-    <tr><td><b>JNJ</b></td><td>Johnson & Johnson</td><td>December 31, 2025</td></tr>
-    <tr><td><b>MSFT</b></td><td>Microsoft Corporation</td><td>June 30, 2026</td></tr>
-    <tr><td><b>WMT</b></td><td>Walmart Inc.</td><td>January 31, 2026</td></tr>
-    <tr><td><b>MRK</b></td><td>Merck & Co., Inc.</td><td>December 31, 2025</td></tr>
-    <tr><td><b>IBM</b></td><td>International Business Machines Corporation</td><td>December 31, 2025</td></tr>
-  </table>
-  <p style="margin-top:10px">A company&rsquo;s valuation date is the end of its most recent
-     fiscal year, which is why the dates differ.</p>
+  <p>From the Project 2 page on Canvas, download the following four items:</p>
+  <ol>
+    <li>The project instructions</li>
+    <li>The Value Line information sheet for your company</li>
+    <li><code>companies_financial_statements.xlsx</code> &mdash; work from the tab with your ticker</li>
+    <li><code>financial_markets_data.xlsx</code></li>
+  </ol>
 </div>
 
 <footer>
@@ -140,9 +122,7 @@ async function look(){
   const c = COMPANIES[idx];
   out.innerHTML = '<div class="card"><div class="tick">' + c[0] + '</div>'
     + '<div class="co">' + c[1] + '</div>'
-    + '<dl><dt>Value it as of</dt><dd>' + c[2] + '</dd>'
-    + '<dt>Statements tab</dt><dd>' + c[0] + '</dd>'
-    + '<dt>Value Line sheet</dt><dd>' + c[0] + '.pdf</dd></dl></div>';
+    + '<dl><dt>Value it as of</dt><dd>' + c[2] + '</dd></dl></div>';
 }
 document.getElementById('go').addEventListener('click', look);
 document.getElementById('sid').addEventListener('keydown', e => { if(e.key === 'Enter') look(); });
